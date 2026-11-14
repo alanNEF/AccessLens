@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { CircleAlert, CircleCheck, Copy, Info, RotateCcw, Sparkles } from 'lucide-react';
-import { isVerifiedFailure, type SimulationMode } from '../../shared/types';
+import { isVerifiedFailure, type ContrastIssue, type SimulationMode } from '../../shared/types';
 import type { SimulatorModeReader } from '../../shared/simulator-mode-reader';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
@@ -17,16 +17,22 @@ function statusText({ phase, view }: FixerState): string {
   if (phase === 'empty') return 'No issue selected';
   if (phase === 'unsupported') return 'No automatic fix for this issue';
   if (phase === 'ready') return 'Suggestion ready — not applied';
-  return view === 'fixed' ? 'Previewing the suggested color' : 'Showing the original color';
+  return view === 'fixed' ? 'Previewing the fix' : 'Showing the original';
 }
 
-function Swatch({ label, color, background, ratio }: { label: string; color: string; background: string; ratio: number }) {
+function requirementText(issue: ContrastIssue): string {
+  if (issue.kind === 'link-color-only') return `Links in text need an underline, or ${issue.requiredRatio}:1 against the surrounding text (WCAG 1.4.1)`;
+  const level = issue.wcagCriterion === '1.4.6' ? 'AAA, enhanced' : 'AA';
+  return `${issue.isLargeText ? 'Large' : 'Normal'} text needs ${issue.requiredRatio}:1 (WCAG ${issue.wcagCriterion} ${level})`;
+}
+
+function Swatch({ label, color, background, ratio, code = color }: { label: string; color: string; background: string; ratio: number; code?: string }) {
   return (
     <figure className="m-0 space-y-2 rounded-lg border border-border p-2.5">
       <div className="flex h-12 items-center justify-center rounded-md border border-border text-xl font-semibold" style={{ color, background }} aria-hidden="true">Aa</div>
       <figcaption className="space-y-0.5 text-xs">
         <span className="block font-medium text-foreground">{label}</span>
-        <code className="block font-mono text-muted-foreground">{color}</code>
+        <code className="block font-mono text-muted-foreground">{code}</code>
         <span className="block tabular-nums text-muted-foreground">{ratio.toFixed(2)}:1</span>
       </figcaption>
     </figure>
@@ -59,7 +65,7 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
     <div className="space-y-5">
       <div>
         <h2 className="mb-1 text-lg font-semibold tracking-tight">Preview a fix</h2>
-        <p className="text-sm text-muted-foreground">Try a clearer text color on the page, then copy the CSS.</p>
+        <p className="text-sm text-muted-foreground">Try a fix on the page, then copy the CSS.</p>
       </div>
 
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
@@ -70,7 +76,7 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
         <Card className="rounded-lg border-dashed bg-secondary/30 py-0 shadow-none"><CardContent className="flex flex-col items-center px-5 py-8 text-center">
           <span className="mb-4 flex size-11 items-center justify-center rounded-xl border border-border bg-background"><Sparkles className="size-5 text-muted-foreground" aria-hidden="true" /></span>
           <h3 className="mb-2 text-sm font-medium">No issue selected</h3>
-          <p className="text-sm text-muted-foreground">Select a contrast failure in Inspector to see a suggested fix.</p>
+          <p className="text-sm text-muted-foreground">Select a failure in Inspector to see a suggested fix.</p>
         </CardContent></Card>
       )}
 
@@ -79,7 +85,7 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
           <dt className="font-medium">Element</dt>
           <dd className="m-0 min-w-0"><code className="font-mono text-xs break-all text-muted-foreground">{issue.selector}</code></dd>
           <dt className="font-medium">Requirement</dt>
-          <dd className="m-0 text-muted-foreground">{issue.isLargeText ? 'Large' : 'Normal'} text needs {issue.requiredRatio}:1 (WCAG {issue.wcagCriterion} AA)</dd>
+          <dd className="m-0 text-muted-foreground">{requirementText(issue)}</dd>
         </dl>
       )}
 
@@ -88,10 +94,32 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
       {issue && fix && isVerifiedFailure(issue) && (
         <>
           <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <Swatch label="Current" color={fix.originalValue} background={issue.backgroundColor} ratio={fix.originalContrastRatio} />
-              <Swatch label="Suggested" color={fix.suggestedValue} background={issue.backgroundColor} ratio={fix.expectedContrastRatio} />
-            </div>
+            {fix.property === 'color' && (
+              <div className="grid grid-cols-2 gap-2">
+                <Swatch label="Current" color={fix.originalValue} background={issue.backgroundColor} ratio={fix.originalContrastRatio} />
+                <Swatch label="Suggested" color={fix.suggestedValue} background={issue.backgroundColor} ratio={fix.expectedContrastRatio} />
+              </div>
+            )}
+            {fix.property === 'background-color' && (
+              <div className="grid grid-cols-2 gap-2">
+                <Swatch label="Current background" color={issue.textColor} background={fix.originalValue} code={fix.originalValue} ratio={fix.originalContrastRatio} />
+                <Swatch label="Suggested background" color={issue.textColor} background={fix.suggestedValue} code={fix.suggestedValue} ratio={fix.expectedContrastRatio} />
+              </div>
+            )}
+            {fix.property === 'text-decoration-line' && (
+              <div className="grid grid-cols-2 gap-2" aria-hidden="true">
+                {(['Current', 'Suggested'] as const).map(label => (
+                  <figure key={label} className="m-0 space-y-2 rounded-lg border border-border p-2.5">
+                    <div className="flex h-12 items-center justify-center rounded-md border border-border bg-white px-2 text-sm">
+                      <span style={{ color: issue.backgroundColor }}>a&nbsp;</span>
+                      <span style={{ color: issue.textColor, textDecorationLine: label === 'Current' ? 'none' : 'underline' }}>link</span>
+                      <span style={{ color: issue.backgroundColor }}>&nbsp;here</span>
+                    </div>
+                    <figcaption className="text-xs font-medium text-foreground">{label}: {label === 'Current' ? 'color only' : 'underlined'}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">Changes the <code className="font-mono">{fix.property}</code> property only.</p>
           </div>
 
@@ -113,6 +141,12 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
                   ))}
                 </div>
               </fieldset>
+              {fix.property === 'text-decoration-line' && state.meetsTarget !== undefined && view === 'fixed' && (
+                <p className={cn('flex items-start gap-2 rounded-lg border p-3 text-sm', state.meetsTarget ? 'border-border' : 'border-destructive text-destructive')}>
+                  {state.meetsTarget ? <CircleCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" /> : <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
+                  <span>{state.meetsTarget ? 'The link is now underlined on the page, so it no longer relies on color.' : 'The page did not show the underline.'}</span>
+                </p>
+              )}
               {state.measuredRatio !== undefined && (
                 <p className={cn('flex items-start gap-2 rounded-lg border p-3 text-sm', state.meetsTarget ? 'border-border' : 'border-destructive text-destructive')}>
                   {state.meetsTarget ? <CircleCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" /> : <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}

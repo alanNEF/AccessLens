@@ -1,4 +1,4 @@
-import { isVerifiedFailure, type ContrastIssue } from '../../shared/types';
+import { isVerifiedFailure, type ContrastIssue, type SuggestedFix } from '../../shared/types';
 import { contrastRatio, floorRatio, suggestFix } from './color-suggester';
 import type { PreviewFailure, PreviewManager, PreviewResult, StylableElement } from './preview-manager';
 import { EMPTY_STATE, snapshot, type FixerState } from './fixer-state';
@@ -17,6 +17,22 @@ interface FixerDependencies {
 
 function isStylable(element: Element): element is StylableElement {
   return 'style' in element;
+}
+
+/** Text thresholds: AA (4.5, 3) and enhanced AAA (7, 4.5). Color-only links use 3 vs surrounding text. */
+const SUPPORTED_RATIOS = new Set([3, 4.5, 7]);
+
+/** WCAG 1.4.1 fix for a link that relies on color: add an underline. Colors are left alone. */
+function underlineFix(issue: ContrastIssue, current: string): SuggestedFix {
+  const ratio = issue.contrastRatio ?? 0;
+  return {
+    issueId: issue.id,
+    property: 'text-decoration-line',
+    originalValue: current.trim() || 'none',
+    suggestedValue: 'underline',
+    originalContrastRatio: ratio,
+    expectedContrastRatio: ratio,
+  };
 }
 
 /**
@@ -54,6 +70,11 @@ export function createFixerController({ previewManager, readComputed = (el, prop
     const { issue, fix } = state;
     if (!element || !issue || !fix || !isVerifiedFailure(issue)) return;
     const rendered = readComputed(element, fix.property);
+    if (fix.property === 'text-decoration-line') {
+      // Success for a color-only link is a visible underline; there is no ratio to measure.
+      publish({ phase: 'previewing', issue, fix, view: 'fixed', meetsTarget: rendered.includes('underline') });
+      return;
+    }
     const ratio = fix.property === 'color'
       ? contrastRatio(rendered, issue.backgroundColor)
       : contrastRatio(issue.textColor, rendered);
@@ -74,8 +95,15 @@ export function createFixerController({ previewManager, readComputed = (el, prop
       element = undefined;
       const reject = (message: string) => publish({ phase: 'unsupported', issue, view: 'original', message });
       if (!isVerifiedFailure(issue)) return reject('This issue needs manual review, so no automatic fix is suggested.');
-      if (issue.requiredRatio !== 4.5 && issue.requiredRatio !== 3) return reject('Only WCAG AA text thresholds (4.5:1 and 3:1) are supported.');
+      if (!SUPPORTED_RATIOS.has(issue.requiredRatio)) return reject('Only the WCAG text thresholds 3:1, 4.5:1 and 7:1 are supported.');
       if (!target.isConnected || !isStylable(target)) return reject(PREVIEW_MESSAGES.detached);
+      if (issue.kind === 'link-color-only') {
+        const current = readComputed(target, 'text-decoration-line');
+        if (current.includes('underline')) return reject('This link is already underlined.');
+        element = target;
+        publish({ phase: 'ready', issue, fix: underlineFix(issue, current), view: 'original' });
+        return;
+      }
       const result = suggestFix(issue);
       if (!result.ok) return reject(result.message);
       element = target;

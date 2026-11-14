@@ -86,7 +86,7 @@ const MESSAGES: Record<UnsupportedReason, string> = {
   'invalid-color': 'The element’s colors could not be read reliably.',
   'transparent-color': 'Transparent or semi-transparent colors need manual review.',
   'already-passes': 'These colors already meet the required contrast ratio.',
-  'no-compliant-color': 'No compliant color could be proposed reliably for this element.',
+  'no-compliant-color': 'Changing only the text or only the background cannot reach this target. Both colors need to change; adjust them by hand.',
 };
 
 function unsupported(reason: UnsupportedReason): SuggestionResult {
@@ -94,13 +94,14 @@ function unsupported(reason: UnsupportedReason): SuggestionResult {
 }
 
 /**
- * FIX-02: one replacement text color reaching the WCAG AA threshold.
+ * FIX-02: one replacement color reaching the required threshold.
  *
- * Text is always adjustable for opaque colors: the search ends at black or
- * white, and one of them reaches at least 4.58:1 against any opaque background
- * (the worst case is where both tie). So no background fallback is needed for
- * the 4.5:1 and 3:1 thresholds; 'background-color' stays in the shared type
- * for future fix types. 'no-compliant-color' is a defensive guard only.
+ * The text color is tried first. For AA (4.5:1, 3:1) it always works: the search
+ * ends at black or white, and one of them reaches at least 4.58:1 against any
+ * opaque background. The enhanced AAA target (7:1) can be out of reach for the
+ * text alone on mid-tone backgrounds, so the background color is tried next
+ * (FIX-02's "solid background color" option). If neither single change can
+ * reach the target, 'no-compliant-color' explains it instead of guessing.
  */
 export function suggestFix(issue: SuggestionInput): SuggestionResult {
   const text = parseOpaque(issue.textColor);
@@ -111,17 +112,32 @@ export function suggestFix(issue: SuggestionInput): SuggestionResult {
   const original = contrastRatio(text, background);
   if (original >= issue.requiredRatio) return unsupported('already-passes');
 
-  const suggestedValue = closestReplacement(text, background, issue.requiredRatio + TARGET_MARGIN);
-  if (!suggestedValue) return unsupported('no-compliant-color');
+  const target = issue.requiredRatio + TARGET_MARGIN;
+  const textFix = closestReplacement(text, background, target);
+  if (textFix) {
+    return {
+      ok: true,
+      fix: {
+        issueId: issue.id,
+        property: 'color',
+        originalValue: toHex(text),
+        suggestedValue: textFix,
+        originalContrastRatio: floorRatio(original),
+        expectedContrastRatio: floorRatio(contrastRatio(textFix, background)),
+      },
+    };
+  }
+  const backgroundFix = closestReplacement(background, text, target);
+  if (!backgroundFix) return unsupported('no-compliant-color');
   return {
     ok: true,
     fix: {
       issueId: issue.id,
-      property: 'color',
-      originalValue: toHex(text),
-      suggestedValue,
+      property: 'background-color',
+      originalValue: toHex(background),
+      suggestedValue: backgroundFix,
       originalContrastRatio: floorRatio(original),
-      expectedContrastRatio: floorRatio(contrastRatio(suggestedValue, background)),
+      expectedContrastRatio: floorRatio(contrastRatio(text, backgroundFix)),
     },
   };
 }

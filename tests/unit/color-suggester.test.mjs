@@ -90,3 +90,20 @@ test('helpers: ratio matches WCAG, floor never rounds up', () => {
   assert.equal(floorRatio(4.499), 4.49);
   assert.equal(floorRatio(21), 21);
 });
+
+test('enhanced 7:1 on a mid-tone background falls back to changing the background', () => {
+  // White text on #777777 is 4.48:1; neither black (4.69:1) nor white text can reach 7:1.
+  const result = suggestFix(issue('#ffffff', '#777777', 7));
+  assert.equal(result.ok, true);
+  assert.equal(result.fix.property, 'background-color');
+  assert.equal(result.fix.originalValue, '#777777');
+  assert.ok(wcag('#ffffff', result.fix.suggestedValue) >= 7);
+  assert.ok(result.fix.expectedContrastRatio >= 7);
+});
+
+test('enhanced 7:1 prefers a text change when one exists', () => {
+  const result = suggestFix(issue('#4b5563', '#f4f1ea', 7));
+  assert.equal(result.ok, true);
+  assert.equal(result.fix.property, 'color');
+  assert.ok(wcag(result.fix.suggestedValue, '#f4f1ea') >= 7);
+});

@@ -71,7 +71,7 @@ test('rejects needs-review, bad thresholds, detached elements and unfixable colo
   const { controller: c, element } = fixture();
   const reject = (i, el = element) => { c.selectIssue(i, el); return c.getState(); };
   assert.match(reject(issue({ status: 'needs-review' })).message, /manual review/);
-  assert.match(reject(issue({ requiredRatio: 7 })).message, /4\.5:1 and 3:1/);
+  assert.match(reject(issue({ requiredRatio: 5 })).message, /3:1, 4\.5:1 and 7:1/);
   assert.match(reject(issue(), { isConnected: false, style: {} }).message, /no longer on the page/);
   assert.match(reject(issue({ textColor: 'rgba(0, 0, 0, 0.4)' })).message, /manual review/);
   assert.match(reject(issue({ textColor: '#000000' })).message, /already meet/);
@@ -128,4 +128,48 @@ test('new selection reverts first; clear, dispose and listeners', () => {
   assert.equal(calls.filter(([n]) => n === 'dispose').length, 1);
   c.selectIssue(issue(), element);
   assert.deepEqual(c.getState(), { phase: 'empty', view: 'original' });
+});
+
+test('enhanced (AAA) 7:1 issues are accepted and fixed to at least 7:1', () => {
+  const { controller: c, element } = fixture();
+  c.selectIssue(issue({ requiredRatio: 7, wcagCriterion: '1.4.6' }), element);
+  assert.equal(c.getState().phase, 'ready');
+  assert.ok(c.getState().fix.expectedContrastRatio >= 7);
+});
+
+test('color-only link (WCAG 1.4.1): suggests an underline and confirms it on the page', () => {
+  // Own fake: the page's text-decoration-line is 'none' until our preview writes 'underline'.
+  let decoration = 'none';
+  const calls = [];
+  const previewManager = {
+    apply(el, property, value) { calls.push(['apply', property, value]); decoration = value; return { ok: true }; },
+    showOriginal() { decoration = 'none'; return { ok: true }; },
+    showFixed() { decoration = 'underline'; return { ok: true }; },
+    revert() { decoration = 'none'; return { ok: true }; },
+    hasActivePreview: () => false,
+    dispose() {},
+  };
+  const c = createFixerController({ previewManager, readComputed: (el, property) => (property === 'text-decoration-line' ? decoration : 'rgb(30, 64, 175)') });
+  const element = { isConnected: true, style: {} };
+  const link = issue({ kind: 'link-color-only', wcagCriterion: '1.4.1', requiredRatio: 3, textColor: '#1e40af', backgroundColor: '#1f2937', contrastRatio: 1.68 });
+  c.selectIssue(link, element);
+  const ready = c.getState();
+  assert.equal(ready.phase, 'ready');
+  assert.deepEqual([ready.fix.property, ready.fix.originalValue, ready.fix.suggestedValue], ['text-decoration-line', 'none', 'underline']);
+  c.preview();
+  assert.deepEqual(calls.at(-1), ['apply', 'text-decoration-line', 'underline']);
+  assert.equal(c.getState().phase, 'previewing');
+  assert.equal(c.getState().meetsTarget, true);
+  assert.equal(c.getState().measuredRatio, undefined, 'no ratio is claimed for an underline fix');
+  c.showOriginal();
+  assert.equal(c.getState().view, 'original');
+  c.showFixed();
+  assert.equal(c.getState().meetsTarget, true);
+});
+
+test('an already-underlined link is not offered a fix', () => {
+  const previewManager = { apply: () => ({ ok: true }), showOriginal: () => ({ ok: true }), showFixed: () => ({ ok: true }), revert: () => ({ ok: true }), hasActivePreview: () => false, dispose() {} };
+  const c = createFixerController({ previewManager, readComputed: () => 'underline' });
+  c.selectIssue(issue({ kind: 'link-color-only', wcagCriterion: '1.4.1', requiredRatio: 3 }), { isConnected: true, style: {} });
+  assert.match(c.getState().message, /already underlined/);
 });
