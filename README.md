@@ -54,6 +54,11 @@ root replacement and new content without demo-specific markers.
 
 ## Panel appearance
 
+Drag the panel by its header (or the collapsed launcher) to move it anywhere on the page. Keyboard users can
+focus the grip button and use the arrow keys (Shift for bigger steps, Home to reset); double-clicking the
+header also resets it. The position is kept on screen when the window resizes and is remembered in
+`browser.storage.local` as `accesslens.position`.
+
 Use the minus button in the panel header to collapse AccessLens to a small
 bottom-right launcher. Select the launcher to expand it again. Collapsing keeps
 the active simulation, selected tab and settings; the toolbar icon still closes
