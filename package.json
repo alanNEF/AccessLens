@@ -9,7 +9,9 @@
     "build": "wxt build",
     "zip": "wxt zip",
     "typecheck": "tsc --noEmit",
-    "test:phase0": "node tests/e2e/phase0.mjs",
+    "test:phase0": "node tests/e2e/phase1.mjs",
+    "test:phase1": "node tests/e2e/phase1.mjs",
+    "demo": "python3 -m http.server 8081 --bind 127.0.0.1 --directory demo-site",
     "postinstall": "wxt prepare"
   },
   "dependencies": {

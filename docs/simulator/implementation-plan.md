@@ -218,11 +218,11 @@ export interface SimulatorModeReader {
 
 ### Phase 0 — Feasibility spike (highest risk)
 
-- [ ] Use demo page with fixed header, text, color-coded elements, image, form controls and modal.
-- [ ] Mount unfiltered keyboard-accessible React panel in Shadow Root.
-- [ ] Prototype one SVG color matrix and one blur effect without page reload.
-- [ ] Switch between them and Off, verify interaction and cleanup.
-- [ ] Document unsupported layouts and select final safe target strategy.
+- [x] Use demo page with fixed header, text, color-coded elements, image, form controls and modal.
+- [x] Mount unfiltered keyboard-accessible React panel in Shadow Root.
+- [x] Prototype one SVG color matrix and one blur effect without page reload.
+- [x] Switch between them and Off, verify interaction and cleanup.
+- [x] Document unsupported layouts and select final safe target strategy.
 
 **Exit gate:** effect works on the controlled demo page, UI remains crisp, normal navigation/input works, reset restores original appearance. If not, resolve rendering strategy before proceeding.
 
