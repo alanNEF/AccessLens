@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   manifest: {
-    permissions: ['activeTab', 'scripting', 'storage'],
+    permissions: ['activeTab', 'scripting', 'storage', 'tts'],
     name: 'AccessLens',
     description: 'An accessibility simulator for developers.',
   },

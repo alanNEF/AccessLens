@@ -76,3 +76,14 @@ threshold and an explanation. **Preview fix** hands a verified failure to Fixer 
 `src/shared/issue-handoff.ts`. Outlines are drawn inside the AccessLens shadow root, so page styles are
 never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
 runs the contrast-mapping and simulator unit tests.
+
+## Visionless Lite
+
+Reload the built extension for its new `tts` permission, then try
+[the Visionless playground](http://127.0.0.1:8081/visionless.html).
+Select Visionless from Simulator, use Tab/Shift+Tab and native Enter/Space,
+and press Escape to stop speech. Stop Speech and Exit Visionless remain in
+an unobscured panel. Local OS voices are required for narration.
+
+Run `npm run test:visionless` for Vitest coverage. See
+[implementation, files, validation and limitations](docs/simulator/visionless-lite.md).

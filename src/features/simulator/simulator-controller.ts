@@ -37,6 +37,9 @@ export function createSimulatorController(engine: SimulationEngine) {
   }
   return {
     getState: () => state,
+    stopSpeech: () => engine.stopSpeech?.(),
+    getSpeechStatus: () => engine.getSpeechStatus?.() || 'Speech unavailable',
+    subscribeSpeech: (listener: () => void) => engine.subscribeSpeech?.(listener) || (() => {}),
     getActiveMode: () => state.settings.mode,
     subscribeActiveMode(listener: (mode: SimulationMode) => void) {
       if (!disposed) modeListeners.add(listener);

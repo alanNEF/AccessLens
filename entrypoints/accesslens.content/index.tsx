@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import { isTogglePanelMessage } from '../../src/shared/messages';
+import { isTogglePanelMessage, type VisionlessNavigationMessage } from '../../src/shared/messages';
 import { createRoot } from 'react-dom/client';
 import { AccessLensPanel } from '../../src/components/AccessLensPanel';
 import { createSimulationEngine } from '../../src/features/simulator/simulation-engine';
@@ -23,6 +23,13 @@ export default defineContentScript({
     let inspector: InspectorStore | undefined;
     let handoff: IssueHandoffStore | undefined;
     let fixer: FixerController | undefined;
+    let leavingDocument = false;
+    let interactionVersion = 0;
+    let unsubscribeNavigation: (() => void) | undefined;
+    const saveNavigation = async (enabled: boolean) => {
+      try { await browser.runtime.sendMessage({type:'accesslens:visionless-navigation',enabled} satisfies VisionlessNavigationMessage); }
+      catch { /* Context invalidation must never interrupt DOM/speech cleanup. */ }
+    };
     let disconnectFixer: (() => void) | undefined;
     // SPA navigation: re-apply simulation; drop Inspector results unless only the #hash changed.
     let lastPath = location.href.split('#')[0];
@@ -38,6 +45,7 @@ export default defineContentScript({
       onMount(container, _shadow, host) {
         host.dataset.accesslensUi = '';
         controller = createSimulatorController(createSimulationEngine(document, host));
+        unsubscribeNavigation = controller.subscribeActiveMode(mode=>{if(!leavingDocument) saveNavigation(mode==='visionless');});
         inspector = createInspectorStore(host);
         handoff = createIssueHandoffStore();
         fixer = createFixerController({ previewManager: createPreviewManager() });
@@ -47,6 +55,9 @@ export default defineContentScript({
         return root;
       },
       onRemove(root) {
+        unsubscribeNavigation?.();
+        unsubscribeNavigation = undefined;
+        if(!leavingDocument) saveNavigation(false);
         // Disconnect first, then dispose: closing the panel reverts any Fixer preview.
         disconnectFixer?.();
         fixer?.dispose();
@@ -58,12 +69,23 @@ export default defineContentScript({
     });
     const togglePanel: Parameters<typeof browser.runtime.onMessage.addListener>[0] = (message: unknown, sender, sendResponse) => {
       if (sender.id !== browser.runtime.id || !isTogglePanelMessage(message)) return;
+      interactionVersion++;
       if (ui.shadowHost.isConnected) ui.remove();
       else if (!document.querySelector('accesslens-panel[data-accesslens-ui]')) ui.mount();
       sendResponse({ visible: ui.shadowHost.isConnected });
     };
     browser.runtime.onMessage.addListener(togglePanel);
     ctx.onInvalidated(() => browser.runtime.onMessage.removeListener(togglePanel));
+    async function resumeVisionless() {
+      const version = interactionVersion;
+      try {
+        const response = await browser.runtime.sendMessage({type:'accesslens:visionless-navigation'} satisfies VisionlessNavigationMessage);
+        if(response?.enabled !== true || leavingDocument || ctx.isInvalid || version!==interactionVersion) return;
+        if(!ui.shadowHost.isConnected) ui.mount();
+        controller?.setMode('visionless');
+      } catch { /* No page mutation if session storage or messaging is unavailable. */ }
+    }
+    void resumeVisionless();
     // WXT checks runtime validity on each tick, including extension removal.
     // No DOM scanning; normally one second, subject to background timer throttling.
     let lastUrl = location.href;
@@ -77,12 +99,17 @@ export default defineContentScript({
     // pagehide also covers navigation and BFCache entry; do not retain effects.
     let reopenOnPageShow = false;
     ctx.addEventListener(window, 'pagehide', () => {
+      leavingDocument = true;
       reopenOnPageShow = ui.shadowHost.isConnected;
       ui.remove();
     });
     ctx.addEventListener(window, 'pageshow', (event) => {
-      if (event.persisted && reopenOnPageShow && !ui.shadowHost.isConnected) ui.mount();
+      if(event.persisted) {
+        leavingDocument = false;
+        if(reopenOnPageShow && !ui.shadowHost.isConnected) ui.mount();
+        void resumeVisionless();
+      }
     });
-    // Toolbar activation mounts the panel; pages start with no simulation.
+    // Hidden by default except when resuming this tab's Visionless session.
   },
 });

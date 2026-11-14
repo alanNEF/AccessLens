@@ -13,6 +13,7 @@ const modes = [
   { id: 'protanopia', description: 'Red sensitivity', icon: Eye },
   { id: 'deuteranopia', description: 'Green sensitivity', icon: Eye },
   { id: 'tritanopia', description: 'Blue sensitivity', icon: Eye },
+  { id: 'visionless', description: 'Keyboard and spoken focus', icon: Eye },
   { id: 'blur', description: 'Reduced visual clarity', icon: Focus },
 ] as const;
 
@@ -20,6 +21,7 @@ export function SimulatorTab({ controller, modeReader }: { controller: Simulator
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const activeMode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const { mode, blurPx } = state.settings;
+  const speechStatus = useSyncExternalStore(controller.subscribeSpeech,controller.getSpeechStatus);
   const intensityId = useId();
   return (
     <div className="space-y-5">
@@ -30,6 +32,17 @@ export function SimulatorTab({ controller, modeReader }: { controller: Simulator
         </div>
         <p className="text-sm text-muted-foreground">Explore visual barriers on this page.</p>
       </div>
+      {mode === 'visionless' && <div className="space-y-3 rounded-lg border border-border bg-secondary/40 p-3.5">
+        <h3 className="text-sm font-semibold">Active mode: Visionless</h3>
+        <p className="text-sm">Use Tab / Shift+Tab to navigate the page, Enter or Space to activate controls, and Escape to stop speech. Panel controls are not narrated.</p>
+        <p aria-live="polite" className="text-xs text-muted-foreground">{speechStatus}</p>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" onClick={()=>controller.stopSpeech()}>Stop Speech</Button>
+          <Button type="button" onClick={()=>controller.reset()}>Exit Visionless</Button>
+        </div>
+        <p className="text-xs text-muted-foreground">Visionless Mode is a simplified educational approximation. It does not reproduce the experience of blindness or replace testing with a real screen reader.</p>
+        <p className="text-xs text-muted-foreground">Native top-layer dialogs and unusual stacking contexts may remain visible. Exit Visionless if blackout is incomplete.</p>
+      </div>}
       <fieldset className="min-w-0 space-y-2.5">
         <legend className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Vision mode</legend>
         <div className="grid grid-cols-2 gap-2">

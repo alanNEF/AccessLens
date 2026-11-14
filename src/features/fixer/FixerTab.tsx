@@ -10,7 +10,7 @@ import type { FixerState } from './fixer-state';
 
 // Local labels keep the Fixer independent of simulator internals.
 const MODE_LABELS: Record<SimulationMode, string> = {
-  none: 'Off', protanopia: 'Protanopia', deuteranopia: 'Deuteranopia', tritanopia: 'Tritanopia', blur: 'Low Acuity',
+  none: 'Off', protanopia: 'Protanopia', deuteranopia: 'Deuteranopia', tritanopia: 'Tritanopia', blur: 'Low Acuity', visionless: 'Visionless',
 };
 
 function statusText({ phase, view }: FixerState): string {
