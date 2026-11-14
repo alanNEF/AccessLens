@@ -1,6 +1,7 @@
 // Dependency-free real Chrome smoke test. Builds must exist: npm run build.
 // CHROME_PATH can select another Chrome binary supporting Extensions.loadUnpacked.
 import assert from 'node:assert/strict';
+import { runCrossSite } from './cross-site.mjs';
 import { build } from 'esbuild';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -11,10 +12,13 @@ import { resolve, join } from 'node:path';
 const work = await mkdtemp(join(tmpdir(), 'accesslens-simulator-'));
 const profile = join(work, 'profile');
 const html = await readFile('demo-site/index.html');
+const compatibility = await readFile('demo-site/compatibility.html');
 const server = createServer((req, res) => {
   res.setHeader('Content-Type', 'text/html');
+  if (req.url === '/bare') return res.end('<!doctype html><body>Bare text<p>Wrapped content</p></body>');
+  if (req.url.startsWith('/compatibility.html')) return res.end(compatibility);
   if (req.url === '/base') return res.end(html.toString().replace('<head>', '<head><base href="/">'));
-  res.end(req.url === '/unsupported' ? '<!doctype html><body><h1>Unmarked page</h1></body>' : html);
+  res.end(req.url === '/unsupported' ? '<!doctype html><style>body {filter:sepia(1)}</style><body><h1>Unsafe ancestor</h1></body>' : html);
 });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
 const url = `http://127.0.0.1:${server.address().port}`;
@@ -39,9 +43,17 @@ try {
   await new Promise(r => socket.addEventListener('open', r, { once: true }));
   let id = 0;
   const pending = new Map();
+  const extensionErrors = [];
   socket.addEventListener('message', ({ data }) => {
     const msg = JSON.parse(data);
-    if (!msg.id) return;
+    if (!msg.id) {
+      if (msg.method === 'Runtime.consoleAPICalled' && msg.params.type === 'error' && JSON.stringify(msg.params.stackTrace).includes('chrome-extension://')) extensionErrors.push('Extension console error');
+      if (msg.method === 'Runtime.exceptionThrown') {
+        const details = msg.params.exceptionDetails;
+        if (JSON.stringify(details).includes('chrome-extension://')) extensionErrors.push(details.text);
+      }
+      return;
+    }
     const promise = pending.get(msg.id);
     pending.delete(msg.id);
     if (msg.error) promise.reject(new Error(JSON.stringify(msg.error)));
@@ -54,6 +66,19 @@ try {
       socket.send(JSON.stringify({ id: callId, method, params, sessionId }));
     });
   }
+  // A second site already open before extension installation/reload.
+  const staleUrl = url.replace('127.0.0.1','localhost') + '/compatibility.html';
+  const staleTarget = await cdp('Target.createTarget', {url:staleUrl});
+  const staleSession = await cdp('Target.attachToTarget',{targetId:staleTarget.targetId,flatten:true});
+  const staleCall = (method,params)=>cdp(method,params,staleSession.sessionId);
+  async function staleValue(expression) {
+    const result=await staleCall('Runtime.evaluate',{expression,returnByValue:true});
+    return result.result.value;
+  }
+  for(let i=0;i<100;i++) {
+    if(await staleValue('document.readyState === "complete" && Boolean(document.querySelector("#navigate"))')) break;
+    await new Promise(r=>setTimeout(r,50));
+  }
   const extension = await cdp('Extensions.loadUnpacked', { path: resolve('.output/chrome-mv3') });
   const { targetId } = await cdp('Target.createTarget', { url: 'about:blank' });
   const { sessionId } = await cdp('Target.attachToTarget', { targetId, flatten: true });
@@ -63,9 +88,20 @@ try {
     if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
     return result.result.value;
   }
+  async function triggerToolbar() {
+    await call('Page.bringToFront');
+    const href = await evaluate('location.href');
+    const {targetInfos} = await cdp('Target.getTargets',{filter:[{type:'tab',exclude:false},{exclude:true}]});
+    const tab = targetInfos.find(info=>info.url===href);
+    assert.ok(tab,'Browser tab target must exist');
+    await cdp('Extensions.triggerAction',{id:extension.id,targetId:tab.targetId});
+  }
   async function waitFor(expression) {
     for (let n = 0; n < 100; n++) {
       if (await evaluate(expression)) return;
+      if (expression.includes('shadowRoot') && n % 10 === 2 && !await evaluate("Boolean(document.querySelector('accesslens-panel'))")) {
+        await triggerToolbar();
+      }
       await new Promise(r => setTimeout(r, 50));
     }
     throw new Error(`Timed out: ${expression}`);
@@ -84,16 +120,51 @@ try {
     return data;
   }
   await call('Page.enable');
+  await call('Runtime.enable');
+  if (process.env.ACCESSLENS_CROSS_SITE) await runCrossSite({call,evaluate,waitFor,select,shadow,owned,work,extensionErrors});
   await call('Page.navigate', { url });
   await waitFor(`${shadow}?.querySelector('button')`);
   await evaluate(`window.originalNodes = [...document.body.children].filter(n => n.localName !== 'accesslens-panel'); window.originalParents = originalNodes.map(n=>n.parentNode)`);
   assert.equal(await evaluate(owned), 0);
+  await select('Low Acuity');
+  await triggerToolbar();
+  await waitFor(`!document.querySelector('accesslens-panel') && ${owned} === 0`);
+  await triggerToolbar();
+  await waitFor(`${shadow}?.querySelector('button')`);
+  assert.equal(await evaluate(`document.querySelectorAll('accesslens-panel').length`),1);
+  assert.equal(await evaluate(owned),0);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), /Off/);
+  console.log('PASS actual toolbar open/close/reopen, effect cleanup, no duplicate panel');
+  await select('Protanopia');
+  await staleCall('Page.bringToFront');
+  const staleTabs=await cdp('Target.getTargets',{filter:[{type:'tab',exclude:false},{exclude:true}]});
+  const staleTab=staleTabs.targetInfos.find(info=>info.url===staleUrl);
+  await cdp('Extensions.triggerAction',{id:extension.id,targetId:staleTab.targetId});
+  let staleOpened=false;
+  for(let i=0;i<100;i++) {
+    if(await staleValue(`Boolean(document.querySelector('accesslens-panel')?.shadowRoot?.querySelector('button'))`)){staleOpened=true;break;}
+    await new Promise(r=>setTimeout(r,50));
+  }
+  assert.ok(staleOpened,'Switching to a site opened before extension load must open its panel without refresh');
+  assert.equal(await staleValue(`document.querySelectorAll('accesslens-panel').length`),1);
+  await staleValue(`[...document.querySelector('accesslens-panel').shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Low Acuity').click()`);
+  assert.equal(await staleValue(`getComputedStyle(document.querySelector('main')).filter`),'blur(2px)');
+  assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`),/Protanopia/);
+  await triggerToolbar(); // closes only the first tab's panel and effects
+  await waitFor(`!document.querySelector('accesslens-panel') && ${owned} === 0`);
+  assert.equal(await staleValue(`document.querySelectorAll('accesslens-panel').length`),1);
+  assert.equal(await staleValue(`getComputedStyle(document.querySelector('main')).filter`),'blur(2px)');
+  await cdp('Target.closeTarget',{targetId:staleTarget.targetId});
+  await triggerToolbar();
+  await waitFor(`${shadow}?.querySelector('button')`);
+  console.log('PASS switch to pre-existing second site without refresh; tab-local state and close');
+
   // Browser tools/other extensions can inject body siblings into the real demo.
   await evaluate(`(() => {const peer=document.createElement('div'); peer.id='third-party-overlay'; peer.textContent='External overlay'; peer.style.cssText='position:fixed;top:0;right:0'; document.body.append(peer);})()`);
   await select('Protanopia');
   assert.equal(await evaluate(`${shadow}.querySelector('[role=alert]')?.textContent || ''`), '');
   assert.equal(await evaluate(owned), 2);
-  assert.equal(await evaluate(`getComputedStyle(document.querySelector('#third-party-overlay')).filter`), 'none');
+  assert.notEqual(await evaluate(`getComputedStyle(document.querySelector('#third-party-overlay')).filter`), 'none');
   await select('Reset');
   assert.equal(await evaluate(owned), 0);
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('accesslens-panel')).position`), 'fixed');
@@ -248,8 +319,8 @@ try {
   await evaluate(`clipEngine.apply('protanopia')`);
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('header')).clipPath`), 'none');
   await evaluate(`clipEngine.reset();document.querySelector('header').style.clipPath='inset(1px)'`);
-  assert.ok(await evaluate(`(() => {try{clipEngine.apply('blur',8);return false;}catch{return true;}})()`));
-  assert.equal(await evaluate(owned), 0);
+  await evaluate(`clipEngine.apply('blur',8)`);
+  assert.equal(await evaluate(owned), 1);
   assert.equal(await evaluate(`document.querySelector('header').style.clipPath`), 'inset(1px)');
   await evaluate(`document.querySelector('header').style.removeProperty('clip-path');clipEngine.dispose()`);
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('header')).clipPath`), 'none');
@@ -267,15 +338,20 @@ try {
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(2px)');
   await select('Off');
   console.log('PASS blur bounds/steps/nonfinite values, node reuse, partial-failure rollback, dispose and keyboard slider');
-  // Existing root filters and ancestor filters must fail without overwriting them.
+  // Compose with author root filters; reject filtered ancestors that affect UI.
   await evaluate(`document.querySelector('main').style.filter='sepia(1)'`);
+  await select('Protanopia');
+  assert.match(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), /sepia.*url/);
+  await select('Reset');
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'sepia(1)');
+  await evaluate(`document.body.style.filter='sepia(1)'`);
   await select('Protanopia');
   assert.equal(await evaluate(owned), 0);
   assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /Unsupported layout/);
   assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), /Off/);
   assert.equal(await evaluate(`${button('Off')}.getAttribute('aria-pressed')`), 'true');
   assert.equal(await evaluate(`document.querySelector('main').style.filter`), 'sepia(1)');
-  await evaluate(`document.querySelector('main').style.removeProperty('filter')`);
+  await evaluate(`document.body.style.removeProperty('filter');document.querySelector('main').style.removeProperty('filter')`);
   await select('Low Acuity');
   await call('Page.reload');
   await waitFor(`${shadow}?.querySelector('button')`);
@@ -288,19 +364,66 @@ try {
   await evaluate(`dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))`);
   await waitFor(`${shadow}?.querySelector('button')`);
   assert.equal(await evaluate(owned), 0);
+  // Unmarked content, SPA route changes, root replacement and async errors.
+  await evaluate(`document.body.removeAttribute('data-accesslens-simulator-demo');document.querySelectorAll('[data-accesslens-simulator-target]').forEach(n=>n.removeAttribute('data-accesslens-simulator-target'))`);
+  await select('Protanopia');
+  await evaluate(`window.removedRoot=document.querySelector('main');const replacement=document.createElement('article');replacement.id='spa-root';replacement.innerHTML='<h1>New route</h1><input aria-label="SPA input">';removedRoot.replaceWith(replacement);history.pushState({},'', '/spa-route')`);
+  await waitFor(`getComputedStyle(document.querySelector('#spa-root')).filter !== 'none'`);
+  assert.equal(await evaluate(owned),2);
+  assert.equal(await evaluate(`removedRoot.getAttributeNames().filter(n=>n.startsWith('data-accesslens-spike-')).length`),0);
+  await evaluate(`document.querySelector('#spa-root').style.filter='grayscale(0.5)'`);
+  await waitFor(`/grayscale.*url/.test(getComputedStyle(document.querySelector('#spa-root')).filter)`);
+  await evaluate(`document.querySelector('style[data-accesslens-simulator-owned]').remove();document.querySelector('svg[data-accesslens-simulator-owned]').remove()`);
+  await waitFor(`${owned} === 2`);
+  await evaluate(`history.pushState({},'', '/route-without-replacement')`);
+  await waitFor(`getComputedStyle(document.querySelector('#spa-root')).filter.includes('/route-without-replacement')`);
+  await select('Low Acuity');
+  await evaluate(`window.detachedRoot=document.querySelector('#spa-root');const next=document.createElement('section');next.id='late-root';next.textContent='Late route content';detachedRoot.replaceWith(next)`);
+  await waitFor(`getComputedStyle(document.querySelector('#late-root')).filter === 'blur(2px)'`);
+  assert.equal(await evaluate(owned),1);
+  // Replace only website body in this fixture; adapter reattaches its own panel.
+  await evaluate(`const body=document.createElement('body');body.innerHTML='<article id="new-body-root">New body</article>';document.body.replaceWith(body)`);
+  await waitFor(`document.querySelector('accesslens-panel') && getComputedStyle(document.querySelector('#new-body-root')).filter === 'blur(2px)'`);
+  assert.equal(await evaluate(`document.querySelectorAll('accesslens-panel').length`),1);
+  await evaluate(`document.body.style.filter='sepia(1)'`);
+  await waitFor(`${shadow}.querySelector('[role=alert]')`);
+  assert.equal(await evaluate(owned),0);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`),/Off/);
+  await evaluate(`document.body.style.removeProperty('filter')`);
+  await select('Reset');
+  assert.equal(await evaluate(`document.querySelectorAll('*').length > 0 && [...document.querySelectorAll('*')].some(n=>n.getAttributeNames().some(a=>a.startsWith('data-accesslens-spike-')))`),false);
+  console.log('PASS unmarked layout, SPA/root/body replacement, composed author filters, async Off/error and marker cleanup');
+  await call('Page.navigate', { url: url + '/compatibility.html' });
+  await waitFor(`${shadow}?.querySelector('button')`);
+  await select('Tritanopia');
+  await evaluate(`document.querySelector('#navigate').click()`);
+  await waitFor(`getComputedStyle(document.querySelector('#route')).filter !== 'none'`);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), /Tritanopia/);
+  await evaluate(`document.querySelector('#overlay').click()`);
+  await waitFor(`/contrast.*url/.test(getComputedStyle(document.querySelector('aside')).filter)`);
+  await select('Reset');
+  assert.equal(await evaluate(owned),0);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('aside')).filter`), 'contrast(1.05)');
+  console.log('PASS runnable unmarked SPA demo controls and original author-filter restoration');
   await call('Page.navigate', { url: url + '/base' });
   await waitFor(`${shadow}?.querySelector('button')`);
   await select('Protanopia');
-  assert.equal(await evaluate(owned), 0);
-  assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /base element/);
+  assert.equal(await evaluate(owned), 2);
+  assert.equal(await evaluate(`${shadow}.querySelector('[role=alert]')`), null);
+  await select('Reset');
+  await call('Page.navigate', { url: url + '/bare' });
+  await waitFor(`${shadow}?.querySelector('button')`);
+  await select('Protanopia');
+  assert.equal(await evaluate(owned),0);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /bare body text/);
   await call('Page.navigate', { url: url + '/unsupported' });
   await waitFor(`${shadow}?.querySelector('button')`);
   await select('Low Acuity');
   assert.equal(await evaluate(owned), 0);
-  assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /only the marked/);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /Unsupported layout/);
   await select('Reset');
   assert.equal(await evaluate(`${shadow}.querySelector('[role=alert]')`), null);
-  console.log('PASS existing-root-filter refusal, reload Off, pagehide cleanup, pageshow remount, unsupported-page recovery');
+  console.log('PASS author-filter composition and ancestor refusal, reload Off, pagehide cleanup, pageshow remount, unsupported-page recovery');
   await call('Page.navigate', { url });
   await waitFor(`${shadow}?.querySelector('button')`);
   // A narrow viewport exercises panel bounds without changing website structure.

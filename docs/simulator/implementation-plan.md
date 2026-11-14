@@ -251,6 +251,8 @@ export interface SimulatorModeReader {
 
 ### Phase 4 — Cross-Site Compatibility
 
+Implementation and test evidence: [Phase 4 validation report](phase-4-validation.md).
+
 #### Objective
 
 Extend the Simulator beyond the controlled demo site to support ordinary external HTTP/HTTPS webpages. The existing simulation modes, state management, and React UI should remain unchanged wherever possible.

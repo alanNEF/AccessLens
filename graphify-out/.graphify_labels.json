@@ -13,10 +13,10 @@
   "11": "Element Highlighter Placeholder",
   "12": "Simulation Filters Placeholder",
   "13": "Simulation Engine Placeholder",
-  "14": "Extension Messages Placeholder",
+  "14": "Phase 4 — Cross-Site Compatibility",
   "15": "WXT Configuration",
   "16": "simulator-prd.md",
-  "17": "phase0.mjs",
+  "17": "scripts",
   "18": "7. Delivery plan",
   "19": "FixerTab.tsx",
   "20": "InspectorTab.tsx",
@@ -44,5 +44,6 @@
   "42": "Simulator module (implementation placeholder)",
   "43": "Unit and end-to-end test directories",
   "44": "WXT extension build",
-  "45": "Phase 2 — controller and Simulator UI"
+  "45": "Phase 2 — controller and Simulator UI",
+  "47": "Phase 3 — read-only integration and QA"
 }
