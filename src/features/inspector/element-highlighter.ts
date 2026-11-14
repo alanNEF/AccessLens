@@ -1,39 +1,64 @@
-let highlightedElement: HTMLElement | null = null;
-let originalOutline = "";
-let originalOutlineOffset = "";
+import { useEffect, useMemo, useState } from 'react';
 
-export function highlightElement(selector: string): boolean {
-  clearHighlight();
-
-  let element: HTMLElement | null;
-
-  try {
-    element = document.querySelector<HTMLElement>(selector);
-  } catch {
-    return false;
-  }
-
-  if (!element) return false;
-
-  highlightedElement = element;
-  originalOutline = element.style.outline;
-  originalOutlineOffset = element.style.outlineOffset;
-
-  element.style.outline = "3px solid #ff9800";
-  element.style.outlineOffset = "3px";
-
-  element.scrollIntoView({
-    behavior: "smooth",
-    block: "center",
-  });
-
-  return true;
+export interface TrackedRect {
+  readonly top: number;
+  readonly left: number;
+  readonly width: number;
+  readonly height: number;
 }
 
-export function clearHighlight(): void {
-  if (!highlightedElement) return;
+const sameRects = (a: readonly (TrackedRect | null)[], b: readonly (TrackedRect | null)[]) =>
+  a.length === b.length && a.every((rect, i) => {
+    const other = b[i];
+    if (!rect || !other) return rect === other;
+    return rect.top === other.top && rect.left === other.left && rect.width === other.width && rect.height === other.height;
+  });
 
-  highlightedElement.style.outline = originalOutline;
-  highlightedElement.style.outlineOffset = originalOutlineOffset;
-  highlightedElement = null;
+function measure(elements: readonly Element[]): (TrackedRect | null)[] {
+  return elements.map(element => {
+    if (!element.isConnected) return null;
+    const { top, left, width, height } = element.getBoundingClientRect();
+    return width === 0 && height === 0 ? null : { top, left, width, height };
+  });
+}
+
+/**
+ * Viewport rectangles for the given elements, kept up to date on scroll, resize and layout changes.
+ * Reading rects never changes the page (INS-05: non-destructive). Detached or hidden elements give null.
+ * The returned array always lines up index-for-index with `elements`.
+ */
+export function useTrackedRects(elements: readonly Element[]): (TrackedRect | null)[] {
+  const [tick, setTick] = useState(0);
+  const rects = useMemo(() => measure(elements), [elements, tick]);
+
+  useEffect(() => {
+    let frame: number | undefined;
+    let last = measure(elements);
+    const update = () => {
+      frame = undefined;
+      const next = measure(elements);
+      if (!sameRects(last, next)) { last = next; setTick(value => value + 1); }
+    };
+    const schedule = () => { if (frame === undefined) frame = requestAnimationFrame(update); };
+    window.addEventListener('scroll', schedule, { capture: true, passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    const resizeObserver = new ResizeObserver(schedule);
+    for (const element of elements) if (element.isConnected) resizeObserver.observe(element);
+    // Layout can also shift without a resize (content loading above); a slow poll catches that cheaply.
+    const poll = window.setInterval(schedule, 500);
+    return () => {
+      window.removeEventListener('scroll', schedule, { capture: true });
+      window.removeEventListener('resize', schedule);
+      resizeObserver.disconnect();
+      window.clearInterval(poll);
+      if (frame !== undefined) cancelAnimationFrame(frame);
+    };
+  }, [elements]);
+
+  return rects;
+}
+
+/** Scrolls the page so the element is in view (INS-05: clicking an issue focuses the element). */
+export function revealElement(element: Element): void {
+  if (element.isConnected) element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
 }

@@ -35,4 +35,48 @@
 .simulator-reset { width: 100%; }
 .simulator-error { padding: 10px; border: 1px solid #ab2424; color: #812020; background: #fff2f2; }
 .simulator-disclaimer { border-top: 1px solid #c8cfda; padding-top: 12px; }
-.accesslens-panel [role='tab'] { border: 0; border-bottom: 3px solid #1767dc; border-radius: 0; font-weight: 600; }
+.accesslens-tabs { display: flex; gap: 4px; border-bottom: 1px solid #c8cfda; margin-bottom: 12px; }
+.accesslens-panel [role='tab'] { border: 0; border-bottom: 3px solid transparent; border-radius: 0; font-weight: 600; color: #526077; }
+.accesslens-panel [role='tab'][aria-selected='true'] { border-bottom-color: #1767dc; color: #172033; }
+.accesslens-panel [hidden] { display: none !important; }
+
+/* Inspector */
+.inspector-toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+.accesslens-panel .inspector-primary { background: #1767dc; border-color: #1767dc; color: #fff; }
+.accesslens-panel .inspector-primary:disabled { opacity: 0.6; cursor: progress; }
+.inspector-status { min-height: 1.5em; margin: 10px 0; font-weight: 600; }
+.inspector-error { padding: 10px; border: 1px solid #ab2424; color: #812020; background: #fff2f2; }
+.inspector-note { font-size: 12px; color: #3d4a5c; background: #f3f5f9; padding: 8px; border-radius: 4px; }
+.inspector-group h2 { margin: 16px 0 6px; font-size: 14px; }
+.inspector-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.accesslens-panel .inspector-card { display: grid; gap: 2px; width: 100%; text-align: left; padding: 8px 10px; }
+.accesslens-panel .inspector-card[aria-pressed='true'] { background: #eef3fb; color: #172033; border: 2px solid #1767dc; }
+.inspector-card-label { overflow-wrap: anywhere; }
+.inspector-card-ratio { font-size: 12px; color: #3d4a5c; }
+.inspector-badge { justify-self: start; display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid; }
+.inspector-badge--failed { color: #8a1c1c; background: #fdecec; border-color: #8a1c1c; }
+.inspector-badge--needs-review { color: #5b3a00; background: #fff4d6; border-color: #5b3a00; border-style: dashed; }
+.inspector-badge--passed { color: #1d5a2a; background: #e8f5ea; border-color: #1d5a2a; }
+.inspector-detail { margin: 12px 0; padding: 12px; border: 1px solid #c8cfda; border-radius: 6px; }
+.inspector-detail-head { display: grid; gap: 4px; margin-bottom: 8px; overflow-wrap: anywhere; }
+.inspector-sample { padding: 8px 12px; border: 1px solid #c8cfda; border-radius: 4px; font-size: 18px; }
+.inspector-swatches { display: flex; gap: 16px; margin: 10px 0; }
+.inspector-swatch { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.inspector-swatch-chip { width: 28px; height: 28px; border: 1px solid #526077; border-radius: 4px; display: grid; place-items: center; }
+.inspector-facts { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0; font-size: 13px; }
+.inspector-facts dt { font-weight: 600; }
+.inspector-facts dd { margin: 0; overflow-wrap: anywhere; }
+.inspector-detail a { color: #1767dc; }
+.inspector-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Highlights are drawn in the shadow root over the page; they never change page styles. */
+.inspector-highlights { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.inspector-highlight { position: fixed; box-sizing: border-box; border: 3px solid #c2410c; border-radius: 4px; pointer-events: none; }
+.inspector-highlight--review { border-style: dashed; border-color: #7c3aed; }
+.inspector-highlight--pass { border-color: #15803d; }
+.inspector-highlight--hover { border: 2px dotted #1767dc; background: #1767dc14; }
+.inspector-highlight.is-selected { border-width: 5px; box-shadow: 0 0 0 3px #fff, 0 0 0 5px #172033; }
+.inspector-highlight-label { position: absolute; top: -22px; left: -3px; padding: 1px 6px; font: 700 11px/18px system-ui, sans-serif; color: #fff; background: #c2410c; border-radius: 3px; white-space: nowrap; }
+.inspector-highlight--review .inspector-highlight-label { background: #7c3aed; }
+.inspector-highlight--pass .inspector-highlight-label { background: #15803d; }
+.accesslens-panel { position: relative; z-index: 1; }
