@@ -56,5 +56,7 @@
   "54": "ref_node_test",
   "55": "src_styles_globals",
   "56": "vitest.config.ts",
-  "57": "types.ts"
+  "57": "types.ts",
+  "58": "panel-position.ts",
+  "59": "panel-position.test.mjs"
 }

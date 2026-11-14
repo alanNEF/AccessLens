@@ -55,5 +55,6 @@
   "53": "ref_node_path",
   "54": "ref_node_test",
   "55": "src_styles_globals",
-  "56": "vitest.config.ts"
+  "56": "vitest.config.ts",
+  "57": "types.ts"
 }
