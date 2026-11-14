@@ -1,12 +1,12 @@
 {
   "entrypoints/accesslens.content/index.tsx": {
-    "mtime": 1794686871.020838,
-    "ast_hash": "9867b7ae3e5506766c9ff4010c373bd5",
+    "mtime": 1794689953.441487,
+    "ast_hash": "e3496780969085f665ab832b1b6933de",
     "semantic_hash": ""
   },
   "entrypoints/background.ts": {
-    "mtime": 1794689101.7730517,
-    "ast_hash": "38d950e152119a9d8d56c642428ac226",
+    "mtime": 1794689825.48359,
+    "ast_hash": "1351bf480b080b73e9e46c7600b20f42",
     "semantic_hash": ""
   },
   "entrypoints/popup/main.tsx": {
@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "src/components/AccessLensPanel.tsx": {
-    "mtime": 1794686871.0266247,
-    "ast_hash": "e0affab7ac894722e43fd5bd01850236",
+    "mtime": 1794689782.1805048,
+    "ast_hash": "829c05277a061359dffd10623623cba1",
     "semantic_hash": ""
   },
   "src/features/fixer/FixerTab.tsx": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "src/shared/messages.ts": {
-    "mtime": 1794688068.0193207,
-    "ast_hash": "f48c7e6647b52c82c1d08e78d407fe4b",
+    "mtime": 1794689825.4635775,
+    "ast_hash": "de951326de566c7a9085c7365fcc0c8b",
     "semantic_hash": ""
   },
   "src/shared/types.ts": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "tests/e2e/phase1.mjs": {
-    "mtime": 1794688729.656977,
-    "ast_hash": "537e09f0b068f198a6c4eded951f35b9",
+    "mtime": 1794689912.4813316,
+    "ast_hash": "e93b69d3752a1f72741cb42232b716d5",
     "semantic_hash": ""
   },
   "tests/unit/simulator-controller.test.mjs": {
@@ -386,8 +386,8 @@
     "semantic_hash": ""
   },
   "docs/simulator/visionless-lite.md": {
-    "mtime": 1794689145.9896693,
-    "ast_hash": "e9ed5c96888ed766d5455764ad6c0d96",
+    "mtime": 1794689953.4417138,
+    "ast_hash": "c976048a6d106dbddb94982bd6c6eca9",
     "semantic_hash": ""
   }
 }

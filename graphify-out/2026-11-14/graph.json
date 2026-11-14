@@ -1900,7 +1900,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_simulator_simulatortab",
-      "community": 1,
+      "community": 57,
       "norm_label": "simulatortab.tsx"
     },
     {
@@ -1910,7 +1910,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_features_simulator_simulatortab_modes",
-      "community": 1,
+      "community": 57,
       "norm_label": "modes"
     },
     {
@@ -1930,7 +1930,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_simulator_filters",
-      "community": 7,
+      "community": 57,
       "norm_label": "filters.ts"
     },
     {
@@ -1940,7 +1940,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "src_features_simulator_filters_blur",
-      "community": 7,
+      "community": 57,
       "norm_label": "blur"
     },
     {
@@ -1950,7 +1950,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "src_features_simulator_filters_normalizeblur",
-      "community": 7,
+      "community": 57,
       "norm_label": "normalizeblur()"
     },
     {
@@ -1990,7 +1990,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_controller",
-      "community": 7,
+      "community": 57,
       "norm_label": "simulator-controller.ts"
     },
     {
@@ -2000,7 +2000,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_controller_createsimulatorcontroller",
-      "community": 7,
+      "community": 57,
       "norm_label": "createsimulatorcontroller()"
     },
     {
@@ -2010,7 +2010,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_controller_simulatorcontroller",
-      "community": 1,
+      "community": 57,
       "norm_label": "simulatorcontroller"
     },
     {
@@ -2040,7 +2040,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_state",
-      "community": 7,
+      "community": 57,
       "norm_label": "simulator-state.ts"
     },
     {
@@ -2050,7 +2050,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_state_simulationsettings",
-      "community": 7,
+      "community": 57,
       "norm_label": "simulationsettings"
     },
     {
@@ -2060,7 +2060,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_state_simulationstatus",
-      "community": 7,
+      "community": 57,
       "norm_label": "simulationstatus"
     },
     {
@@ -2070,7 +2070,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_state_simulatorstate",
-      "community": 7,
+      "community": 57,
       "norm_label": "simulatorstate"
     },
     {
@@ -2080,7 +2080,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_state_default_settings",
-      "community": 7,
+      "community": 57,
       "norm_label": "default_settings"
     },
     {
@@ -2090,7 +2090,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_state_validatemode",
-      "community": 7,
+      "community": 57,
       "norm_label": "validatemode()"
     },
     {
@@ -2100,7 +2100,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "src_features_simulator_simulator_state_snapshot",
-      "community": 7,
+      "community": 57,
       "norm_label": "snapshot()"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "src_features_simulator_visionless_speech_client_speechclient",
-      "community": 5,
+      "community": 7,
       "norm_label": "speechclient"
     },
     {
@@ -2270,7 +2270,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "src_features_simulator_visionless_speech_client_speechclient_speak",
-      "community": 5,
+      "community": 7,
       "norm_label": ".speak()"
     },
     {
@@ -2280,7 +2280,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "src_features_simulator_visionless_speech_client_speechclient_stop",
-      "community": 5,
+      "community": 7,
       "norm_label": ".stop()"
     },
     {
@@ -2434,13 +2434,33 @@
       "norm_label": "isspeechmessage()"
     },
     {
+      "label": "VisionlessNavigationMessage",
+      "file_type": "code",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "src_shared_messages_visionlessnavigationmessage",
+      "community": 5,
+      "norm_label": "visionlessnavigationmessage"
+    },
+    {
+      "label": "isVisionlessNavigationMessage()",
+      "file_type": "code",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L30",
+      "_origin": "ast",
+      "id": "src_shared_messages_isvisionlessnavigationmessage",
+      "community": 5,
+      "norm_label": "isvisionlessnavigationmessage()"
+    },
+    {
       "label": "simulator-mode-reader.ts",
       "file_type": "code",
       "source_file": "src/shared/simulator-mode-reader.ts",
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_shared_simulator_mode_reader",
-      "community": 1,
+      "community": 57,
       "norm_label": "simulator-mode-reader.ts"
     },
     {
@@ -2450,7 +2470,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "src_shared_simulator_mode_reader_simulatormodereader",
-      "community": 1,
+      "community": 57,
       "norm_label": "simulatormodereader"
     },
     {
@@ -2460,7 +2480,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "src_shared_simulator_mode_reader_createsimulatormodereader",
-      "community": 1,
+      "community": 57,
       "norm_label": "createsimulatormodereader()"
     },
     {
@@ -2470,7 +2490,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_shared_types",
-      "community": 2,
+      "community": 57,
       "norm_label": "types.ts"
     },
     {
@@ -2490,7 +2510,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "src_shared_types_simulationmode",
-      "community": 7,
+      "community": 57,
       "norm_label": "simulationmode"
     },
     {
@@ -2677,7 +2697,7 @@
       "label": "edgeCapture()",
       "file_type": "code",
       "source_file": "tests/e2e/phase1.mjs",
-      "source_location": "L340",
+      "source_location": "L349",
       "_origin": "ast",
       "id": "tests_e2e_phase1_edgecapture",
       "community": 4,
@@ -2687,7 +2707,7 @@
       "label": "setEnabled()",
       "file_type": "code",
       "source_file": "tests/e2e/phase1.mjs",
-      "source_location": "L486",
+      "source_location": "L517",
       "_origin": "ast",
       "id": "tests_e2e_phase1_setenabled",
       "community": 4,
@@ -2830,7 +2850,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_unit_simulator_controller_test",
-      "community": 7,
+      "community": 57,
       "norm_label": "simulator-controller.test.mjs"
     },
     {
@@ -2840,7 +2860,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "tests_unit_simulator_controller_test_fixture",
-      "community": 7,
+      "community": 57,
       "norm_label": "fixture()"
     },
     {
@@ -4304,6 +4324,16 @@
       "norm_label": "limits and next steps"
     },
     {
+      "label": "Navigation and collapsed-panel fixes",
+      "file_type": "document",
+      "source_file": "docs/simulator/visionless-lite.md",
+      "source_location": "L123",
+      "_origin": "ast",
+      "id": "docs_simulator_visionless_lite_navigation_and_collapsed_panel_fixes",
+      "community": 3,
+      "norm_label": "navigation and collapsed-panel fixes"
+    },
+    {
       "label": "ui-redesign.md",
       "file_type": "document",
       "source_file": "docs/ui-redesign.md",
@@ -5229,6 +5259,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_shared_messages_visionlessnavigationmessage",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -5302,6 +5343,17 @@
       "weight": 1.0,
       "source": "entrypoints_background",
       "target": "src_shared_messages_isspeechmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/background.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "entrypoints_background",
+      "target": "src_shared_messages_isvisionlessnavigationmessage",
       "confidence_score": 1.0
     },
     {
@@ -10222,6 +10274,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/shared/messages.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "src_shared_messages",
+      "target": "src_shared_messages_isvisionlessnavigationmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/messages.ts",
       "source_location": "L8",
       "weight": 1.0,
       "source": "src_shared_messages",
@@ -10256,6 +10318,16 @@
       "weight": 1.0,
       "source": "src_shared_messages",
       "target": "src_shared_messages_togglepanelmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "src_shared_messages",
+      "target": "src_shared_messages_visionlessnavigationmessage",
       "confidence_score": 1.0
     },
     {
@@ -10503,7 +10575,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/e2e/phase1.mjs",
-      "source_location": "L340",
+      "source_location": "L349",
       "weight": 1.0,
       "source": "tests_e2e_phase1",
       "target": "tests_e2e_phase1_edgecapture",
@@ -10565,7 +10637,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/e2e/phase1.mjs",
-      "source_location": "L486",
+      "source_location": "L517",
       "weight": 1.0,
       "source": "tests_e2e_phase1",
       "target": "tests_e2e_phase1_setenabled",
@@ -10630,7 +10702,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/e2e/phase1.mjs",
-      "source_location": "L487",
+      "source_location": "L518",
       "weight": 1.0,
       "source": "tests_e2e_phase1_setenabled",
       "target": "tests_e2e_phase1_cdp",
@@ -10652,7 +10724,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "tests/e2e/phase1.mjs",
-      "source_location": "L343",
+      "source_location": "L352",
       "weight": 1.0,
       "source": "tests_e2e_phase1_edgecapture",
       "target": "tests_e2e_phase1_evaluate",
@@ -12177,6 +12249,16 @@
       "weight": 1.0,
       "source": "docs_simulator_visionless_lite_visionless_lite",
       "target": "docs_simulator_visionless_lite_limits_and_next_steps",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/visionless-lite.md",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "docs_simulator_visionless_lite_visionless_lite",
+      "target": "docs_simulator_visionless_lite_navigation_and_collapsed_panel_fixes",
       "confidence_score": 1.0
     },
     {

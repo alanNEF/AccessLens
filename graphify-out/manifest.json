@@ -1,11 +1,11 @@
 {
   "entrypoints/accesslens.content/index.tsx": {
-    "mtime": 1794689953.441487,
+    "mtime": 1794691895.9420884,
     "ast_hash": "e3496780969085f665ab832b1b6933de",
     "semantic_hash": ""
   },
   "entrypoints/background.ts": {
-    "mtime": 1794689825.48359,
+    "mtime": 1794691895.9426696,
     "ast_hash": "1351bf480b080b73e9e46c7600b20f42",
     "semantic_hash": ""
   },
@@ -15,17 +15,17 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1794688203.3860393,
+    "mtime": 1794691895.9493382,
     "ast_hash": "cae8049e9d17a2264584cacc489a0b3c",
     "semantic_hash": ""
   },
   "src/components/AccessLensPanel.tsx": {
-    "mtime": 1794689782.1805048,
-    "ast_hash": "829c05277a061359dffd10623623cba1",
+    "mtime": 1794691895.9495692,
+    "ast_hash": "dfb5b75939bfdc8f616f84da37e6e187",
     "semantic_hash": ""
   },
   "src/features/fixer/FixerTab.tsx": {
-    "mtime": 1794688106.5842836,
+    "mtime": 1794691895.950249,
     "ast_hash": "c63374931a80b2fd20db614b3cd393ea",
     "semantic_hash": ""
   },
@@ -55,17 +55,17 @@
     "semantic_hash": ""
   },
   "src/features/simulator/SimulatorTab.tsx": {
-    "mtime": 1794688767.1472256,
+    "mtime": 1794691895.950886,
     "ast_hash": "e28b957803a643f1aec2082d1d0753b6",
     "semantic_hash": ""
   },
   "src/features/simulator/filters.ts": {
-    "mtime": 1794688068.062331,
+    "mtime": 1794691895.9512231,
     "ast_hash": "7c3b008b792e98849f34b6f47008652d",
     "semantic_hash": ""
   },
   "src/features/simulator/simulation-engine.ts": {
-    "mtime": 1794688068.0628958,
+    "mtime": 1794691895.9515235,
     "ast_hash": "f124a47c6318d1ebe883adf648516742",
     "semantic_hash": ""
   },
@@ -75,12 +75,12 @@
     "semantic_hash": ""
   },
   "src/shared/messages.ts": {
-    "mtime": 1794689825.4635775,
+    "mtime": 1794691895.9533212,
     "ast_hash": "de951326de566c7a9085c7365fcc0c8b",
     "semantic_hash": ""
   },
   "src/shared/types.ts": {
-    "mtime": 1794688068.0620835,
+    "mtime": 1794691895.9535763,
     "ast_hash": "f7143122bc5d7b1d2cb7d2e92b3f660c",
     "semantic_hash": ""
   },
@@ -90,17 +90,17 @@
     "semantic_hash": ""
   },
   "wxt.config.ts": {
-    "mtime": 1794688068.0625114,
+    "mtime": 1794691895.9555533,
     "ast_hash": "513785d7cd9960020878f166735f7e96",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1794688949.032723,
-    "ast_hash": "d9dcb14c5f6cb0e3132bdea70286fbd4",
+    "mtime": 1794691895.9406073,
+    "ast_hash": "dcfafc3964e3a894d6b7e47831967475",
     "semantic_hash": ""
   },
   "demo-site/index.html": {
-    "mtime": 1794688500.570835,
+    "mtime": 1794691895.9410162,
     "ast_hash": "75dd6d6907ca5d1e5284b6b7593cf41f",
     "semantic_hash": ""
   },
@@ -135,7 +135,7 @@
     "semantic_hash": ""
   },
   "src/features/simulator/simulator-controller.ts": {
-    "mtime": 1794688068.0631287,
+    "mtime": 1794691895.9517567,
     "ast_hash": "c904bb25b975ff8d52860ec10166b275",
     "semantic_hash": ""
   },
@@ -145,7 +145,7 @@
     "semantic_hash": ""
   },
   "tests/e2e/phase1.mjs": {
-    "mtime": 1794689912.4813316,
+    "mtime": 1794691895.954333,
     "ast_hash": "e93b69d3752a1f72741cb42232b716d5",
     "semantic_hash": ""
   },
@@ -185,7 +185,7 @@
     "semantic_hash": ""
   },
   "tests/e2e/cross-site.mjs": {
-    "mtime": 1794688698.7201216,
+    "mtime": 1794691895.9540093,
     "ast_hash": "2ad40b7fbb1259adc391b3fcff336dcd",
     "semantic_hash": ""
   },
@@ -336,58 +336,73 @@
     "semantic_hash": ""
   },
   "src/features/simulator/visionless/accessible-label.ts": {
-    "mtime": 1794688356.3491445,
+    "mtime": 1794691895.9519556,
     "ast_hash": "69a763b397e75a8f04fd43e8fb62270a",
     "semantic_hash": ""
   },
   "src/features/simulator/visionless/focus-announcer.ts": {
-    "mtime": 1794688068.0251114,
+    "mtime": 1794691895.9522061,
     "ast_hash": "ba1c98f81175b378b5795290aaec4a25",
     "semantic_hash": ""
   },
   "src/features/simulator/visionless/speech-broker.ts": {
-    "mtime": 1794688646.1859965,
+    "mtime": 1794691895.9524832,
     "ast_hash": "13f6be2d1ea619b139ab0162900d77a5",
     "semantic_hash": ""
   },
   "src/features/simulator/visionless/speech-client.ts": {
-    "mtime": 1794688646.18616,
+    "mtime": 1794691895.9529016,
     "ast_hash": "dcf4481d987967036b2a9c33d1a40e20",
     "semantic_hash": ""
   },
   "src/features/simulator/visionless/visionless-engine.ts": {
-    "mtime": 1794688106.5840347,
+    "mtime": 1794691895.9530528,
     "ast_hash": "27fbb11de8bb7eb19e91befa9a48b37d",
     "semantic_hash": ""
   },
   "tests/unit/visionless-broker.test.ts": {
-    "mtime": 1794688203.3571725,
+    "mtime": 1794691895.954788,
     "ast_hash": "8f2222286a82a6cf6cbed91d8640bc38",
     "semantic_hash": ""
   },
   "tests/unit/visionless-client.test.ts": {
-    "mtime": 1794688646.186261,
+    "mtime": 1794691895.9549313,
     "ast_hash": "515b7986e23084e8cbf2be5b979d0bbf",
     "semantic_hash": ""
   },
   "tests/unit/visionless.test.ts": {
-    "mtime": 1794688203.3549778,
+    "mtime": 1794691895.9551306,
     "ast_hash": "93ae8c052da72ac7f084709326672547",
     "semantic_hash": ""
   },
   "vitest.config.ts": {
-    "mtime": 1794688203.3525467,
+    "mtime": 1794691895.9552612,
     "ast_hash": "baa030e7e30e4f9f7e76ca913d73342b",
     "semantic_hash": ""
   },
   "demo-site/visionless.html": {
-    "mtime": 1794688500.5536635,
+    "mtime": 1794691895.941334,
     "ast_hash": "dcbee2d8d81b2275f52933afffd30b02",
     "semantic_hash": ""
   },
   "docs/simulator/visionless-lite.md": {
-    "mtime": 1794689953.4417138,
+    "mtime": 1794691895.9417028,
     "ast_hash": "c976048a6d106dbddb94982bd6c6eca9",
+    "semantic_hash": ""
+  },
+  "src/components/shared/panel-position.ts": {
+    "mtime": 1794691895.9496977,
+    "ast_hash": "12a7f26f6f2efcaccac46b426893452a",
+    "semantic_hash": ""
+  },
+  "src/components/shared/use-panel-position.ts": {
+    "mtime": 1794691895.949877,
+    "ast_hash": "f9417cccd908ad441917d19b55899244",
+    "semantic_hash": ""
+  },
+  "tests/unit/panel-position.test.mjs": {
+    "mtime": 1794691895.954517,
+    "ast_hash": "94043cc34b35f6e9e7853334815d2e4f",
     "semantic_hash": ""
   }
 }
