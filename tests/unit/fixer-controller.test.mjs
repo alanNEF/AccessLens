@@ -11,7 +11,7 @@ const issue = (overrides = {}) => Object.freeze({
 
 // Fake page + preview manager. `css` is the element's computed CSS color and
 // `opacity` the opacity it is drawn with (null = its background is faded too).
-function fixture({ css = 'rgb(153, 153, 153)', opacity = 1 } = {}) {
+function fixture({ css = 'rgb(153, 153, 153)', opacity = 1, palette = [] } = {}) {
   const calls = [];
   const element = { isConnected: true, style: {} };
   let rendered = css;
@@ -27,7 +27,7 @@ function fixture({ css = 'rgb(153, 153, 153)', opacity = 1 } = {}) {
     hasActivePreview: () => active,
     dispose() { calls.push(['dispose']); active = false; },
   };
-  const controller = createFixerController({ previewManager, readComputed: () => rendered, readOpacity: () => currentOpacity ?? undefined });
+  const controller = createFixerController({ previewManager, readComputed: () => rendered, readOpacity: () => currentOpacity ?? undefined, readPalette: () => palette });
   return { controller, calls, element, next, setRendered: v => { rendered = v; }, setOpacity: v => { currentOpacity = v; } };
 }
 
@@ -210,4 +210,36 @@ test('an already-underlined link is not offered a fix', () => {
   const c = createFixerController({ previewManager, readComputed: () => 'underline' });
   c.selectIssue(issue({ kind: 'link-color-only', wcagCriterion: '1.4.1', requiredRatio: 3 }), { isConnected: true, style: {} });
   assert.match(c.getState().message, /already underlined/);
+});
+
+test('site palette: alternative offered; useAlternative swaps and ends any preview', () => {
+  // Grey text on white; the site's green is a valid but further option.
+  const { controller: c, calls, element } = fixture({ palette: ['#1f5135'] });
+  c.selectIssue(issue(), element);
+  const ready = c.getState();
+  assert.equal(ready.fix.source, 'adjusted');
+  assert.equal(ready.fix.colorBlindSafe, true);
+  assert.equal(ready.alternative.suggestedValue, '#1f5135');
+  c.preview();
+  assert.equal(c.getState().phase, 'previewing');
+  assert.equal(c.getState().alternative.suggestedValue, '#1f5135', 'alternative kept while previewing');
+  c.useAlternative();
+  const swapped = c.getState();
+  assert.equal(swapped.phase, 'ready', 'switching ends the preview');
+  assert.equal(calls.at(-1)[0], 'revert');
+  assert.equal(swapped.fix.suggestedValue, '#1f5135');
+  assert.equal(swapped.alternative.suggestedValue, ready.fix.suggestedValue, 'the old fix becomes the alternative');
+  c.useAlternative();
+  assert.equal(c.getState().fix.suggestedValue, ready.fix.suggestedValue, 'switches back');
+  c.clear();
+  assert.equal(c.getState().alternative, undefined);
+});
+
+test('no alternative without a usable site color; useAlternative then does nothing', () => {
+  const { controller: c, element } = fixture();
+  c.selectIssue(issue(), element);
+  const before = c.getState();
+  assert.equal(before.alternative, undefined);
+  c.useAlternative();
+  assert.equal(c.getState(), before);
 });

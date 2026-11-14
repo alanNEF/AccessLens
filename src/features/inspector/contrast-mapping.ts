@@ -45,7 +45,7 @@ const REVIEW_REASONS: Record<string, string> = {
   shadowOnText: 'A text shadow changes how readable the text is.',
   colorParse: 'One of the colors could not be read.',
 };
-const DEFAULT_REVIEW_REASON = 'AccessLens could not reliably determine this text’s colors.';
+const DEFAULT_REVIEW_REASON = 'Perspective could not reliably determine this text’s colors.';
 
 export function reviewReasonFor(messageKey: string | null | undefined): string {
   return (messageKey && REVIEW_REASONS[messageKey]) || DEFAULT_REVIEW_REASON;

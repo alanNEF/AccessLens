@@ -79,13 +79,13 @@ export default defineBackground(() => {
         await browser.tabs.sendMessage(tabId, message, { frameId: 0 });
       }
       await browser.action.setBadgeText({ tabId, text: '' });
-      await browser.action.setTitle({ tabId, title: 'AccessLens — show/hide simulator' });
+      await browser.action.setTitle({ tabId, title: 'Perspective — show/hide panel' });
     } catch {
       // Browser stores, internal pages, navigation races, or denied site access
       // can still prevent injection. Do not reload or change the user's page.
       await Promise.allSettled([
         browser.action.setBadgeText({ tabId, text: '!' }),
-        browser.action.setTitle({ tabId, title: 'AccessLens could not open here. Check site access or wait for loading to finish and retry. Chrome-restricted pages are unsupported.' }),
+        browser.action.setTitle({ tabId, title: 'Perspective could not open here. Check site access or wait for loading to finish and retry. Chrome-restricted pages are unsupported.' }),
       ]);
     } finally {
       opening.delete(tabId);

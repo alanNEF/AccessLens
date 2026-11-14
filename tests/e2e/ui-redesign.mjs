@@ -27,16 +27,16 @@ export async function runUiRedesign({ call, evaluate, waitFor, select, shadow, t
   // Collapsing preserves active effects, selected tab, and settings; focus follows.
   await select('Low Acuity');
   await evaluate(`[...${shadow}.querySelectorAll('[role=tab]')].find(n=>n.textContent==='Inspector').focus()`);
-  await evaluate(`${shadow}.querySelector('button[aria-label="Collapse AccessLens"]').focus()`);
+  await evaluate(`${shadow}.querySelector('button[aria-label="Collapse Perspective"]').focus()`);
   await key('Enter');
-  await waitFor(`${shadow}.querySelector('button[aria-label="Expand AccessLens"]')`);
+  await waitFor(`${shadow}.querySelector('button[aria-label="Expand Perspective"]')`);
   assert.equal(await evaluate(`getComputedStyle(${shadow}.querySelector('section')).display`),'none');
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`),'blur(2px)');
-  assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`),'Expand AccessLens');
+  assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`),'Expand Perspective');
   assert.ok(await evaluate(`(() => {const r=document.querySelector('accesslens-panel').getBoundingClientRect();return r.width<=48&&r.height<=48;})()`),'Collapsed host must not block the old panel area');
   await key('Enter');
   await waitFor(`!${shadow}.querySelector('section').hidden`);
-  assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`),'Collapse AccessLens');
+  assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`),'Collapse Perspective');
   assert.equal(await evaluate(`${shadow}.querySelector('[role=tab][aria-selected=true]').textContent`),'Inspector');
   await evaluate(`[...${shadow}.querySelectorAll('[role=tab]')].find(n=>n.textContent==='Simulator').focus()`);
   await select('Reset');

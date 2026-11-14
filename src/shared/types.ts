@@ -59,4 +59,10 @@ export interface SuggestedFix {
   suggestedValue: string;
   originalContrastRatio: number;
   expectedContrastRatio: number;
+  /** 'adjusted': lightness-shifted original; 'site-palette': a color the page already uses. */
+  source?: 'adjusted' | 'site-palette';
+  /** True when it also meets the target under protanopia, deuteranopia and tritanopia simulation. */
+  colorBlindSafe?: boolean;
+  /** Contrast under each color-vision simulation, truncated to 2 decimals. */
+  simulatedRatios?: Readonly<Partial<Record<'protanopia' | 'deuteranopia' | 'tritanopia', number>>>;
 }

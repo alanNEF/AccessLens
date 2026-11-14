@@ -30,12 +30,12 @@ export function underlineFix(issue: ContrastIssue, current = 'none'): SuggestedF
   };
 }
 
-/** The same eligibility checks and color engine for individual and bulk fixes. */
-export function generateCorrection({ issue, element }: CorrectionTarget) {
+/** The same eligibility checks and color engine for individual and bulk fixes. `palette`: the site's colors. */
+export function generateCorrection({ issue, element }: CorrectionTarget, palette?: readonly string[]) {
   if (!isVerifiedFailure(issue)) return { ok: false, message: 'This issue needs manual review, so no automatic fix is suggested.' } as const;
   if (!SUPPORTED_RATIOS.has(issue.requiredRatio)) return { ok: false, message: UNSUPPORTED_RATIO_MESSAGE } as const;
   if (!element.isConnected || !isStylable(element)) return { ok: false, message: DETACHED_MESSAGE } as const;
   if (issue.kind === 'link-color-only') return { ok: true, fix: underlineFix(issue), element, issue } as const;
-  const result = suggestFix(issue);
+  const result = suggestFix({ ...issue, palette });
   return result.ok ? { ...result, element, issue } : result;
 }

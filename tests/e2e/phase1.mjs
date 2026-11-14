@@ -199,8 +199,8 @@ try {
   await evaluate(`const button=document.createElement('button');button.id='visionless-native-activation';button.textContent='Native action';window.nativeClicks=0;button.addEventListener('click',()=>window.nativeClicks++);document.querySelector('main').append(button)`);
   await select('Visionless');
   await select('Visionless');
-  await select('Collapse AccessLens');
-  const expandPoint=await evaluate(`(()=>{const b=${button('Expand AccessLens')};const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+  await select('Collapse Perspective');
+  const expandPoint=await evaluate(`(()=>{const b=${button('Expand Perspective')};const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
   const expandShot=await call('Page.captureScreenshot',{clip:{...expandPoint,width:1,height:1,scale:1}});
   const expandPixel=await evaluate(`(async()=>{const img=await createImageBitmap(await(await fetch('data:image/png;base64,${expandShot.data}')).blob());const c=document.createElement('canvas');c.width=1;c.height=1;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(0,0,1,1).data];})()`);
   assert.ok(expandPixel.slice(0,3).some(v=>v>0),'Collapsed expand icon must paint above the blackout');
@@ -510,7 +510,7 @@ try {
   // This checks real disable/re-enable behavior without touching user profiles.
   const helperDir = join(work,'management-helper');
   await mkdir(helperDir);
-  await writeFile(join(helperDir,'manifest.json'), JSON.stringify({manifest_version:3,name:'AccessLens test lifecycle helper',version:'1.0',permissions:['management']}));
+  await writeFile(join(helperDir,'manifest.json'), JSON.stringify({manifest_version:3,name:'Perspective test lifecycle helper',version:'1.0',permissions:['management']}));
   await writeFile(join(helperDir,'control.html'), '<!doctype html><title>Test helper</title>');
   const helper = await cdp('Extensions.loadUnpacked', {path:helperDir});
   const helperTarget = await cdp('Target.createTarget', {url:`chrome-extension://${helper.id}/control.html`});

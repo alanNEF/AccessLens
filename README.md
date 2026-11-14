@@ -1,4 +1,4 @@
-# AccessLens
+# Perspective
 
 An all inclusive accessibility simulator for developers.
 
@@ -34,7 +34,7 @@ contrast with axe-core (see below). The Fixer suggests and temporarily previews 
 
 Run `npm run build`, load `.output/chrome-mv3` as an unpacked extension in
 Chrome, then serve the demo with `npm run demo`.
-Pin AccessLens in Chrome’s Extensions menu, then click its toolbar icon in the
+Pin Perspective in Chrome’s Extensions menu, then click its toolbar icon in the
 active tab to show or hide the panel. Closing clears the simulation; reopening
 starts in Off. Already-open tabs initialize on the first icon click without a refresh.
 
@@ -59,7 +59,7 @@ focus the grip button and use the arrow keys (Shift for bigger steps, Home to re
 header also resets it. The position is kept on screen when the window resizes and is remembered in
 `browser.storage.local` as `accesslens.position`.
 
-Use the minus button in the panel header to collapse AccessLens to a small
+Use the minus button in the panel header to collapse Perspective to a small
 bottom-right launcher. Select the launcher to expand it again. Collapsing keeps
 the active simulation, selected tab and settings; the toolbar icon still closes
 the extension and clears simulation effects.
@@ -96,7 +96,7 @@ Open the Inspector tab and click **Scan text contrast**, or **Pick element** and
 Failures (measured below WCAG AA 4.5:1, or 3:1 for large text) and cases that need manual review
 (gradients, background images, overlaps) are outlined on the page and listed with colors, ratio,
 threshold and an explanation. **Preview fix** hands a verified failure to Fixer through
-`src/shared/issue-handoff.ts`. Outlines are drawn inside the AccessLens shadow root, so page styles are
+`src/shared/issue-handoff.ts`. Outlines are drawn inside the Perspective shadow root, so page styles are
 never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
 runs the contrast-mapping and simulator unit tests.
 

@@ -1,1 +1,1 @@
-export const APP_NAME = 'AccessLens';
+export const APP_NAME = 'Perspective';

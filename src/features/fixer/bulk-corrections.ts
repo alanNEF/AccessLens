@@ -29,9 +29,11 @@ const pause = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 const errorText = (cause: unknown) => cause instanceof Error ? cause.message : 'This correction could not be generated or applied.';
 
 /** Bulk state and orchestration; all page writes still go through the shared preview manager. */
-export function createBulkCorrections({ previewManager, readComputed, beforeRun, beforeEnable }: {
+export function createBulkCorrections({ previewManager, readComputed, readPalette, beforeRun, beforeEnable }: {
   previewManager: PreviewManager;
   readComputed: (element: Element, property: string) => string;
+  /** The site's own colors, read once per run (site-palette.ts). */
+  readPalette?: () => readonly string[];
   beforeRun: () => void;
   beforeEnable: (element: Element, property: SuggestedFix['property']) => void;
 }) {
@@ -113,12 +115,13 @@ export function createBulkCorrections({ previewManager, readComputed, beforeRun,
       const failures: BulkFailure[] = [];
       const claimed = new Map<Element, Set<SuggestedFix['property']>>();
       const ids = new Set<string>();
+      const palette = readPalette?.();
       let skipped = 0;
       for (const [index, item] of items.entries()) {
         if (disposed || current !== version) return;
         if (item.issue.status !== 'failed') { skipped++; continue; }
         try {
-          const result = generateCorrection(item);
+          const result = generateCorrection(item, palette);
           if (!result.ok) { failures.push({ issue: item.issue, message: result.message }); continue; }
           const id = `bulk:${item.issue.id}:${result.fix.property}`;
           const properties = claimed.get(item.element) ?? new Set<SuggestedFix['property']>();
