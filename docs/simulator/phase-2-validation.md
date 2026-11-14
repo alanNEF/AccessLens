@@ -59,3 +59,18 @@ Known limits remain controlled marked roots only, separate-root compositing,
 no backdrop filtering, native-modal inertness, and unsupported base elements or
 root filters. Phase 3 compatibility expansion and performance profiling remain
 out of scope.
+
+## Blur edge clipping
+
+Low Acuity now applies `clip-path: inset(0)` alongside blur on each marked root.
+This contains outward halos without changing dimensions, scrolling or DOM
+parents. Color modes and Off/Reset remove the owned clipping rule. Existing
+root clip-paths are refused for blur rather than overwritten. Clipping also
+cuts off shadows, focus rings or descendants that extend beyond a root's box;
+softening inside the box remains part of the blur.
+
+Reload the unpacked extension and refresh the demo, select Low Acuity and move
+the slider to 8 px. Compare the fixed header boundary with the earlier halo:
+it should now end at its original box. Use Reset to compare with Off.
+The Chrome suite captures before/after maximum-blur screenshots and checks that
+a pixel below the header matches Off when clipped but differs without clipping.

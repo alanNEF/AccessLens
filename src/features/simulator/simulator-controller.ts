@@ -4,14 +4,19 @@ import { DEFAULT_SETTINGS, normalizeBlur, snapshot, validateMode, type Simulatio
 
 /** Sole owner of transient simulator state. Engine remains the sole DOM writer.
  * Only final applied snapshots are published: synchronous requests never expose
- * an unfulfilled mode. Read-only integration with other features is Phase 3.
+ * an unfulfilled mode. Consumers receive applied mode through a read-only reader.
  */
 export function createSimulatorController(engine: SimulationEngine) {
   let state = snapshot(DEFAULT_SETTINGS);
   let disposed = false;
   const listeners = new Set<(state: SimulatorState) => void>();
+  const modeListeners = new Set<(mode: SimulationMode) => void>();
   function publish(next: SimulatorState) {
+    const previousMode = state.settings.mode;
     state = next;
+    if (previousMode !== next.settings.mode) {
+      for (const listener of [...modeListeners]) listener(next.settings.mode);
+    }
     for (const listener of [...listeners]) listener(state);
   }
   function transition(settings: () => SimulationSettings) {
@@ -29,6 +34,11 @@ export function createSimulatorController(engine: SimulationEngine) {
   }
   return {
     getState: () => state,
+    getActiveMode: () => state.settings.mode,
+    subscribeActiveMode(listener: (mode: SimulationMode) => void) {
+      if (!disposed) modeListeners.add(listener);
+      return () => { modeListeners.delete(listener); };
+    },
     subscribe(listener: (state: SimulatorState) => void) {
       if (!disposed) listeners.add(listener);
       return () => { listeners.delete(listener); };
@@ -46,6 +56,7 @@ export function createSimulatorController(engine: SimulationEngine) {
       disposed = true;
       publish(snapshot(DEFAULT_SETTINGS));
       listeners.clear();
+      modeListeners.clear();
     },
   };
 }

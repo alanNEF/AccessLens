@@ -1,16 +1,16 @@
 # Graph Report - AccessLens  (2026-11-14)
 
 ## Corpus Check
-- 32 files · ~10,839 words
+- 34 files · ~12,557 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 196 nodes · 190 edges · 45 communities (21 shown, 24 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
+- 209 nodes · 212 edges · 46 communities (22 shown, 24 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4232fb9e`
+- Built from commit: `7b0f104d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -50,18 +50,19 @@
 - [[_COMMUNITY_Simulator module (implementation placeholder)|Simulator module (implementation placeholder)]]
 - [[_COMMUNITY_Unit and end-to-end test directories|Unit and end-to-end test directories]]
 - [[_COMMUNITY_WXT extension build|WXT extension build]]
+- [[_COMMUNITY_Phase 2 — controller and Simulator UI|Phase 2 — controller and Simulator UI]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `scripts` - 10 edges
+1. `scripts` - 11 edges
 2. `AccessLens — Simulator Implementation Plan` - 10 edges
-3. `AccessLens — Coding Agent Instructions` - 9 edges
-4. `SimulationMode` - 7 edges
-5. `AccessLens` - 5 edges
-6. `7. Delivery plan` - 5 edges
-7. `Phase 0 feasibility report` - 5 edges
-8. `BLUR` - 4 edges
-9. `normalizeBlur()` - 4 edges
-10. `createSimulatorController()` - 4 edges
+3. `SimulationMode` - 9 edges
+4. `AccessLens — Coding Agent Instructions` - 9 edges
+5. `evaluate()` - 5 edges
+6. `AccessLens` - 5 edges
+7. `7. Delivery plan` - 5 edges
+8. `Phase 0 feasibility report` - 5 edges
+9. `Phase 3 — read-only integration and QA` - 5 edges
+10. `BLUR` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `fixture()` --calls--> `createSimulatorController()`  [INFERRED]
@@ -72,23 +73,25 @@
   src/features/simulator/simulator-controller.ts → src/features/simulator/simulator-state.ts
 - `SimulationSettings` --references--> `SimulationMode`  [EXTRACTED]
   src/features/simulator/simulator-state.ts → src/shared/types.ts
+- `SimulatorModeReader` --references--> `SimulationMode`  [EXTRACTED]
+  src/shared/simulator-mode-reader.ts → src/shared/types.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (45 total, 24 thin omitted)
+## Communities (46 total, 24 thin omitted)
 
 ### Community 1 - "React Extension Panel"
 Cohesion: 0.16
-Nodes (17): AccessLensPanel(), BLUR, normalizeBlur(), createSimulationEngine(), SimulationEngine, createSimulatorController(), SimulatorController, DEFAULT_SETTINGS (+9 more)
+Nodes (19): AccessLensPanel(), BLUR, normalizeBlur(), createSimulationEngine(), SimulationEngine, createSimulatorController(), SimulatorController, DEFAULT_SETTINGS (+11 more)
 
 ### Community 2 - "Application Package Metadata"
 Cohesion: 0.13
 Nodes (14): dependencies, react, react-dom, description, devDependencies, @types/react, @types/react-dom, typescript (+6 more)
 
 ### Community 3 - "Project Setup and Documentation"
-Cohesion: 0.12
-Nodes (13): Known limitations and Phase 1 implications, Manual-demo regression, Phase 0 feasibility report, Target selection and ownership, Tested layouts and evidence, Phase 2 — controller and Simulator UI, Run the local demo, Verification (+5 more)
+Cohesion: 0.11
+Nodes (15): Known limitations and Phase 1 implications, Manual-demo regression, Phase 0 feasibility report, Target selection and ownership, Tested layouts and evidence, Compatibility limits, Delivered scope, Phase 3 — read-only integration and QA (+7 more)
 
 ### Community 4 - "Build Tool Dependencies"
 Cohesion: 0.15
@@ -115,15 +118,19 @@ Cohesion: 0.14
 Nodes (13): Design, Frontend Developer, Functional Requirements, Non-Functional Requirements, Overview, Problem, Requirements, UI (+5 more)
 
 ### Community 17 - "phase0.mjs"
-Cohesion: 0.20
-Nodes (10): scripts, build, demo, dev, postinstall, test:phase0, test:phase1, test:phase2 (+2 more)
+Cohesion: 0.18
+Nodes (11): scripts, build, demo, dev, postinstall, test:phase0, test:phase1, test:phase2 (+3 more)
 
 ### Community 18 - "7. Delivery plan"
-Cohesion: 0.31
-Nodes (7): chrome, evaluate(), profile, screenshot(), select(), server, waitFor()
+Cohesion: 0.27
+Nodes (10): cdp(), chrome, edgeCapture(), evaluate(), profile, screenshot(), select(), server (+2 more)
+
+### Community 45 - "Phase 2 — controller and Simulator UI"
+Cohesion: 0.40
+Nodes (4): Blur edge clipping, Phase 2 — controller and Simulator UI, Run the local demo, Verification
 
 ## Knowledge Gaps
-- **116 isolated node(s):** `name`, `description`, `private`, `version`, `type` (+111 more)
+- **122 isolated node(s):** `name`, `description`, `private`, `version`, `type` (+117 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -133,11 +140,11 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `scripts` connect `phase0.mjs` to `Application Package Metadata`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **What connects `name`, `description`, `private` to the rest of the system?**
-  _116 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _122 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Application Package Metadata` be split into smaller, more focused modules?**
   _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
 - **Should `Project Setup and Documentation` be split into smaller, more focused modules?**
-  _Cohesion score 0.125 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
 - **Should `Development Commands` be split into smaller, more focused modules?**
   _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
 - **Should `Simulation Filters Placeholder` be split into smaller, more focused modules?**

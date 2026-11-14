@@ -1,7 +1,7 @@
 {
   "entrypoints/accesslens.content/index.tsx": {
-    "mtime": 1794669311.0954134,
-    "ast_hash": "d3a79e3440d6251bbe1e7129e496cb87",
+    "mtime": 1794671439.821343,
+    "ast_hash": "2600c39afb9442a81d3ea7609fabb843",
     "semantic_hash": ""
   },
   "entrypoints/background.ts": {
@@ -10,18 +10,18 @@
     "semantic_hash": "7b0b08bb39f55fe39c13a5e92fbe0476"
   },
   "entrypoints/popup/main.tsx": {
-    "mtime": 1794669101.5637696,
-    "ast_hash": "21bd95c3ccf10d6ecd150a78677d8ae9",
+    "mtime": 1794671549.553442,
+    "ast_hash": "2688a36f7bcdf8ef4d6cdeb89dbc26ef",
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1794669390.5969312,
-    "ast_hash": "0d122eb8ec3b1b70416853139de88fb0",
+    "mtime": 1794671492.1698484,
+    "ast_hash": "84ee2e01d2a18eead58fe84e93af0a8a",
     "semantic_hash": ""
   },
   "src/components/AccessLensPanel.tsx": {
-    "mtime": 1794669039.2289379,
-    "ast_hash": "e5c402bb8d13263a3e236984e71b61fe",
+    "mtime": 1794671439.82124,
+    "ast_hash": "bca63e5ac2ac5b2f428cc53c9e9bf595",
     "semantic_hash": ""
   },
   "src/features/fixer/FixerTab.tsx": {
@@ -55,18 +55,18 @@
     "semantic_hash": "ed81c43af93d1d545f9afc95919247a5"
   },
   "src/features/simulator/SimulatorTab.tsx": {
-    "mtime": 1794670071.8984194,
-    "ast_hash": "599b19fc700e4293f515302379cf770f",
+    "mtime": 1794671439.7942238,
+    "ast_hash": "a4afda246522da494da4e7e20b318c66",
     "semantic_hash": ""
   },
   "src/features/simulator/filters.ts": {
-    "mtime": 1794669039.2228038,
-    "ast_hash": "a1346b4a811462a5c0e68f7064cb0228",
+    "mtime": 1794670831.1707304,
+    "ast_hash": "dc0d873d4a0d72cc727af38023a9010e",
     "semantic_hash": ""
   },
   "src/features/simulator/simulation-engine.ts": {
-    "mtime": 1794670071.8982835,
-    "ast_hash": "c9b2924bea04bf169dbfe81fd4f87eb4",
+    "mtime": 1794670945.3201706,
+    "ast_hash": "1476004a40cf4cf288d435564e926022",
     "semantic_hash": ""
   },
   "src/shared/constants.ts": {
@@ -80,9 +80,9 @@
     "semantic_hash": "3bcd416211a091786af856b209ed5bdd"
   },
   "src/shared/types.ts": {
-    "mtime": 1794630180.5486426,
-    "ast_hash": "23695cae4a5a90c3ad341449525391a3",
-    "semantic_hash": "23695cae4a5a90c3ad341449525391a3"
+    "mtime": 1794670831.203607,
+    "ast_hash": "6db20a6aff033505bc1e3493d28e10d7",
+    "semantic_hash": ""
   },
   "tsconfig.json": {
     "mtime": 1794630179.8172677,
@@ -95,13 +95,13 @@
     "semantic_hash": "04f3e9de9f1cb2c0b6bc7d717d58b10b"
   },
   "README.md": {
-    "mtime": 1794669390.5971563,
-    "ast_hash": "777ff90cf1b8469638a45afbd808f3f9",
+    "mtime": 1794671549.553676,
+    "ast_hash": "7ffd9a5c72309de049ed9e3fa160def8",
     "semantic_hash": ""
   },
   "demo-site/index.html": {
-    "mtime": 1794669101.5699685,
-    "ast_hash": "5793cfebaa398cbdc03077ccfdb88869",
+    "mtime": 1794671549.5532153,
+    "ast_hash": "21f5a41350b1be236b41f4c21856efa0",
     "semantic_hash": ""
   },
   "docs/fixer-prd.md": {
@@ -124,19 +124,49 @@
     "ast_hash": "6e4a4143129ca29d066762a5abb99aa4",
     "semantic_hash": "6e4a4143129ca29d066762a5abb99aa4"
   },
-  "tests/e2e/phase0.mjs": {
-    "mtime": 1794670057.7408652,
-    "ast_hash": "0c8bde942f7c51022a50b0c40d6da099",
-    "semantic_hash": ""
-  },
   "docs/simulator/implementation-plan.md": {
-    "mtime": 1794668834.9253323,
-    "ast_hash": "6fb73c08a843cd16ee8a93bd50ea9ec6",
+    "mtime": 1794671549.5539963,
+    "ast_hash": "faa4d7fe3c3b80103febdde55c6c49bb",
     "semantic_hash": ""
   },
   "docs/simulator/phase-0-feasibility.md": {
     "mtime": 1794670071.8985481,
     "ast_hash": "43e7aca0bd9a2a3e6d0391969ad16279",
+    "semantic_hash": ""
+  },
+  "src/features/simulator/simulator-controller.ts": {
+    "mtime": 1794671439.7920277,
+    "ast_hash": "cdc8924d866e95f7f1b959a09bbd8221",
+    "semantic_hash": ""
+  },
+  "src/features/simulator/simulator-state.ts": {
+    "mtime": 1794671439.7898858,
+    "ast_hash": "4fe0c57bbe8e15fe9ff4e909a66a0b19",
+    "semantic_hash": ""
+  },
+  "tests/e2e/phase1.mjs": {
+    "mtime": 1794671492.1700475,
+    "ast_hash": "da26ee40d01d8f7697fe4c04f9f522c7",
+    "semantic_hash": ""
+  },
+  "tests/unit/simulator-controller.test.mjs": {
+    "mtime": 1794671492.152565,
+    "ast_hash": "f7fe07a1edba19b626385162c7cbb766",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1794671118.1525776,
+    "ast_hash": "1e8e1e97ddb13b1beec51f045b66d691",
+    "semantic_hash": ""
+  },
+  "docs/simulator/phase-1-validation.md": {
+    "mtime": 1794670945.328404,
+    "ast_hash": "efcc044559b7a4050fea5f39fd5f9767",
+    "semantic_hash": ""
+  },
+  "docs/simulator/phase-2-validation.md": {
+    "mtime": 1794671549.5584264,
+    "ast_hash": "7e641d9795709f27f5fde3e990d2a5d4",
     "semantic_hash": ""
   }
 }

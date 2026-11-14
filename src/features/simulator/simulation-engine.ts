@@ -18,7 +18,7 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
     svg = undefined;
   }
 
-  function validateTargets() {
+  function validateTargets(mode: SimulationMode) {
     const view = doc.defaultView!;
     const targets = [...doc.querySelectorAll<HTMLElement>(TARGET)];
     if (doc.body.dataset.accesslensSimulatorDemo !== 'phase-0' || !targets.length) {
@@ -27,6 +27,9 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
     if (panelHost.parentElement !== doc.body || targets.includes(panelHost) ||
         [doc.documentElement, doc.body, ...targets].some(node => view.getComputedStyle(node).filter !== 'none')) {
       throw new Error('Unsupported layout: panel must be a body sibling and simulation roots must have no existing filter. Reset remains available.');
+    }
+    if (mode === 'blur' && targets.some(node => view.getComputedStyle(node).clipPath !== 'none')) {
+      throw new Error('Unsupported layout: blur clipping conflicts with an existing root clip-path. Reset remains available.');
     }
     if (doc.querySelector('base')) {
       throw new Error('Simulator does not support pages with a base element.');
@@ -46,7 +49,7 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
         // Clear our rule synchronously before checking author filters. Reuse the
         // same nodes on success; failures always roll back to a clean Off state.
         if (style) style.textContent = '';
-        validateTargets();
+        validateTargets(mode);
         const preset = PRESETS[mode];
         if ('matrix' in preset) {
           if (!svg) {
@@ -75,7 +78,9 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
         }
         style ??= doc.createElement('style');
         style.dataset.accesslensSimulatorOwned = owner;
-        style.textContent = `${TARGET} { filter: ${mode === 'blur' ? `blur(${intensity}px)` : `url("#${owner}")`} !important; }`;
+        // Clip after filtering to contain the halo without changing layout or
+        // scrolling. This also clips overflowing descendants and shadows.
+        style.textContent = `${TARGET} { filter: ${mode === 'blur' ? `blur(${intensity}px)` : `url("#${owner}")`} !important; ${mode === 'blur' ? 'clip-path: inset(0) !important;' : ''} }`;
         doc.head.append(style);
         // Catch blocked styles / conflicting author rules; painting is browser-tested.
         if ([...doc.querySelectorAll(TARGET)].some(node => doc.defaultView!.getComputedStyle(node).filter === 'none')) {

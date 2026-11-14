@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { AccessLensPanel } from '../../src/components/AccessLensPanel';
 import { createSimulationEngine } from '../../src/features/simulator/simulation-engine';
 import { createSimulatorController, type SimulatorController } from '../../src/features/simulator/simulator-controller';
+import { createSimulatorModeReader } from '../../src/shared/simulator-mode-reader';
 import './style.css';
 
 export default defineContentScript({
@@ -16,7 +17,7 @@ export default defineContentScript({
       onMount(container, _shadow, host) {
         controller = createSimulatorController(createSimulationEngine(document, host));
         const root = createRoot(container);
-        root.render(<AccessLensPanel controller={controller} />);
+        root.render(<AccessLensPanel controller={controller} modeReader={createSimulatorModeReader(controller)} />);
         return root;
       },
       onRemove(root) {
@@ -25,7 +26,7 @@ export default defineContentScript({
       },
     });
     // WXT checks runtime validity on each tick, including extension removal.
-    // No DOM scanning; at most one second before owned effects are cleaned up.
+    // No DOM scanning; normally one second, subject to background timer throttling.
     ctx.setInterval(() => {}, 1000);
     // pagehide also covers navigation and BFCache entry; do not retain effects.
     ctx.addEventListener(window, 'pagehide', () => ui.remove());

@@ -243,11 +243,170 @@ export interface SimulatorModeReader {
 
 ### Phase 3 — Read-only integration and QA (SIM-05, SIM-07, NFRs)
 
-- [ ] Add `SimulatorModeReader` interface and wire at extension composition root.
-- [ ] Confirm downstream feature boundaries need no simulator internals.
-- [ ] Profile mode-switch latency (<300 ms target on controlled demo page).
-- [ ] Run Chrome end-to-end tests for interactions, scrolling, reset, tab reload, and unsupported pages.
-- [ ] Verify extension disable/removal doesn't leave persistent page visual changes in supported conditions.
+- [x] Add `SimulatorModeReader` interface and wire at extension composition root.
+- [x] Confirm downstream feature boundaries need no simulator internals.
+- [x] Profile mode-switch latency (<300 ms target on controlled demo page).
+- [x] Run Chrome end-to-end tests for interactions, scrolling, reset, tab reload, and unsupported pages.
+- [x] Verify extension disable/removal doesn't leave persistent page visual changes in supported conditions.
+
+### Phase 4 — Cross-Site Compatibility
+
+#### Objective
+
+Extend the Simulator beyond the controlled demo site to support ordinary external HTTP/HTTPS webpages. The existing simulation modes, state management, and React UI should remain unchanged wherever possible.
+
+The goal is to make AccessLens site-agnostic while preserving the requirements defined in SIM-01 through SIM-07.
+
+#### 4.1 Expand Content Script Injection
+
+**Files:** `entrypoints/accesslens.content/index.tsx`, `wxt.config.ts`
+
+- Update WXT content-script match patterns to support HTTP and HTTPS websites instead of only localhost.
+- Continue using the existing content-script entrypoint to initialize the AccessLens panel and Simulator controller.
+- Run the content script in the top-level frame only for the MVP.
+- Ensure the extension initializes only once per page.
+- Handle unsupported or restricted pages gracefully.
+
+**Implementation example:**
+
+```typescript
+export default defineContentScript({
+  matches: ["http://*/*", "https://*/*"],
+  runAt: "document_idle",
+  allFrames: false,
+  cssInjectionMode: "ui",
+
+  async main(ctx) {
+    // Initialize existing AccessLens panel
+    // Initialize Simulator controller
+  },
+});
+```
+
+**Acceptance criteria:**
+- AccessLens loads on supported external websites.
+- Existing demo-site functionality remains intact.
+- No duplicate panels or controllers are created.
+
+#### 4.2 Make DOM Targeting Site-Agnostic
+
+**Files:** `src/features/simulator/simulator-dom.ts`, `simulation-engine.ts`
+
+The current implementation must not depend on the demo site's DOM structure.
+
+- Remove assumptions about specific containers such as `#root`, `#app`, or `main`.
+- Introduce a DOM adapter responsible for identifying simulation targets on arbitrary webpages.
+- Apply simulation effects through extension-owned CSS/SVG resources.
+- Exclude the AccessLens panel and its host from simulation effects.
+- Avoid overwriting existing inline styles or permanently modifying website elements.
+- Ensure switching modes replaces the previous effect instead of stacking filters.
+- Restore the original rendering when the simulation is disabled.
+
+**Important:** Shadow DOM isolates panel styles but does not protect the panel from filters applied to ancestor elements. Validate the filtering strategy on external sites before finalizing it.
+
+Applying filters to multiple individual elements can also produce different visual results from filtering the entire composited page. Prioritize a reliable implementation for ordinary webpages rather than attempting universal rendering support.
+
+**Acceptance criteria:**
+- Simulations work without site-specific selectors.
+- The AccessLens panel remains unaffected.
+- Page scrolling, links, and buttons continue working where technically possible.
+- Reset removes all extension-owned effects.
+
+#### 4.3 Support Dynamic Websites and SPA Navigation
+
+**Files:** `entrypoints/accesslens.content/index.tsx`, `simulator-dom.ts`
+
+Modern websites frequently update their DOM without a full page reload.
+
+- Preserve the active simulation during ordinary client-side navigation.
+- Detect when simulation targets are replaced or removed.
+- Reapply effects to newly created top-level content when necessary.
+- Use a narrowly scoped `MutationObserver` only if required.
+- Batch or debounce DOM updates to avoid unnecessary processing.
+- Prevent duplicate observers, stylesheets, and SVG filter definitions.
+- Clean up listeners and observers when the content script is invalidated.
+
+Do not continuously scan the entire DOM.
+
+**Acceptance criteria:**
+- Simulation remains active during supported SPA navigation.
+- Newly rendered content receives the appropriate effect.
+- Navigation does not produce duplicate filters or controllers.
+- Performance remains responsive.
+
+#### 4.4 Cross-Site Testing
+
+**Files:** `tests/e2e/`, `demo-site/`
+
+Validate the Simulator on websites with different rendering architectures.
+
+| Test website | Primary test |
+|---|---|
+| Wikipedia | Traditional HTML, scrolling, and text-heavy layouts |
+| Hacker News | Simple HTML and links |
+| GitHub | Dynamic components and SPA-style navigation |
+| MDN Web Docs | Documentation layouts and sticky elements |
+| YouTube | Dynamic content and complex rendering |
+
+For each supported test website, verify:
+
+- AccessLens initializes correctly.
+- Protanopia, Deuteranopia, and Tritanopia apply.
+- Low Acuity blur and its intensity slider work.
+- The AccessLens panel remains readable and keyboard accessible.
+- Switching between modes does not stack effects.
+- Off/Reset restores the original appearance.
+- Ordinary webpage interactions remain functional.
+- No significant console errors or resource leaks occur.
+
+Use automated browser tests where practical and manual visual verification for rendering fidelity.
+
+#### 4.5 Performance and Compatibility
+
+Maintain the Simulator PRD's performance target of mode changes feeling immediate, with a target under 300 ms on the controlled demo site.
+
+Additional requirements:
+
+- Avoid expensive DOM traversal during mode changes.
+- Reuse injected filter definitions where possible.
+- Minimize layout shifts and unnecessary style recalculations.
+- Keep all simulation processing client-side.
+- Preserve existing TypeScript interfaces and the single-active-mode behavior.
+
+**Explicitly out of scope:**
+- Restricted Chrome pages (`chrome://`).
+- Cross-origin iframe simulation.
+- Guaranteed compatibility with every website.
+- Perfect simulation of an individual's visual impairment.
+- Permanent modifications to website source code.
+- Backend services or persistent storage.
+
+#### 4.6 Completion Criteria
+
+Phase 4 is complete when:
+
+1. AccessLens runs on ordinary external HTTP/HTTPS websites.
+2. All five Simulator options behave according to the PRD.
+3. The panel remains unaffected by simulation effects.
+4. Simulations can be switched or reset without reloading.
+5. Supported SPA navigation does not break active simulations.
+6. At least three external websites pass the cross-site testing checklist.
+7. The original demo site continues to pass all Phase 3 tests.
+8. Known compatibility limitations are documented.
+
+#### Recommended Implementation Order
+
+| Priority | Task |
+|---|---|
+| P0 | Expand WXT content-script matches |
+| P0 | Test existing Simulator on external websites |
+| P0 | Remove demo-specific DOM assumptions |
+| P0 | Ensure panel isolation and reliable reset |
+| P1 | Handle dynamic DOM updates and SPA navigation |
+| P1 | Add cross-site browser tests |
+| P1 | Document unsupported cases and compatibility limitations |
+
+**Engineering recommendation:** Start by changing the content-script match patterns and testing the existing implementation on Wikipedia and GitHub. Identify actual compatibility failures before modifying the simulation engine. This minimizes unnecessary changes and protects the functionality already completed in Phases 0–3.
 
 ## 8. Testing matrix and acceptance checks
 
