@@ -105,3 +105,16 @@ test('cssContrastRatio reads hex and rgb(), and refuses transparent or unknown f
   assert.equal(m.cssContrastRatio('oklch(0.5 0.1 200)', '#fff'), null);
   assert.ok(m.cssContrastRatio('rgba(0, 0, 0, 1)', '#fff') > 20);
 });
+
+test('at AAA, a failure found by the AA rule is judged against the AAA target (axe enhanced rule skips < 4.5:1)', () => {
+  const data = { fgColor: '#a3a3a3', bgColor: '#ffffff', contrastRatio: 2.52, expectedContrastRatio: '4.5:1', fontSize: '10.5pt (14px)', fontWeight: 'normal' };
+  const issue = m.toContrastIssue({ id: 'a', status: 'failed', selector: '.fine-print', elementLabel: '<p>', data, level: 'AAA', fromMinimumRule: true });
+  assert.equal(issue.requiredRatio, 7);
+  assert.equal(issue.isLargeText, false, 'the AA "4.5:1" must not be read as AAA large text');
+  assert.equal(issue.wcagCriterion, '1.4.6');
+  const large = m.toContrastIssue({ id: 'b', status: 'failed', selector: 'h2', elementLabel: '<h2>', level: 'AAA', fromMinimumRule: true,
+    data: { fgColor: '#bbbbbb', bgColor: '#ffffff', contrastRatio: 1.9, expectedContrastRatio: '3:1', fontSize: '21.0pt (28px)' } });
+  assert.deepEqual([large.requiredRatio, large.isLargeText], [4.5, true]);
+  const nullData = m.toContrastIssue({ id: 'c', status: 'needs-review', selector: 'p', elementLabel: '<p>', data: null, level: 'AAA', fromMinimumRule: true });
+  assert.equal(nullData.requiredRatio, 7);
+});

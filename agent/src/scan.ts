@@ -71,7 +71,15 @@ function fixFor(raw: RawNode, issue: ContrastIssue): { fix?: AgentFix; no_fix?: 
 }
 
 export function toReport(url: string, level: ContrastLevel, raws: readonly RawNode[], maxIssues: number): AgentReport {
-  const issues: AgentIssue[] = raws.map(raw => {
+  // At AAA both text rules can report one element; keep its first (failures come first) result.
+  const seen = new Set<string>();
+  const unique = raws.filter(raw => {
+    const key = `${raw.rule === 'link-in-text-block' ? 'link' : 'text'}|${JSON.stringify(raw.target)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  const issues: AgentIssue[] = unique.map(raw => {
     const common = {
       id: `${raw.rule}-${raw.status}-${raw.index}`,
       status: raw.status,
@@ -80,7 +88,7 @@ export function toReport(url: string, level: ContrastLevel, raws: readonly RawNo
     };
     const issue = raw.rule === 'link-in-text-block'
       ? toLinkIssue({ ...common, data: raw.data as AxeLinkData | null, computedLinkColor: raw.color, computedTextColor: raw.surroundingColor })
-      : toContrastIssue({ ...common, data: raw.data as AxeContrastData | null, level });
+      : toContrastIssue({ ...common, data: raw.data as AxeContrastData | null, level, fromMinimumRule: raw.rule === 'color-contrast' });
     return {
       id: issue.id,
       status: issue.status === 'failed' ? 'fail' : 'review',

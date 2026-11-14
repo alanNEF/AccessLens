@@ -32,8 +32,11 @@ export interface RawNode {
 export async function scanInPage(options: PageScanOptions): Promise<RawNode[]> {
   const axe = (window as any).axe;
   if (!axe) throw new Error('axe-core is not loaded in the page.');
-  const textRule = options.level === 'AAA' ? 'color-contrast-enhanced' : 'color-contrast';
-  const rules = [textRule, 'link-in-text-block'];
+  // At AAA, color-contrast-enhanced only reports 4.5–7:1 (3–4.5:1 large) and passes lower ratios,
+  // so color-contrast runs too; its results are judged against the AAA target outside the page.
+  const rules = options.level === 'AAA'
+    ? ['color-contrast', 'color-contrast-enhanced', 'link-in-text-block']
+    : ['color-contrast', 'link-in-text-block'];
 
   document.querySelectorAll('style[data-accesslens-agent]').forEach(node => node.remove());
   if (options.css) {

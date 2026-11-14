@@ -63,7 +63,10 @@ try {
   const aaa = (await request('tools/call', { name: 'accesslens_scan', arguments: { url, level: 'AAA' } })).structuredContent;
   assert.equal(aaa.level, 'AAA');
   assert.equal(find(aaa, 'fine-print')?.wcag, '1.4.6');
-  assert.equal(find(aaa, 'fine-print')?.required, 7);
+  assert.equal(find(aaa, 'fine-print')?.required, 7, 'AA-rule failures are judged against 7:1 at AAA');
+  assert.equal(find(aaa, 'vendor-meta')?.status, 'fail', 'T8 (6.70:1) fails only at AAA');
+  assert.equal(find(aa, 'vendor-meta'), undefined, 'T8 passes AA');
+  assert.equal(aaa.issues.filter(issue => issue.selector.includes('hero')).length, 1, 'no duplicate review items at AAA');
   console.log(`PASS scan AAA: ${aaa.summary.fail} fail`);
 
   // Verify-a-fix loop: inject the suggested CSS and scan again.
