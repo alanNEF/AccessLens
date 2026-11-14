@@ -7,6 +7,8 @@ import { Card, CardContent } from '../../components/ui/card';
 import { cn } from '../../components/shared/utils';
 import type { FixerController } from './fixer-controller';
 import type { FixerState } from './fixer-state';
+import type { ImageIssue } from '../inspector/image-runner';
+import { ImageAltFixer } from './ImageAltFixer';
 
 // Local labels keep the Fixer independent of simulator internals.
 const MODE_LABELS: Record<SimulationMode, string> = {
@@ -33,7 +35,15 @@ function Swatch({ label, color, background, ratio }: { label: string; color: str
   );
 }
 
-export function FixerTab({ controller, modeReader }: { controller: FixerController; modeReader: SimulatorModeReader }) {
+export function FixerTab({
+  controller,
+  modeReader,
+  selectedImage,
+}: {
+  controller: FixerController;
+  modeReader: SimulatorModeReader;
+  selectedImage: ImageIssue | null;
+}) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const mode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const [copyStatus, setCopyStatus] = useState('');
@@ -54,7 +64,9 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
       setCopyStatus('Copy blocked on this page. The declaration is selected: press Ctrl+C (⌘C on Mac).');
     }
   }
-
+  if (selectedImage) {
+  return <ImageAltFixer selectedImage={selectedImage} />;
+  }
   return (
     <div className="space-y-5">
       <div>

@@ -9,6 +9,7 @@ import type { FixerController } from '../features/fixer/fixer-controller';
 import { HighlightLayer } from '../features/inspector/HighlightLayer';
 import type { InspectorStore } from '../features/inspector/inspector-store';
 import type { InspectedIssue } from '../features/inspector/axe-runner';
+import type { ImageIssue } from '../features/inspector/image-runner';
 import type { IssueHandoffStore } from '../shared/issue-handoff';
 import { isVerifiedFailure, type FeatureId } from '../shared/types';
 import { APP_NAME } from '../shared/constants';
@@ -32,11 +33,16 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
 
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<FeatureId>('simulator');
+  const [selectedImage, setSelectedImage] = useState<ImageIssue | null>(null);
   // Inspector → Fixer handoff (INS-07): store the verified issue, then show the Fixer tab.
   function previewFix(item: InspectedIssue) {
     if (!isVerifiedFailure(item.issue)) return;
     handoff.set({ issue: item.issue, element: item.element });
     setActiveTab('fixer');
+  }
+  function previewImageFix(item: ImageIssue) {
+  setSelectedImage(item);
+  setActiveTab('fixer');
   }
   const expandButton = useRef<HTMLButtonElement>(null);
   const collapseButton = useRef<HTMLButtonElement>(null);
@@ -92,8 +98,21 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
               </div>
               <div className="accesslens-scroll min-h-0 overflow-y-auto overscroll-contain px-5 pt-4 pb-5">
                 <TabsContent value="simulator" className="m-0"><SimulatorTab controller={controller} modeReader={modeReader} /></TabsContent>
-                <TabsContent value="inspector" className="m-0"><InspectorTab store={inspector} modeReader={modeReader} onPreviewFix={previewFix} /></TabsContent>
-                <TabsContent value="fixer" className="m-0"><FixerTab controller={fixer} modeReader={modeReader} /></TabsContent>
+                <TabsContent value="inspector" className="m-0">
+                  <InspectorTab
+                   store={inspector}
+                   modeReader={modeReader}
+                   onPreviewFix={previewFix}
+                   onPreviewImageFix={previewImageFix}
+                  />
+                </TabsContent>
+                <TabsContent value="fixer" className="m-0">
+                  <FixerTab
+                    controller={fixer}
+                    modeReader={modeReader}
+                    selectedImage={selectedImage}
+                  />
+                </TabsContent>
               </div>
             </Tabs>
             {storageError && <p role="alert" className="px-5 pb-3 text-xs text-destructive">Theme storage is unavailable. Changes apply to this session.</p>}

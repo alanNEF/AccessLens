@@ -9,6 +9,7 @@ import { isVerifiedFailure, type ContrastStatus } from '../../shared/types';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { cn } from '../../components/shared/utils';
+import type { ImageIssue } from './image-runner';
 
 const WCAG_LINK = 'https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html';
 
@@ -122,10 +123,11 @@ function IssueDetail({ item, onPreviewFix }: { item: InspectedIssue; onPreviewFi
   );
 }
 
-export function InspectorTab({ store, modeReader, onPreviewFix }: {
+export function InspectorTab({ store, modeReader, onPreviewFix, onPreviewImageFix }: {
   store: InspectorStore;
   modeReader: SimulatorModeReader;
   onPreviewFix: (item: InspectedIssue) => void;
+  onPreviewImageFix: (item: ImageIssue) => void;
 }) {
   const state = useSyncExternalStore(store.subscribe, store.getState);
   const imageIssues = state.imageIssues;
@@ -204,6 +206,16 @@ export function InspectorTab({ store, modeReader, onPreviewFix }: {
             >
               Show image on page
             </Button>
+
+            {item.element instanceof HTMLImageElement && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => onPreviewImageFix(item)}
+              >
+                Fix image
+              </Button>
+            )}
           </div>
           ))}
       </section>
