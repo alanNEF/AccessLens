@@ -15,8 +15,9 @@ export function connectInspectorToFixer(inspector: InspectorStore, handoff: Issu
     else fixer.clear();
   });
   const stopInspector = inspector.subscribe(() => {
-    const { status, picking } = inspector.getState();
-    if ((status === 'scanning' || picking) && fixer.hasActivePreview()) fixer.revert();
+    const { status, picking, issues, picked } = inspector.getState();
+    if (status === 'scanning' || picking) fixer.prepareForInspection();
+    else if (status === 'idle' && issues.length === 0 && !picked) fixer.bulk.clear();
   });
   return () => { stopHandoff(); stopInspector(); };
 }

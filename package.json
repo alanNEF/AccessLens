@@ -15,6 +15,8 @@
     "test:phase3": "node --test tests/unit/simulator-controller.test.mjs && node tests/e2e/phase1.mjs",
     "test:phase4": "node --test tests/unit/simulator-controller.test.mjs && ACCESSLENS_CROSS_SITE=1 node tests/e2e/phase1.mjs",
     "test:fixer": "node --test tests/unit/color-suggester.test.mjs tests/unit/preview-manager.test.mjs tests/unit/fixer-controller.test.mjs",
+    "test:bulk": "vitest run tests/unit/bulk-corrections.test.ts",
+    "test:bulk:e2e": "npm run build && ACCESSLENS_BULK_ONLY=1 node tests/e2e/phase1.mjs",
     "demo": "python3 -m http.server 8081 --bind 127.0.0.1 --directory demo-site",
     "postinstall": "wxt prepare",
     "test:unit": "node --test tests/unit/*.test.mjs",

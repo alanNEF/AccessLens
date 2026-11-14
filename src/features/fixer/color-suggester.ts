@@ -6,7 +6,7 @@ import type { SuggestedFix, VerifiedContrastFailure } from '../../shared/types';
 
 // Tree-shakeable Culori: register only the modes needed to parse computed CSS
 // colors (rgb/hex, lab, lch, oklab, oklch) and to measure contrast/difference.
-useMode(modeRgb);
+const toRgb = useMode(modeRgb);
 useMode(modeLrgb);
 useMode(modeOklab);
 useMode(modeLab);
@@ -20,12 +20,15 @@ const colorDifference = differenceCiede2000();
 const TARGET_MARGIN = 0.01;
 const SEARCH_STEPS = 20;
 
-export type UnsupportedReason = 'invalid-color' | 'transparent-color' | 'already-passes' | 'no-compliant-color';
+export type UnsupportedReason = 'invalid-color' | 'transparent-color' | 'already-passes' | 'no-compliant-color' | 'too-transparent';
 type SuggestionResult =
   | { readonly ok: true; readonly fix: SuggestedFix }
   | { readonly ok: false; readonly reason: UnsupportedReason; readonly message: string };
 
-type SuggestionInput = Pick<VerifiedContrastFailure, 'id' | 'textColor' | 'backgroundColor' | 'requiredRatio'>;
+type SuggestionInput = Pick<VerifiedContrastFailure, 'id' | 'textColor' | 'backgroundColor' | 'requiredRatio'> & {
+  /** Combined CSS opacity the text is drawn with, 0–1. The CSS color is faded by it. */
+  readonly opacity?: number;
+};
 
 /** Parses a CSS color, accepting only fully opaque values. */
 export function parseOpaque(value: string): Color | UnsupportedReason {
@@ -45,6 +48,19 @@ export function contrastRatio(a: Color | string, b: Color | string): number {
   return wcagContrast(a, b);
 }
 
+/**
+ * What the browser draws: `color` faded to `opacity` over the background,
+ * mixed per sRGB channel (CSS compositing) and rounded to 8-bit hex.
+ */
+export function renderedColor(color: Color | string, background: Color | string, opacity: number): string {
+  const fg = toRgb(color);
+  const bg = toRgb(background);
+  if (!fg || !bg) return '';
+  if (opacity >= 1) return toHex(fg);
+  const mix = (f: number, b: number) => opacity * f + (1 - opacity) * b;
+  return formatHex({ mode: 'rgb', r: mix(fg.r, bg.r), g: mix(fg.g, bg.g), b: mix(fg.b, bg.b) });
+}
+
 /** Truncate to two decimals: 4.499 shows as 4.49, never as 4.50. */
 export function floorRatio(ratio: number): number {
   return Math.floor(ratio * 100) / 100;
@@ -53,12 +69,13 @@ export function floorRatio(ratio: number): number {
 /**
  * Smallest OKLCH lightness change (hue and chroma kept) that makes `adjustable`
  * reach `target` against `fixed`, moving toward black or white. Candidates are
- * judged on their rounded hex value, so rounding can never produce a failure.
+ * judged on their rounded hex value as drawn at `opacity`, so neither rounding
+ * nor fading can produce a failure.
  */
-function searchLightness(adjustable: Color, fixed: Color, target: number, toward: 0 | 1): string | undefined {
+function searchLightness(adjustable: Color, fixed: Color, target: number, opacity: number, toward: 0 | 1): string | undefined {
   const start = toOklch(adjustable);
   const hexAt = (l: number) => toHex({ ...start, l });
-  const passes = (hex: string) => contrastRatio(hex, fixed) >= target;
+  const passes = (hex: string) => contrastRatio(renderedColor(hex, fixed, opacity), fixed) >= target;
   if (!passes(hexAt(toward))) return undefined;
   let failing = start.l;
   let passing: number = toward;
@@ -71,10 +88,10 @@ function searchLightness(adjustable: Color, fixed: Color, target: number, toward
 }
 
 /** Closest passing candidate by CIEDE2000, trying darker and lighter. */
-function closestReplacement(adjustable: Color, fixed: Color, target: number): string | undefined {
+function closestReplacement(adjustable: Color, fixed: Color, target: number, opacity: number): string | undefined {
   let best: { hex: string; difference: number } | undefined;
   for (const toward of [0, 1] as const) {
-    const hex = searchLightness(adjustable, fixed, target, toward);
+    const hex = searchLightness(adjustable, fixed, target, opacity, toward);
     if (!hex) continue;
     const difference = colorDifference(adjustable, hex);
     if (!best || difference < best.difference) best = { hex, difference };
@@ -87,6 +104,7 @@ const MESSAGES: Record<UnsupportedReason, string> = {
   'transparent-color': 'Transparent or semi-transparent colors need manual review.',
   'already-passes': 'These colors already meet the required contrast ratio.',
   'no-compliant-color': 'Changing only the text or only the background cannot reach this target. Both colors need to change; adjust them by hand.',
+  'too-transparent': 'This text is drawn too transparent (CSS opacity) for any text color to reach the required contrast. Raise its opacity instead.',
 };
 
 function unsupported(reason: UnsupportedReason): SuggestionResult {
@@ -94,50 +112,61 @@ function unsupported(reason: UnsupportedReason): SuggestionResult {
 }
 
 /**
- * FIX-02: one replacement color reaching the required threshold.
+ * FIX-02: one replacement color reaching the required threshold (AA, or enhanced AAA 7:1).
  *
- * The text color is tried first. For AA (4.5:1, 3:1) it always works: the search
- * ends at black or white, and one of them reaches at least 4.58:1 against any
- * opaque background. The enhanced AAA target (7:1) can be out of reach for the
- * text alone on mid-tone backgrounds, so the background color is tried next
- * (FIX-02's "solid background color" option). If neither single change can
- * reach the target, 'no-compliant-color' explains it instead of guessing.
+ * `textColor` is the CSS `color` to edit. With `opacity` below 1 the browser
+ * fades it into the background, so every ratio here is measured on the color
+ * as drawn, and the suggestion is the CSS color that passes after fading.
+ *
+ * Fully opaque text is always adjustable: the search ends at black or white,
+ * and one of them reaches at least 4.58:1 against any opaque background. Faded
+ * text may not be ('too-transparent').
+ *
+ * The enhanced 7:1 target can be out of reach for the text alone on mid-tone
+ * backgrounds, so for opaque text the background color is tried next (FIX-02's
+ * "solid background color" option). Faded text is not given a background fix:
+ * its drawn color depends on the background too.
  */
 export function suggestFix(issue: SuggestionInput): SuggestionResult {
+  const opacity = issue.opacity ?? 1;
+  if (!(opacity > 0 && opacity <= 1)) return unsupported('too-transparent');
   const text = parseOpaque(issue.textColor);
   if (typeof text === 'string') return unsupported(text);
   const background = parseOpaque(issue.backgroundColor);
   if (typeof background === 'string') return unsupported(background);
 
-  const original = contrastRatio(text, background);
+  const drawnRatio = (color: Color | string) => contrastRatio(renderedColor(color, background, opacity), background);
+  const original = drawnRatio(text);
   if (original >= issue.requiredRatio) return unsupported('already-passes');
 
   const target = issue.requiredRatio + TARGET_MARGIN;
-  const textFix = closestReplacement(text, background, target);
-  if (textFix) {
-    return {
-      ok: true,
-      fix: {
-        issueId: issue.id,
-        property: 'color',
-        originalValue: toHex(text),
-        suggestedValue: textFix,
-        originalContrastRatio: floorRatio(original),
-        expectedContrastRatio: floorRatio(contrastRatio(textFix, background)),
-      },
-    };
+  const suggestedValue = closestReplacement(text, background, target, opacity);
+  if (!suggestedValue && opacity >= 1) {
+    const backgroundFix = closestReplacement(background, text, target, 1);
+    if (backgroundFix) {
+      return {
+        ok: true,
+        fix: {
+          issueId: issue.id,
+          property: 'background-color',
+          originalValue: toHex(background),
+          suggestedValue: backgroundFix,
+          originalContrastRatio: floorRatio(original),
+          expectedContrastRatio: floorRatio(contrastRatio(text, backgroundFix)),
+        },
+      };
+    }
   }
-  const backgroundFix = closestReplacement(background, text, target);
-  if (!backgroundFix) return unsupported('no-compliant-color');
+  if (!suggestedValue) return unsupported(opacity < 1 ? 'too-transparent' : 'no-compliant-color');
   return {
     ok: true,
     fix: {
       issueId: issue.id,
-      property: 'background-color',
-      originalValue: toHex(background),
-      suggestedValue: backgroundFix,
+      property: 'color',
+      originalValue: toHex(text),
+      suggestedValue,
       originalContrastRatio: floorRatio(original),
-      expectedContrastRatio: floorRatio(contrastRatio(text, backgroundFix)),
+      expectedContrastRatio: floorRatio(drawnRatio(suggestedValue)),
     },
   };
 }

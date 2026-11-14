@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
 const { outputFiles } = await build({ entryPoints: ['src/features/fixer/color-suggester.ts'], bundle: true, write: false, format: 'esm' });
-const { suggestFix, contrastRatio, floorRatio } = await import('data:text/javascript;base64,' + Buffer.from(outputFiles[0].text).toString('base64'));
+const { suggestFix, contrastRatio, floorRatio, renderedColor } = await import('data:text/javascript;base64,' + Buffer.from(outputFiles[0].text).toString('base64'));
 
 // Independent WCAG 2.x formula, so the tests do not only trust Culori.
 function luminance(hex) {
@@ -89,6 +89,55 @@ test('helpers: ratio matches WCAG, floor never rounds up', () => {
   assert.ok(Math.abs(contrastRatio('#777777', '#ffffff') - wcag('#777777', '#ffffff')) < 1e-9);
   assert.equal(floorRatio(4.499), 4.49);
   assert.equal(floorRatio(21), 21);
+});
+
+// Independent CSS compositing: color faded to `alpha` over the background, per sRGB channel.
+function blend(hex, bgHex, alpha) {
+  const ch = (h, i) => parseInt(h.slice(i, i + 2), 16);
+  return '#' + [1, 3, 5].map(i => Math.round(alpha * ch(hex, i) + (1 - alpha) * ch(bgHex, i)).toString(16).padStart(2, '0')).join('');
+}
+
+test('renderedColor matches CSS opacity compositing', () => {
+  assert.equal(renderedColor('#07271c', '#43e8b0', 0.6), blend('#07271c', '#43e8b0', 0.6));
+  assert.equal(renderedColor('#07271c', '#43e8b0', 0.6), '#1f7457', 'the Health card as Inspector reported it');
+  assert.equal(renderedColor('rgb(10, 20, 30)', '#ffffff', 1), '#0a141e');
+});
+
+test('opacity: suggests the CSS color that passes after fading (Health card)', () => {
+  const result = suggestFix({ ...issue('#07271c', '#43e8b0'), opacity: 0.6 });
+  assert.equal(result.ok, true);
+  const { fix } = result;
+  assert.equal(fix.originalValue, '#07271c');
+  assert.equal(fix.originalContrastRatio, 3.62, 'measured as drawn, like Inspector');
+  assert.ok(wcag(blend(fix.suggestedValue, '#43e8b0', 0.6), '#43e8b0') >= 4.5, 'passes once faded');
+  assert.ok(luminance(fix.suggestedValue) < luminance('#07271c'), 'darker, not lighter');
+});
+
+test('opacity: too faint for any color is explained', () => {
+  assert.equal(suggestFix({ ...issue('#07271c', '#43e8b0'), opacity: 0.3 }).reason, 'too-transparent');
+  assert.equal(suggestFix({ ...issue('#999999', '#ffffff'), opacity: 0 }).reason, 'too-transparent');
+});
+
+test('opacity: random cases pass as drawn, or are honestly impossible', () => {
+  let seed = 11;
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const hex = () => '#' + Array.from({ length: 3 }, () => Math.floor(random() * 256).toString(16).padStart(2, '0')).join('');
+  let fixed = 0, impossible = 0;
+  for (let i = 0; i < 300; i++) {
+    const [text, bg, alpha, required] = [hex(), hex(), 0.3 + random() * 0.7, random() < 0.5 ? 4.5 : 3];
+    if (wcag(blend(text, bg, alpha), bg) >= required) continue;
+    const result = suggestFix({ ...issue(text, bg, required), opacity: alpha });
+    if (result.ok) {
+      assert.ok(wcag(blend(result.fix.suggestedValue, bg, alpha), bg) >= required, `${result.fix.suggestedValue} at ${alpha} on ${bg}`);
+      fixed++;
+    } else {
+      assert.equal(result.reason, 'too-transparent');
+      const best = Math.max(wcag(blend('#000000', bg, alpha), bg), wcag(blend('#ffffff', bg, alpha), bg));
+      assert.ok(best < required + 0.05, `claimed impossible but black/white reach ${best.toFixed(2)}`);
+      impossible++;
+    }
+  }
+  assert.ok(fixed > 50 && impossible > 5, `fixed ${fixed}, impossible ${impossible}`);
 });
 
 test('enhanced 7:1 on a mid-tone background falls back to changing the background', () => {

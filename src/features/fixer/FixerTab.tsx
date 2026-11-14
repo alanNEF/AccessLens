@@ -7,6 +7,8 @@ import { Card, CardContent } from '../../components/ui/card';
 import { cn } from '../../components/shared/utils';
 import type { FixerController } from './fixer-controller';
 import type { FixerState } from './fixer-state';
+import { BulkCorrections } from './BulkCorrections';
+import type { InspectorStore } from '../inspector/inspector-store';
 
 // Local labels keep the Fixer independent of simulator internals.
 const MODE_LABELS: Record<SimulationMode, string> = {
@@ -26,10 +28,11 @@ function requirementText(issue: ContrastIssue): string {
   return `${issue.isLargeText ? 'Large' : 'Normal'} text needs ${issue.requiredRatio}:1 (WCAG ${issue.wcagCriterion} ${level})`;
 }
 
-function Swatch({ label, color, background, ratio, code = color }: { label: string; color: string; background: string; ratio: number; code?: string }) {
+/** `opacity` fades only the sample text, matching how the page draws it. */
+function Swatch({ label, color, background, ratio, opacity = 1, code = color }: { label: string; color: string; background: string; ratio: number; opacity?: number; code?: string }) {
   return (
     <figure className="m-0 space-y-2 rounded-lg border border-border p-2.5">
-      <div className="flex h-12 items-center justify-center rounded-md border border-border text-xl font-semibold" style={{ color, background }} aria-hidden="true">Aa</div>
+      <div className="flex h-12 items-center justify-center rounded-md border border-border text-xl font-semibold" style={{ background }} aria-hidden="true"><span style={{ color, opacity }}>Aa</span></div>
       <figcaption className="space-y-0.5 text-xs">
         <span className="block font-medium text-foreground">{label}</span>
         <code className="block font-mono text-muted-foreground">{code}</code>
@@ -39,7 +42,7 @@ function Swatch({ label, color, background, ratio, code = color }: { label: stri
   );
 }
 
-export function FixerTab({ controller, modeReader }: { controller: FixerController; modeReader: SimulatorModeReader }) {
+export function FixerTab({ controller, modeReader, inspector }: { controller: FixerController; modeReader: SimulatorModeReader; inspector: InspectorStore }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const mode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const [copyStatus, setCopyStatus] = useState('');
@@ -67,6 +70,8 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
         <h2 className="mb-1 text-lg font-semibold tracking-tight">Preview a fix</h2>
         <p className="text-sm text-muted-foreground">Try a fix on the page, then copy the CSS.</p>
       </div>
+
+      <BulkCorrections controller={controller} inspector={inspector} />
 
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
         Status: <strong className="font-medium text-foreground">{statusText(state)}</strong>
@@ -96,8 +101,8 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
           <div className="space-y-2">
             {fix.property === 'color' && (
               <div className="grid grid-cols-2 gap-2">
-                <Swatch label="Current" color={fix.originalValue} background={issue.backgroundColor} ratio={fix.originalContrastRatio} />
-                <Swatch label="Suggested" color={fix.suggestedValue} background={issue.backgroundColor} ratio={fix.expectedContrastRatio} />
+                <Swatch label="Current" color={fix.originalValue} background={issue.backgroundColor} ratio={fix.originalContrastRatio} opacity={state.opacity} />
+                <Swatch label="Suggested" color={fix.suggestedValue} background={issue.backgroundColor} ratio={fix.expectedContrastRatio} opacity={state.opacity} />
               </div>
             )}
             {fix.property === 'background-color' && (
@@ -121,6 +126,11 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
               </div>
             )}
             <p className="text-xs text-muted-foreground">Changes the <code className="font-mono">{fix.property}</code> property only.</p>
+            {state.opacity !== undefined && state.opacity < 1 && (
+              <p className="text-xs text-muted-foreground">
+                This text is drawn at {Math.round(state.opacity * 100)}% opacity, so the suggested color is darker or lighter than it looks: ratios are measured as drawn. Raising the opacity is another way to fix it.
+              </p>
+            )}
           </div>
 
           {phase === 'ready' && (

@@ -100,6 +100,18 @@ threshold and an explanation. **Preview fix** hands a verified failure to Fixer 
 never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
 runs the contrast-mapping and simulator unit tests.
 
+## Bulk Fixer previews
+
+Use **Scan page** in Inspector, open Fixer and choose **Run All Corrections**.
+Supported text-contrast suggestions are validated and enabled immediately. Toggle individual
+checkboxes, **Select All**, **Deselect All**, or **Restore Original** to compare temporary changes.
+Unsupported results and failed corrections are reported separately. Existing single-issue previews
+remain available; the latest action owns a given element/property.
+
+Try `demo-site/bulk-corrections.html`. Run `npm run test:bulk` for DOM/state tests and
+`npm run test:bulk:e2e` for the production extension in an isolated Chrome profile.
+See [implementation, changed files and validation](docs/fixer/bulk-corrections.md).
+
 ## Visionless Lite
 
 Reload the built extension for its new `tts` permission, then try
