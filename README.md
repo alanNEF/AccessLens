@@ -72,6 +72,16 @@ tooltip overlays stay within the extension's Shadow DOM.
 See [UI implementation and validation](docs/ui-redesign.md) for changed files,
 dependencies, accessibility details and browser checks.
 
+## For coding agents
+
+`agent/` builds an MCP server and Claude Code plugin (`agent-plugin/`) that runs the same checks headlessly and
+returns compact JSON with CSS fixes, so agents can test accessibility without screenshots. See
+[agent/README.md](agent/README.md). Install in Claude Code (2.1.275+) with:
+
+```
+/plugin install accesslens --marketplace alanNEF/accesslens
+```
+
 ## From simulation to fix
 
 | Simulation | Inspector check | Fixer |

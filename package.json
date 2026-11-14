@@ -20,7 +20,9 @@
     "demo": "python3 -m http.server 8081 --bind 127.0.0.1 --directory demo-site",
     "postinstall": "wxt prepare",
     "test:unit": "node --test tests/unit/*.test.mjs",
-    "test:visionless": "vitest run"
+    "test:visionless": "vitest run",
+    "build:agent": "node agent/build.mjs",
+    "test:agent": "node agent/smoke-test.mjs"
   },
   "dependencies": {
     "axe-core": "^4.14.0",
