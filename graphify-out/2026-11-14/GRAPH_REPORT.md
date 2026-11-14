@@ -1,16 +1,16 @@
 # Graph Report - AccessLens  (2026-11-14)
 
 ## Corpus Check
-- 71 files · ~34,154 words
+- 74 files · ~35,672 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 471 nodes · 713 edges · 58 communities (24 shown, 34 thin omitted)
+- 486 nodes · 737 edges · 60 communities (25 shown, 35 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.7)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `617ea361`
+- Built from commit: `40d84528`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -68,6 +68,8 @@
 - [[_COMMUNITY_ref_node_test|ref_node_test]]
 - [[_COMMUNITY_src_styles_globals|src_styles_globals]]
 - [[_COMMUNITY_types.ts|types.ts]]
+- [[_COMMUNITY_panel-position.ts|panel-position.ts]]
+- [[_COMMUNITY_panel-position.test.mjs|panel-position.test.mjs]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `cn()` - 29 edges
@@ -96,15 +98,15 @@
 ## Import Cycles
 - None detected.
 
-## Communities (58 total, 34 thin omitted)
+## Communities (60 total, 35 thin omitted)
 
 ### Community 1 - "AccessLensPanel.tsx"
-Cohesion: 0.08
-Nodes (38): AccessLensPanel(), OverlayContainerContext, ThemePreference, useTheme(), cn(), Button(), buttonVariants, Card() (+30 more)
+Cohesion: 0.10
+Nodes (30): cn(), Button(), buttonVariants, Card(), CardAction(), CardContent(), CardDescription(), CardFooter() (+22 more)
 
 ### Community 2 - "fixer-controller.ts"
-Cohesion: 0.09
-Nodes (32): closestReplacement(), colorDifference, contrastRatio(), floorRatio(), intoSrgb, MESSAGES, parseOpaque(), searchLightness() (+24 more)
+Cohesion: 0.08
+Nodes (37): closestReplacement(), colorDifference, contrastRatio(), floorRatio(), intoSrgb, MESSAGES, parseOpaque(), searchLightness() (+29 more)
 
 ### Community 3 - "Project Setup and Documentation"
 Cohesion: 0.05
@@ -115,32 +117,32 @@ Cohesion: 0.24
 Nodes (13): runCrossSite(), cdp(), chrome, edgeCapture(), evaluate(), profile, screenshot(), select() (+5 more)
 
 ### Community 5 - "messages.ts"
-Cohesion: 0.13
-Nodes (14): createSpeechBroker(), Session, SpeechBackend, createSpeechClient(), isSpeechMessage(), isTogglePanelMessage(), isVisionlessNavigationMessage(), SpeechMessage (+6 more)
+Cohesion: 0.08
+Nodes (24): createSimulationEngine(), describeElement(), ElementDescription, text(), visible(), attachFocusAnnouncer(), createSpeechBroker(), Session (+16 more)
 
 ### Community 6 - "axe-runner.ts"
 Cohesion: 0.19
 Nodes (18): collect(), inspectElement(), queue, runAxe(), scanTextContrast(), toInspected(), AxeContrastData, describeElement() (+10 more)
 
 ### Community 7 - "simulator-controller.ts"
-Cohesion: 0.18
-Nodes (12): createSimulationEngine(), SimulationEngine, createSimulatorDom(), describeElement(), ElementDescription, text(), visible(), attachFocusAnnouncer() (+4 more)
+Cohesion: 0.13
+Nodes (15): scripts, build, demo, dev, postinstall, test:fixer, test:phase0, test:phase1 (+7 more)
 
 ### Community 8 - "Color Suggestion Placeholder"
 Cohesion: 0.07
 Nodes (29): 1. Goal and product boundaries, 2. Architecture and execution boundaries, 3. Data model and contracts, 4.1 Expand Content Script Injection, 4.2 Make DOM Targeting Site-Agnostic, 4.3 Support Dynamic Websites and SPA Navigation, 4.4 Cross-Site Testing, 4.5 Performance and Compatibility (+21 more)
 
 ### Community 9 - "index.tsx"
-Cohesion: 0.11
-Nodes (17): connectInspectorToFixer(), createFixerController(), FixerController, InspectedIssue, revealElement(), TrackedRect, useTrackedRects(), HighlightLayer() (+9 more)
+Cohesion: 0.09
+Nodes (25): AccessLensPanel(), OverlayContainerContext, usePanelPosition(), ThemePreference, useTheme(), Tooltip(), TooltipContent(), TooltipProvider() (+17 more)
 
 ### Community 11 - "components.json"
 Cohesion: 0.12
 Nodes (16): aliases, components, hooks, lib, ui, utils, iconLibrary, rsc (+8 more)
 
 ### Community 12 - "scripts"
-Cohesion: 0.05
-Nodes (41): dependencies, axe-core, class-variance-authority, clsx, culori, lucide-react, radix-ui, react (+33 more)
+Cohesion: 0.07
+Nodes (26): dependencies, axe-core, class-variance-authority, clsx, culori, lucide-react, radix-ui, react (+18 more)
 
 ### Community 13 - "fixer-prd.md"
 Cohesion: 0.14
@@ -171,28 +173,32 @@ Cohesion: 0.40
 Nodes (4): Blur edge clipping, Phase 2 — controller and Simulator UI, Run the local demo, Verification
 
 ### Community 57 - "types.ts"
-Cohesion: 0.19
-Nodes (15): BLUR, normalizeBlur(), createSimulatorController(), SimulatorController, DEFAULT_SETTINGS, SimulationSettings, SimulationStatus, SimulatorState (+7 more)
+Cohesion: 0.21
+Nodes (13): BLUR, normalizeBlur(), SimulationEngine, createSimulatorController(), createSimulatorDom(), DEFAULT_SETTINGS, SimulationSettings, SimulationStatus (+5 more)
+
+### Community 58 - "panel-position.ts"
+Cohesion: 0.33
+Nodes (9): clampNumber(), clampOffset(), DEFAULT_OFFSET, dragOffset(), isPanelOffset(), nudgeOffset(), PanelOffset, passedThreshold() (+1 more)
 
 ## Knowledge Gaps
-- **199 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+194 more)
+- **202 isolated node(s):** `$schema`, `style`, `rsc`, `tsx`, `config` (+197 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **34 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **35 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `AccessLens — Simulator Implementation Plan` connect `Color Suggestion Placeholder` to `Project Setup and Documentation`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Why does `cn()` connect `AccessLensPanel.tsx` to `types.ts`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `cn()` connect `AccessLensPanel.tsx` to `index.tsx`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `$schema`, `style`, `rsc` to the rest of the system?**
-  _199 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _202 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `AccessLensPanel.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.08246753246753247 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10188261351052048 - nodes in this community are weakly interconnected._
 - **Should `fixer-controller.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.08961593172119488 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07536231884057971 - nodes in this community are weakly interconnected._
 - **Should `Project Setup and Documentation` be split into smaller, more focused modules?**
   _Cohesion score 0.05263157894736842 - nodes in this community are weakly interconnected._
 - **Should `messages.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.13 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08292682926829269 - nodes in this community are weakly interconnected._

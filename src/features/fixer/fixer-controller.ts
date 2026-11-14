@@ -1,5 +1,5 @@
 import { isVerifiedFailure, type ContrastIssue } from '../../shared/types';
-import { contrastRatio, floorRatio } from './color-suggester';
+import { contrastRatio, floorRatio, renderedColor, suggestFix } from './color-suggester';
 import type { PreviewFailure, PreviewManager, PreviewResult, StylableElement } from './preview-manager';
 import { EMPTY_STATE, snapshot, type FixerState } from './fixer-state';
 import { generateCorrection, DETACHED_MESSAGE } from './correction-generator';
@@ -16,13 +16,47 @@ interface FixerDependencies {
   readonly previewManager: PreviewManager;
   /** Computed style read-back for FIX-06; injectable for tests. */
   readonly readComputed?: (element: Element, property: string) => string;
+  /** Opacity the text is drawn with (see readDrawnOpacity); injectable for tests. */
+  readonly readOpacity?: (element: Element) => number | undefined;
 }
+
+function isStylable(element: Element): element is StylableElement {
+  return 'style' in element;
+}
+
+const isClear = (color: string) => color === 'transparent' || /^rgba\(.*,\s*0\)$/.test(color);
+
+/**
+ * Combined CSS opacity of the element and its ancestors up to the one that
+ * paints its background. Undefined when that background layer (or anything
+ * above it) is faded too: text and background then fade together, which the
+ * Fixer does not model.
+ */
+function readDrawnOpacity(element: Element): number | undefined {
+  let opacity = 1;
+  let reachedBackground = false;
+  for (let node: Element | null = element; node; node = node.parentElement) {
+    const style = getComputedStyle(node);
+    const own = Number.parseFloat(style.opacity);
+    reachedBackground ||= style.backgroundImage !== 'none' || !isClear(style.backgroundColor);
+    if (!reachedBackground) opacity *= own;
+    else if (own < 1) return undefined;
+  }
+  return opacity;
+}
+
+/** A difference above this between the drawn color and Inspector's measurement means something else affects the text. */
+const MEASUREMENT_TOLERANCE = 0.1;
 
 /**
  * Sole owner of Fixer state. Pure color math lives in color-suggester; the
  * preview manager is the only code that writes to the page.
  */
-export function createFixerController({ previewManager, readComputed = (el, prop) => getComputedStyle(el).getPropertyValue(prop) }: FixerDependencies) {
+export function createFixerController({
+  previewManager,
+  readComputed = (el, prop) => getComputedStyle(el).getPropertyValue(prop),
+  readOpacity = readDrawnOpacity,
+}: FixerDependencies) {
   let state = EMPTY_STATE;
   let element: StylableElement | undefined;
   let disposed = false;
@@ -41,8 +75,8 @@ export function createFixerController({ previewManager, readComputed = (el, prop
 
   /** Keep the suggestion; drop preview-only fields. */
   function backToReady(message?: string) {
-    const { issue, fix } = state;
-    publish({ phase: 'ready', issue, fix, view: 'original', ...(message ? { message } : {}) });
+    const { issue, fix, opacity } = state;
+    publish({ phase: 'ready', issue, fix, opacity, view: 'original', ...(message ? { message } : {}) });
   }
 
   /** Any failed page write ends the preview. A detached element cannot be retried. */
@@ -54,16 +88,20 @@ export function createFixerController({ previewManager, readComputed = (el, prop
     publish({ phase: 'unsupported', issue: state.issue, view: 'original', message: PREVIEW_MESSAGES.detached });
   }
 
-  /** FIX-06: measure what the page actually renders after the override. */
+  /** The text color as actually drawn: computed CSS color faded by its opacity. Empty if unknown. */
+  function drawnTextColor(target: Element, background: string): string {
+    const opacity = readOpacity(target);
+    return opacity === undefined ? '' : renderedColor(readComputed(target, 'color'), background, opacity);
+  }
+
+  /** FIX-06: measure what the page actually draws after the override. */
   function measure() {
-    const { issue, fix } = state;
+    const { issue, fix, opacity } = state;
     if (!element || !issue || !fix || !isVerifiedFailure(issue)) return;
-    const rendered = readComputed(element, fix.property);
-    const ratio = fix.property === 'color'
-      ? contrastRatio(rendered, issue.backgroundColor)
-      : contrastRatio(issue.textColor, rendered);
+    const drawn = drawnTextColor(element, issue.backgroundColor);
+    const ratio = drawn ? contrastRatio(drawn, issue.backgroundColor) : Number.NaN;
     const measuredRatio = Number.isFinite(ratio) ? floorRatio(ratio) : undefined;
-    publish({ phase: 'previewing', issue, fix, view: 'fixed', measuredRatio, meetsTarget: measuredRatio !== undefined && ratio >= issue.requiredRatio });
+    publish({ phase: 'previewing', issue, fix, opacity, view: 'fixed', measuredRatio, meetsTarget: measuredRatio !== undefined && ratio >= issue.requiredRatio });
   }
 
   function revert() {
@@ -85,10 +123,20 @@ export function createFixerController({ previewManager, readComputed = (el, prop
       previewManager.revert();
       element = undefined;
       const reject = (message: string) => publish({ phase: 'unsupported', issue, view: 'original', message });
-      const result = generateCorrection({ issue, element: target });
+      if (!isVerifiedFailure(issue)) return reject('This issue needs manual review, so no automatic fix is suggested.');
+      if (issue.requiredRatio !== 4.5 && issue.requiredRatio !== 3) return reject('Only WCAG AA text thresholds (4.5:1 and 3:1) are supported.');
+      if (!target.isConnected || !isStylable(target)) return reject(PREVIEW_MESSAGES.detached);
+      // Inspector reports the color as drawn; the Fixer edits the CSS color, which opacity then fades.
+      const opacity = readOpacity(target);
+      if (opacity === undefined) return reject('The background behind this text is itself faded (CSS opacity), so the result can’t be measured reliably. Check it by eye.');
+      const drawn = drawnTextColor(target, issue.backgroundColor);
+      if (!drawn || Math.abs(contrastRatio(drawn, issue.backgroundColor) - issue.contrastRatio) > MEASUREMENT_TOLERANCE) {
+        return reject('AccessLens could not confirm how this text is drawn, so no automatic fix is suggested. Check it by eye.');
+      }
+      const result = suggestFix({ ...issue, textColor: readComputed(target, 'color'), opacity });
       if (!result.ok) return reject(result.message);
-      element = result.element;
-      publish({ phase: 'ready', issue, fix: result.fix, view: 'original' });
+      element = target;
+      publish({ phase: 'ready', issue, fix: result.fix, opacity, view: 'original' });
     },
     /** Preview fix: apply the temporary override and measure it. */
     preview() {
