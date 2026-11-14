@@ -1,4 +1,4 @@
-import type { SuggestedFix } from '../../shared/types';
+import type { OperatingMode, SuggestedFix } from '../../shared/types';
 
 type FixProperty = SuggestedFix['property'];
 
@@ -9,6 +9,7 @@ export type PreviewFailure = 'detached' | 'not-applied' | 'page-changed' | 'conf
 export type PreviewResult = { readonly ok: true } | { readonly ok: false; readonly reason: PreviewFailure };
 
 interface ActivePreview {
+  readonly owner: OperatingMode;
   readonly element: StylableElement;
   readonly property: FixProperty;
   readonly value: string;
@@ -30,7 +31,17 @@ const fail = (reason: PreviewFailure): PreviewResult => ({ ok: false, reason });
  */
 export function createPreviewManager() {
   const previews = new Map<string, ActivePreview>();
+  let mode: OperatingMode = 'developer';
+  const writers = new Set<(phase: 'before' | 'after') => void>();
   const SINGLE = 'individual';
+
+  // Monitoring can drain page mutations before our write, then discard only our
+  // synchronous records. Keep observing external changes during asynchronous scans.
+  function mutate<T>(run: () => T): T {
+    for (const listener of writers) listener('before');
+    try { return run(); }
+    finally { for (const listener of writers) listener('after'); }
+  }
 
   function write(preview: ActivePreview): PreviewResult {
     const { element, property, value } = preview;
@@ -42,7 +53,7 @@ export function createPreviewManager() {
     preview.originalValue = style.getPropertyValue(property);
     preview.originalPriority = style.getPropertyPriority(property);
     // !important so the preview also wins over author !important rules.
-    style.setProperty(property, value, 'important');
+    mutate(() => style.setProperty(property, value, 'important'));
     const written = style.getPropertyValue(property);
     if (!written || style.getPropertyPriority(property) !== 'important') {
       restoreOriginal(preview);
@@ -53,17 +64,19 @@ export function createPreviewManager() {
   }
 
   function restoreOriginal(preview: ActivePreview) {
-    const { element, property, originalValue, originalPriority } = preview;
-    if (originalValue) element.style.setProperty(property, originalValue, originalPriority);
-    else element.style.removeProperty(property);
-    // Leave no empty style="" behind on elements that had no style attribute.
-    // Chrome syncs CSSOM edits to the attribute lazily; read it first so a
-    // pending sync cannot re-create style="" after removeAttribute.
-    if (!preview.hadStyleAttribute && element.style.length === 0) {
-      element.getAttribute('style');
-      element.removeAttribute('style');
-    }
-    preview.written = undefined;
+    mutate(() => {
+      const { element, property, originalValue, originalPriority } = preview;
+      if (originalValue) element.style.setProperty(property, originalValue, originalPriority);
+      else element.style.removeProperty(property);
+      // Leave no empty style="" behind on elements that had no style attribute.
+      // Chrome syncs CSSOM edits to the attribute lazily; read it first so a
+      // pending sync cannot re-create style="" after removeAttribute.
+      if (!preview.hadStyleAttribute && element.style.length === 0) {
+        element.getAttribute('style');
+        element.removeAttribute('style');
+      }
+      preview.written = undefined;
+    });
   }
 
   /** Undo our write unless page script has since changed the same property. */
@@ -97,12 +110,33 @@ export function createPreviewManager() {
   }
 
   return {
+    getMode: () => mode,
+    /** Mode transitions end the departing workflow; snapshots never cross owners. */
+    setMode(next: OperatingMode) {
+      if (mode === next) return;
+      revertAll();
+      mode = next;
+    },
+    subscribeWrites(listener: (phase: 'before' | 'after') => void) {
+      writers.add(listener);
+      return () => { writers.delete(listener); };
+    },
+    isApplied(id: string) {
+      const item = previews.get(id);
+      return Boolean(item?.element.isConnected && item.written !== undefined &&
+        item.element.style.getPropertyValue(item.property) === item.written &&
+        item.element.style.getPropertyPriority(item.property) === 'important');
+    },
+    revertOwner(owner: OperatingMode) {
+      for (const [id, item] of previews) if (item.owner === owner) revert(id);
+    },
     /** Start/replace one preview. A property can have only one owner. */
-    apply(element: StylableElement, property: FixProperty, value: string, id = SINGLE): PreviewResult {
+    apply(element: StylableElement, property: FixProperty, value: string, id = SINGLE, owner: OperatingMode = 'developer'): PreviewResult {
+      if (owner !== mode) return fail('conflict');
       if ([...previews.entries()].some(([key, item]) => key !== id && item.element === element && item.property === property)) return fail('conflict');
       const previous = revert(id);
       if (!previous.ok) return previous;
-      const preview: ActivePreview = { element, property, value, originalValue: '', originalPriority: '', hadStyleAttribute: false };
+      const preview: ActivePreview = { owner, element, property, value, originalValue: '', originalPriority: '', hadStyleAttribute: false };
       const result = write(preview);
       if (result.ok) previews.set(id, preview);
       return result;
@@ -122,7 +156,7 @@ export function createPreviewManager() {
     revertAll,
     isShowingFixed: () => previews.get(SINGLE)?.written !== undefined,
     hasActivePreview: () => previews.size > 0,
-    dispose(): void { revertAll(); },
+    dispose(): void { revertAll(); writers.clear(); },
   };
 }
 export type PreviewManager = ReturnType<typeof createPreviewManager>;

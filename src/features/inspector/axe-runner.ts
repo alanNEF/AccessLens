@@ -58,9 +58,9 @@ function collect(results: axe.AxeResults, includePasses: boolean): InspectedIssu
  * `exclude` is the AccessLens panel host, so our own UI is never audited.
  * axe reads computed CSS colors, so an active simulation does not change results (INS-02).
  */
-export async function scanTextContrast(exclude: Element): Promise<InspectedIssue[]> {
+export async function scanTextContrast(exclude: Element, roots: readonly Element[] = [document.documentElement]): Promise<InspectedIssue[]> {
   const results = await runAxe(
-    { include: [document.documentElement], exclude: [exclude] } as unknown as axe.ElementContext,
+    { include: [...roots], exclude: [exclude] } as unknown as axe.ElementContext,
     { runOnly: { type: 'rule', values: [RULE] }, elementRef: true, resultTypes: ['violations', 'incomplete'] },
   );
   return collect(results, false);

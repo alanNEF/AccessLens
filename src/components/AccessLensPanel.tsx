@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { Eye, ScanLine, SlidersHorizontal, Sparkles, Sun, Moon, Monitor, ShieldCheck, Minus, ChevronUp, GripVertical } from 'lucide-react';
 import { SimulatorTab } from '../features/simulator/SimulatorTab';
 import { InspectorTab } from '../features/inspector/InspectorTab';
@@ -20,14 +20,18 @@ import { Switch } from './ui/switch';
 import { OverlayContainerContext } from './shared/overlay-container';
 import { useTheme } from './shared/use-theme';
 import { usePanelPosition } from './shared/use-panel-position';
+import { UserMode } from '../features/user-mode/UserMode';
+import type { UserModeController } from '../features/user-mode/user-mode-controller';
 
-export function AccessLensPanel({ controller, modeReader, inspector, handoff, fixer }: {
+export function AccessLensPanel({ controller, modeReader, inspector, handoff, fixer, userMode }: {
   controller: SimulatorController;
   modeReader: SimulatorModeReader;
   inspector: InspectorStore;
   handoff: IssueHandoffStore;
   fixer: FixerController;
+  userMode: UserModeController;
 }) {
+  const { mode } = useSyncExternalStore(userMode.subscribe, userMode.getState);
   const { ready, theme, preference, changeTheme, storageError } = useTheme();
   const [overlayContainer, setOverlayContainer] = useState<HTMLDivElement | null>(null);
   const [rootEl, setRootEl] = useState<HTMLDivElement | null>(null);
@@ -59,7 +63,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
     <div ref={setRootEl} className={`accesslens-ui ${theme === 'dark' ? 'dark' : ''}`} data-theme={theme} data-dragging={position.dragging}>
       <OverlayContainerContext.Provider value={overlayContainer}>
         <TooltipProvider delayDuration={350}>
-          <HighlightLayer store={inspector} />
+          {mode === 'developer' && <HighlightLayer store={inspector} />}
           {collapsed && <Button ref={expandButton} onClick={position.guardClick(toggleCollapsed)} {...position.dragHandlers} aria-label="Expand AccessLens" aria-expanded={false}
             title="Click to expand · drag to move"
             className="accesslens-drag-handle relative z-10 size-12 rounded-xl border border-border bg-primary text-primary-foreground shadow-xl hover:bg-primary/90">
@@ -81,7 +85,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground"><Eye className="size-5" aria-hidden="true" /></div>
                 <div>
                   <h1 className="text-base leading-6 font-semibold tracking-tight">{APP_NAME}</h1>
-                  <p className="accesslens-subtitle text-xs text-muted-foreground">Your accessibility toolkit</p>
+                  <p className="accesslens-subtitle text-xs text-muted-foreground">{mode === 'user' ? 'Make the web easier to use.' : 'Your accessibility toolkit'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
@@ -96,7 +100,11 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
               </div>
             </header>
             <Separator />
-            <Tabs value={activeTab} onValueChange={value => setActiveTab(value as FeatureId)} className="flex min-h-0 flex-1 flex-col gap-0">
+            <div role="group" aria-label="Operating mode" className="grid grid-cols-2 gap-1 px-5 pt-4">
+              <Button variant={mode === 'developer' ? 'secondary' : 'ghost'} aria-pressed={mode === 'developer'} onClick={() => userMode.setMode('developer')}>Developer</Button>
+              <Button variant={mode === 'user' ? 'secondary' : 'ghost'} aria-pressed={mode === 'user'} onClick={() => userMode.setMode('user')}>User</Button>
+            </div>
+            {mode === 'user' ? <div className="accesslens-scroll min-h-0 overflow-y-auto overscroll-contain"><UserMode controller={userMode} /></div> : <Tabs value={activeTab} onValueChange={value => setActiveTab(value as FeatureId)} className="flex min-h-0 flex-1 flex-col gap-0">
               <div className="shrink-0 px-5 pt-4 pb-1">
                 <TabsList className="grid h-10 w-full grid-cols-3 rounded-lg bg-secondary p-1" aria-label="AccessLens features">
                   <TabsTrigger value="simulator"><SlidersHorizontal aria-hidden="true" />Simulator</TabsTrigger>
@@ -109,7 +117,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
                 <TabsContent value="inspector" className="m-0"><InspectorTab store={inspector} modeReader={modeReader} onPreviewFix={previewFix} /></TabsContent>
                 <TabsContent value="fixer" className="m-0"><FixerTab controller={fixer} modeReader={modeReader} inspector={inspector} /></TabsContent>
               </div>
-            </Tabs>
+            </Tabs>}
             {storageError && <p role="alert" className="px-5 pb-3 text-xs text-destructive">Theme storage is unavailable. Changes apply to this session.</p>}
             <Separator />
             <footer className="flex shrink-0 items-center gap-2 bg-secondary/50 px-5 py-3 text-xs text-muted-foreground"><ShieldCheck className="size-3.5" aria-hidden="true" />Temporary effects. Your source stays yours.</footer>

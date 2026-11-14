@@ -10,6 +10,7 @@ import { createIssueHandoffStore, type IssueHandoffStore } from '../../src/share
 import { createFixerController, type FixerController } from '../../src/features/fixer/fixer-controller';
 import { createPreviewManager } from '../../src/features/fixer/preview-manager';
 import { connectInspectorToFixer } from '../../src/features/fixer/connect-inspector';
+import { createUserModeController, type UserModeController } from '../../src/features/user-mode/user-mode-controller';
 import './style.css';
 
 export default defineContentScript({
@@ -23,6 +24,7 @@ export default defineContentScript({
     let inspector: InspectorStore | undefined;
     let handoff: IssueHandoffStore | undefined;
     let fixer: FixerController | undefined;
+    let userMode: UserModeController | undefined;
     let leavingDocument = false;
     let interactionVersion = 0;
     let unsubscribeNavigation: (() => void) | undefined;
@@ -36,7 +38,7 @@ export default defineContentScript({
     const onPageChange = () => {
       controller?.refresh();
       const path = location.href.split('#')[0];
-      if (path !== lastPath) { lastPath = path; inspector?.clear(); handoff?.clear(); }
+      if (path !== lastPath) { lastPath = path; userMode?.resetPage(); inspector?.clear(); handoff?.clear(); }
     };
     const ui = await createShadowRootUi(ctx, {
       name: 'accesslens-panel',
@@ -48,10 +50,12 @@ export default defineContentScript({
         unsubscribeNavigation = controller.subscribeActiveMode(mode=>{if(!leavingDocument) saveNavigation(mode==='visionless');});
         inspector = createInspectorStore(host);
         handoff = createIssueHandoffStore();
-        fixer = createFixerController({ previewManager: createPreviewManager() });
+        const previews = createPreviewManager();
+        fixer = createFixerController({ previewManager: previews });
         disconnectFixer = connectInspectorToFixer(inspector, handoff, fixer);
+        userMode = createUserModeController({ host, inspector, fixer, previews, simulator: controller, handoff });
         const root = createRoot(container);
-        root.render(<AccessLensPanel controller={controller} modeReader={createSimulatorModeReader(controller)} inspector={inspector} handoff={handoff} fixer={fixer} />);
+        root.render(<AccessLensPanel controller={controller} modeReader={createSimulatorModeReader(controller)} inspector={inspector} handoff={handoff} fixer={fixer} userMode={userMode} />);
         return root;
       },
       onRemove(root) {
@@ -60,6 +64,7 @@ export default defineContentScript({
         if(!leavingDocument) saveNavigation(false);
         // Disconnect first, then dispose: closing the panel reverts any Fixer preview.
         disconnectFixer?.();
+        userMode?.dispose();
         fixer?.dispose();
         controller?.dispose();
         inspector?.dispose();

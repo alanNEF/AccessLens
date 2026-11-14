@@ -94,6 +94,22 @@ Try `demo-site/bulk-corrections.html`. Run `npm run test:bulk` for DOM/state tes
 `npm run test:bulk:e2e` for the production extension in an isolated Chrome profile.
 See [implementation, changed files and validation](docs/fixer/bulk-corrections.md).
 
+## User Mode
+
+Open the panel, choose **User**, and turn on **Enable Accessibility Improvements**.
+AccessLens runs the existing Inspector and bulk Fixer automatically, shows the number of
+verified text improvements, and watches for new content without Inspector highlights or a checklist.
+Turn the switch off or choose **Restore Original Page** to undo the changes.
+
+Mode changes restore the departing workflow's corrections and stop simulation/picking.
+Returning to Developer keeps its tabs and controls available. Improvements require activation
+for the current page; closing the panel, changing SPA routes, or navigating restores and disables them.
+Nothing is activated automatically on other websites.
+
+Try `demo-site/user-mode.html`. Run `npm run test:user`, `npm run test:user:e2e`, and
+`npm run test:bulk:e2e`. Browser tests use the repository's isolated real-Chrome/CDP harness.
+See [ownership, dynamic behavior, changed files, verification, and limitations](docs/user-mode.md).
+
 ## Visionless Lite
 
 Reload the built extension for its new `tts` permission, then try

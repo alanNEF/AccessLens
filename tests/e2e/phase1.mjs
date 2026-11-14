@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { runCrossSite } from './cross-site.mjs';
 import { runUiRedesign } from './ui-redesign.mjs';
 import { runBulkCorrections } from './bulk-corrections.mjs';
+import { runUserMode } from './user-mode.mjs';
 import { build } from 'esbuild';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -16,10 +17,12 @@ const profile = join(work, 'profile');
 const html = await readFile('demo-site/index.html');
 const compatibility = await readFile('demo-site/compatibility.html');
 const bulkHtml = await readFile('demo-site/bulk-corrections.html');
+const userHtml = await readFile('demo-site/user-mode.html');
 const server = createServer((req, res) => {
   res.setHeader('Content-Type', 'text/html');
   if (req.url === '/bare') return res.end('<!doctype html><body>Bare text<p>Wrapped content</p></body>');
   if (req.url.startsWith('/bulk-corrections.html')) return res.end(bulkHtml);
+  if (req.url.startsWith('/user-mode.html')) return res.end(userHtml);
   if (req.url.startsWith('/compatibility.html')) return res.end(compatibility);
   if (req.url === '/base') return res.end(html.toString().replace('<head>', '<head><base href="/">'));
   res.end(req.url === '/unsupported' ? '<!doctype html><style>body {filter:sepia(1)}</style><body><h1>Unsafe ancestor</h1></body>' : html);
@@ -125,7 +128,9 @@ try {
   }
   await call('Page.enable');
   await call('Runtime.enable');
-  if (process.env.ACCESSLENS_BULK_ONLY) {
+  if (process.env.ACCESSLENS_USER_ONLY) {
+    await runUserMode({call,evaluate,waitFor,select,shadow,triggerToolbar,work,url,deactivate:()=>cdp('Extensions.uninstall',{id:extension.id})});
+  } else if (process.env.ACCESSLENS_BULK_ONLY) {
     await runBulkCorrections({call,evaluate,waitFor,select,shadow,triggerToolbar,work,url,deactivate:()=>cdp('Extensions.uninstall',{id:extension.id})});
   } else {
   if (process.env.ACCESSLENS_CROSS_SITE) await runCrossSite({call,evaluate,waitFor,select,shadow,owned,work,extensionErrors});
@@ -315,7 +320,7 @@ try {
     await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',text:'\r',windowsVirtualKeyCode:13});
     await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
     assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), new RegExp(label));
-    assert.equal(await evaluate(`${shadow}.querySelectorAll('button[aria-pressed=true]').length`), 1);
+    assert.equal(await evaluate(`${shadow}.querySelectorAll('fieldset button[aria-pressed=true]').length`), 1);
   }
   await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
   assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('role')`), 'slider');

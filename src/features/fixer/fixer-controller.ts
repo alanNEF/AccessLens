@@ -126,6 +126,9 @@ export function createFixerController({
       if (!isVerifiedFailure(issue)) return reject('This issue needs manual review, so no automatic fix is suggested.');
       if (issue.requiredRatio !== 4.5 && issue.requiredRatio !== 3) return reject('Only WCAG AA text thresholds (4.5:1 and 3:1) are supported.');
       if (!target.isConnected || !isStylable(target)) return reject(PREVIEW_MESSAGES.detached);
+      // Validate the handoff against author colors when this target already has
+      // a bulk correction. Transfer its property before measuring the original.
+      bulk.release(target, 'color');
       // Inspector reports the color as drawn; the Fixer edits the CSS color, which opacity then fades.
       const opacity = readOpacity(target);
       if (opacity === undefined) return reject('The background behind this text is itself faded (CSS opacity), so the result can’t be measured reliably. Check it by eye.');

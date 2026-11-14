@@ -28,6 +28,7 @@ export function createInspectorStore(panelHost: Element) {
   let runId = 0;
   const listeners = new Set<() => void>();
   let stopPicking: (() => void) | null = null;
+  let queue: Promise<unknown> = Promise.resolve();
 
   function set(patch: Partial<InspectorState>) {
     if (disposed) return;
@@ -41,7 +42,12 @@ export function createInspectorStore(panelHost: Element) {
    * axe works out each text's background from what is stacked on screen. Our fixed panel sits on top
    * of page text, so it is hidden for the duration of a run to avoid false "overlapped" results.
    */
-  async function withPanelHidden<T>(run: () => Promise<T>): Promise<T> {
+  function withPanelHidden<T>(run: () => Promise<T>, hide = true): Promise<T> {
+    const next = queue.then(() => hide ? hidePanel(run) : run());
+    queue = next.catch(() => undefined);
+    return next;
+  }
+  async function hidePanel<T>(run: () => Promise<T>): Promise<T> {
     const host = panelHost as HTMLElement;
     const previous = host.style.getPropertyValue('visibility');
     const priority = host.style.getPropertyPriority('visibility');
@@ -131,6 +137,12 @@ export function createInspectorStore(panelHost: Element) {
       return () => { listeners.delete(listener); };
     },
     scan,
+    /** Same audit engine, without selection, highlights, or developer result state. */
+    scanSilently(roots?: readonly Element[]) {
+      // Keep status and cancellation controls available in User Mode. axe excludes
+      // our host and treats any covered page text as uncertain, hence never fixed.
+      return withPanelHidden(() => scanTextContrast(panelHost, roots), false);
+    },
     startPicking,
     cancelPicking,
     select(id: string | null) { set({ selectedId: id }); },
