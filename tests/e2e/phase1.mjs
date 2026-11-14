@@ -1,6 +1,7 @@
 // Dependency-free real Chrome smoke test. Builds must exist: npm run build.
 // CHROME_PATH can select another Chrome binary supporting Extensions.loadUnpacked.
 import assert from 'node:assert/strict';
+import { build } from 'esbuild';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { readFile, mkdtemp, writeFile, rm } from 'node:fs/promises';
@@ -98,13 +99,22 @@ try {
   const panelBefore = await screenshot('panel-off', `${shadow}.querySelector('h1')`);
   const swatchBefore = await screenshot('swatch-off', `document.querySelector('.red')`);
   const baselineHeight = await evaluate('document.documentElement.scrollHeight');
-  for (const mode of ['Protanopia', 'Blur (2 px)']) {
+  const painted = new Set();
+  for (const mode of ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Low Acuity']) {
     await select(mode);
-    assert.equal(await evaluate(owned), mode === 'Protanopia' ? 2 : 1);
+    assert.equal(await evaluate(owned), mode === 'Low Acuity' ? 1 : 2);
     assert.equal(await evaluate(`${shadow}.querySelector('[role=alert]')?.textContent || ''`), '');
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('accesslens-panel')).filter`), 'none');
-    assert.equal(await screenshot(`panel-${mode.startsWith('Blur') ? 'blur' : 'color'}`, `${shadow}.querySelector('h1')`), panelBefore, 'Panel heading pixels must remain identical');
-    assert.notEqual(await screenshot(`swatch-${mode.startsWith('Blur') ? 'blur' : 'color'}`, `document.querySelector('.red')`), swatchBefore, 'Page pixels must change');
+    assert.equal(await screenshot(`panel-${mode === 'Low Acuity' ? 'blur' : 'color'}`, `${shadow}.querySelector('h1')`), panelBefore, 'Panel heading pixels must remain identical');
+    assert.notEqual(await screenshot(`swatch-${mode === 'Low Acuity' ? 'blur' : 'color'}`, `document.querySelector('.red')`), swatchBefore, 'Page pixels must change');
+    if (mode !== 'Low Acuity') {
+      const crop = await screenshot('reference-' + mode, `document.querySelector('.red')`);
+      painted.add(crop);
+      const pixel = await evaluate(`(async () => {const b=await (await fetch('data:image/png;base64,${crop}')).blob(); const img=await createImageBitmap(b); const c=document.createElement('canvas'); c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(120,85,1,1).data];})()`);
+      // Independent reference fixture: linear-light matrix output for #e00000.
+      const expected = { Protanopia: [94,82,0,255], Deuteranopia: [142,125,0,255], Tritanopia: [248,0,12,255] }[mode];
+      assert.ok(pixel.every((v,i)=>Math.abs(v-expected[i])<=3), `${mode} reference ${pixel} vs ${expected}`);
+    }
     assert.equal(await evaluate('document.documentElement.scrollHeight'), baselineHeight);
     // Actual keyboard input into the existing form, not replacement DOM.
     await evaluate(`document.querySelector('input[name=name]').focus(); document.querySelector('input[name=name]').value = ''`);
@@ -134,6 +144,7 @@ try {
     assert.equal(await screenshot('swatch-restored', `document.querySelector('.red')`), swatchBefore);
     console.log(`PASS ${mode}: painted page, identical panel pixels, forms, modal, anchors, fixed header, scrolling and Reset`);
   }
+  assert.equal(painted.size, 3, 'Three presets must paint distinctly');
   // Keyboard-operate simulator controls. Repeated selections do not add nodes.
   await call('Emulation.setFocusEmulationEnabled', { enabled: true });
   await evaluate(`${button('Protanopia')}.focus()`);
@@ -143,12 +154,48 @@ try {
   assert.equal(await evaluate(owned), 2);
   for (let i=0; i<20; i++) {
     await select('Protanopia'); assert.equal(await evaluate(owned), 2);
-    await select('Blur (2 px)'); assert.equal(await evaluate(owned), 1);
+    await select('Low Acuity'); assert.equal(await evaluate(owned), 1);
   }
   await select('Off'); await select('Off'); await select('Reset');
   assert.equal(await evaluate(owned), 0);
   assert.equal(await evaluate(`document.querySelectorAll('accesslens-panel').length`), 1);
   console.log('PASS keyboard activation, 40 switches, duplicate requests, Off/Reset ownership cleanup');
+  // Test the React-independent engine through a bundled test-only entrypoint.
+  const bundle = await build({ stdin: { contents: "export { createSimulationEngine } from './src/features/simulator/simulation-engine';", resolveDir: process.cwd() }, bundle:true, write:false, format:'iife', globalName:'engineTest' });
+  await evaluate(bundle.outputFiles[0].text);
+  await evaluate(`window.testEngine=engineTest.createSimulationEngine(document,document.querySelector('accesslens-panel'))`);
+  await evaluate(`testEngine.apply('blur', 99); window.styleBefore=document.querySelector('[data-accesslens-simulator-owned]')`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(8px)');
+  await evaluate(`testEngine.apply('blur', -2)`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(0px)');
+  assert.ok(await evaluate(`styleBefore === document.querySelector('[data-accesslens-simulator-owned]')`));
+  await evaluate(`testEngine.apply('blur', 2.3)`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(2.5px)');
+  for (const invalid of ['NaN','Infinity', "'bad'"]) {
+    assert.ok(await evaluate(`(() => {try {testEngine.apply('blur', ${invalid}); return false;} catch {return true;}})()`));
+    assert.equal(await evaluate(owned), 0);
+  }
+  await evaluate(`testEngine.apply('protanopia'); window.svgBefore=document.querySelector('svg[data-accesslens-simulator-owned]'); testEngine.apply('tritanopia')`);
+  assert.ok(await evaluate(`svgBefore === document.querySelector('svg[data-accesslens-simulator-owned]')`));
+  // Force a DOM failure after partial SVG creation: rollback must remove it.
+  assert.ok(await evaluate(`(() => {testEngine.reset();const append=document.head.append;document.head.append=()=>{throw new Error('injected failure')};try {testEngine.apply('protanopia');return false;}catch{return true;}finally{document.head.append=append;}})()`));
+  assert.equal(await evaluate(owned), 0);
+  await evaluate(`testEngine.apply('blur');testEngine.dispose();testEngine.dispose()`);
+  assert.equal(await evaluate(owned), 0);
+  assert.ok(await evaluate(`(() => {try{testEngine.apply('blur');return false;}catch{return true;}})()`));
+  // Real range keyboard interaction updates the active effect without a reload.
+  await select('Low Acuity');
+  await evaluate(`${shadow}.querySelector('input[type=range]').focus()`);
+  await call('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
+  await call('Input.dispatchKeyEvent', {type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(2.5px)');
+  await select('Protanopia');
+  assert.equal(await evaluate(`${shadow}.querySelector('input[type=range]')`), null);
+  await select('Reset');
+  await select('Low Acuity');
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(2px)');
+  await select('Off');
+  console.log('PASS blur bounds/steps/nonfinite values, node reuse, partial-failure rollback, dispose and keyboard slider');
   // Existing root filters and ancestor filters must fail without overwriting them.
   await evaluate(`document.querySelector('main').style.filter='sepia(1)'`);
   await select('Protanopia');
@@ -156,7 +203,7 @@ try {
   assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /Unsupported layout/);
   assert.equal(await evaluate(`document.querySelector('main').style.filter`), 'sepia(1)');
   await evaluate(`document.querySelector('main').style.removeProperty('filter')`);
-  await select('Blur (2 px)');
+  await select('Low Acuity');
   await call('Page.reload');
   await waitFor(`${shadow}?.querySelector('button')`);
   assert.equal(await evaluate(owned), 0);
@@ -170,7 +217,7 @@ try {
   assert.equal(await evaluate(owned), 0);
   await call('Page.navigate', { url: url + '/unsupported' });
   await waitFor(`${shadow}?.querySelector('button')`);
-  await select('Blur (2 px)');
+  await select('Low Acuity');
   assert.equal(await evaluate(owned), 0);
   assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /only the marked/);
   await select('Reset');
@@ -180,7 +227,7 @@ try {
   await waitFor(`${shadow}?.querySelector('button')`);
   // A narrow viewport exercises panel bounds without changing website structure.
   await call('Emulation.setDeviceMetricsOverride', { width: 480, height: 900, deviceScaleFactor: 1, mobile: false });
-  await select('Blur (2 px)');
+  await select('Low Acuity');
   assert.ok(await evaluate(`(() => {const r=${shadow}.querySelector('section').getBoundingClientRect(); return r.left>=0 && r.right<=innerWidth && r.bottom<=innerHeight;})()`));
   const capture = await call('Page.captureScreenshot');
   await writeFile(join(work, 'narrow-blur.png'), Buffer.from(capture.data, 'base64'));
