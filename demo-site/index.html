@@ -1,14 +1,40 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AccessLens demo</title>
-  </head>
-  <body>
-    <main>
-      <h1>AccessLens demo site</h1>
-      <p>Add accessibility test scenarios here as features are implemented.</p>
-    </main>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <title>AccessLens Inspector Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: white;
+      padding: 40px;
+    }
+
+    .bad-text {
+      color: #cccccc;
+      background: #ffffff;
+      font-size: 16px;
+    }
+
+    .good-text {
+      color: #222222;
+      background: #ffffff;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>AccessLens Test Website</h1>
+
+  <h2>Low Contrast Example</h2>
+  <p class="bad-text">
+    This text is intentionally difficult to read.
+  </p>
+
+  <h2>Accessible Contrast Example</h2>
+  <p class="good-text">
+    This text should pass the contrast check.
+  </p>
+</body>
 </html>
