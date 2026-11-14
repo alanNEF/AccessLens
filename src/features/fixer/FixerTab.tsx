@@ -20,10 +20,11 @@ function statusText({ phase, view }: FixerState): string {
   return view === 'fixed' ? 'Previewing the suggested color' : 'Showing the original color';
 }
 
-function Swatch({ label, color, background, ratio }: { label: string; color: string; background: string; ratio: number }) {
+/** `opacity` fades only the sample text, matching how the page draws it. */
+function Swatch({ label, color, background, ratio, opacity = 1 }: { label: string; color: string; background: string; ratio: number; opacity?: number }) {
   return (
     <figure className="m-0 space-y-2 rounded-lg border border-border p-2.5">
-      <div className="flex h-12 items-center justify-center rounded-md border border-border text-xl font-semibold" style={{ color, background }} aria-hidden="true">Aa</div>
+      <div className="flex h-12 items-center justify-center rounded-md border border-border text-xl font-semibold" style={{ background }} aria-hidden="true"><span style={{ color, opacity }}>Aa</span></div>
       <figcaption className="space-y-0.5 text-xs">
         <span className="block font-medium text-foreground">{label}</span>
         <code className="block font-mono text-muted-foreground">{color}</code>
@@ -89,10 +90,15 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
         <>
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              <Swatch label="Current" color={fix.originalValue} background={issue.backgroundColor} ratio={fix.originalContrastRatio} />
-              <Swatch label="Suggested" color={fix.suggestedValue} background={issue.backgroundColor} ratio={fix.expectedContrastRatio} />
+              <Swatch label="Current" color={fix.originalValue} background={issue.backgroundColor} ratio={fix.originalContrastRatio} opacity={state.opacity} />
+              <Swatch label="Suggested" color={fix.suggestedValue} background={issue.backgroundColor} ratio={fix.expectedContrastRatio} opacity={state.opacity} />
             </div>
             <p className="text-xs text-muted-foreground">Changes the <code className="font-mono">{fix.property}</code> property only.</p>
+            {state.opacity !== undefined && state.opacity < 1 && (
+              <p className="text-xs text-muted-foreground">
+                This text is drawn at {Math.round(state.opacity * 100)}% opacity, so the suggested color is darker or lighter than it looks: ratios are measured as drawn. Raising the opacity is another way to fix it.
+              </p>
+            )}
           </div>
 
           {phase === 'ready' && (

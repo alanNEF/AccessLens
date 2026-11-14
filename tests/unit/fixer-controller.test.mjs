@@ -9,24 +9,26 @@ const issue = (overrides = {}) => Object.freeze({
   contrastRatio: 2.85, requiredRatio: 4.5, isLargeText: false, status: 'failed', wcagCriterion: '1.4.3', ...overrides,
 });
 
-// Fake preview manager: records calls; each result can be overridden per test.
-function fixture() {
+// Fake page + preview manager. `css` is the element's computed CSS color and
+// `opacity` the opacity it is drawn with (null = its background is faded too).
+function fixture({ css = 'rgb(153, 153, 153)', opacity = 1 } = {}) {
   const calls = [];
   const element = { isConnected: true, style: {} };
-  let rendered = 'rgb(153, 153, 153)';
+  let rendered = css;
+  let currentOpacity = opacity;
   let active = false;
   const next = {};
   const result = name => next[name] ?? { ok: true };
   const previewManager = {
     apply(el, property, value) { calls.push(['apply', property, value]); const r = result('apply'); if (r.ok) { active = true; rendered = value; } return r; },
-    showOriginal() { calls.push(['showOriginal']); rendered = 'rgb(153, 153, 153)'; return result('showOriginal'); },
+    showOriginal() { calls.push(['showOriginal']); rendered = css; return result('showOriginal'); },
     showFixed() { calls.push(['showFixed']); return result('showFixed'); },
-    revert() { calls.push(['revert']); active = false; rendered = 'rgb(153, 153, 153)'; return result('revert'); },
+    revert() { calls.push(['revert']); active = false; rendered = css; return result('revert'); },
     hasActivePreview: () => active,
     dispose() { calls.push(['dispose']); active = false; },
   };
-  const controller = createFixerController({ previewManager, readComputed: () => rendered });
-  return { controller, calls, element, next, setRendered: v => { rendered = v; } };
+  const controller = createFixerController({ previewManager, readComputed: () => rendered, readOpacity: () => currentOpacity ?? undefined });
+  return { controller, calls, element, next, setRendered: v => { rendered = v; }, setOpacity: v => { currentOpacity = v; } };
 }
 
 test('select → ready with a suggestion; preview measures the page (FIX-01/02/06)', () => {
@@ -73,13 +75,49 @@ test('rejects needs-review, bad thresholds, detached elements and unfixable colo
   assert.match(reject(issue({ status: 'needs-review' })).message, /manual review/);
   assert.match(reject(issue({ requiredRatio: 7 })).message, /4\.5:1 and 3:1/);
   assert.match(reject(issue(), { isConnected: false, style: {} }).message, /no longer on the page/);
-  assert.match(reject(issue({ textColor: 'rgba(0, 0, 0, 0.4)' })).message, /manual review/);
-  assert.match(reject(issue({ textColor: '#000000' })).message, /already meet/);
   const state = c.getState();
   assert.equal(state.phase, 'unsupported');
   assert.equal(state.fix, undefined);
   c.preview();
   assert.equal(c.getState(), state, 'preview does nothing when unsupported');
+});
+
+test('colors are read from the page and cross-checked against Inspector (FIX-08)', () => {
+  const pick = (options, i) => { const { controller: c, element } = fixture(options); c.selectIssue(i, element); return c.getState(); };
+  assert.match(pick({ css: 'rgb(0, 0, 0)' }, issue({ textColor: '#000000', contrastRatio: 21 })).message, /already meet/);
+  // The page's color does not reproduce Inspector's measurement: something else affects the text.
+  assert.match(pick({ css: 'rgb(0, 0, 0)' }, issue()).message, /could not confirm/);
+  assert.match(pick({ css: 'rgba(0, 0, 0, 0.4)', opacity: 1 }, issue({ contrastRatio: 21 })).message, /manual review/);
+  // Background layer itself faded: readOpacity returns undefined.
+  assert.match(pick({ opacity: null }, issue()).message, /faded/);
+});
+
+// The Health card bug: text drawn at 60% opacity. Inspector reports the faded color
+// (#1f7457); the CSS color is #07271c. The old Fixer suggested #056549, drawn 2.29:1.
+test('compensates for text opacity: suggestion passes as drawn (FIX-02/06)', () => {
+  const healthCard = issue({ textColor: '#1f7457', backgroundColor: '#43e8b0', contrastRatio: 3.62 });
+  const { controller: c, element } = fixture({ css: 'rgb(7, 39, 28)', opacity: 0.6 });
+  c.selectIssue(healthCard, element);
+  const ready = c.getState();
+  assert.equal(ready.phase, 'ready', ready.message);
+  assert.equal(ready.opacity, 0.6);
+  assert.equal(ready.fix.originalValue, '#07271c', 'edits the CSS color, not the faded one');
+  assert.notEqual(ready.fix.suggestedValue, '#056549');
+  assert.ok(ready.fix.expectedContrastRatio >= 4.5);
+  c.preview();
+  assert.equal(c.getState().meetsTarget, true);
+  assert.ok(c.getState().measuredRatio >= 4.5, 'measured as drawn, after fading');
+  // The near-black suggestion would read about 14:1 unfaded; measuring the fade keeps it honest.
+  assert.ok(c.getState().measuredRatio < 6);
+});
+
+test('text too faint for any color is explained, not fixed', () => {
+  // #07271c at 30% over mint is drawn #31ae84 (1.78:1); even black at 30% cannot reach 4.5:1.
+  const faint = issue({ textColor: '#31ae84', backgroundColor: '#43e8b0', contrastRatio: 1.78 });
+  const { controller: c, element } = fixture({ css: 'rgb(7, 39, 28)', opacity: 0.3 });
+  c.selectIssue(faint, element);
+  assert.equal(c.getState().phase, 'unsupported');
+  assert.match(c.getState().message, /too transparent/);
 });
 
 test('measured result is honest when the page does not render the fix (FIX-06)', () => {
