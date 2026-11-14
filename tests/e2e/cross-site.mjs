@@ -43,7 +43,7 @@ export async function runCrossSite({call, evaluate, waitFor, select, shadow, own
         assert.ok((await call('Page.captureScreenshot',{clip:pageClip})).data!==pageOff, `${label}: page pixels did not change`);
         await writeFile(join(work,`${name.replaceAll(' ','-')}-${label.replaceAll(' ','-')}.png`),Buffer.from(shot,'base64'));
       }
-      await evaluate(`${shadow}.querySelector('input[type=range]').focus()`);
+      await evaluate(`${shadow}.querySelector('[role=slider]').focus()`);
       await call('Input.dispatchKeyEvent',{type:'keyDown',key:'End',code:'End',windowsVirtualKeyCode:35});
       await call('Input.dispatchKeyEvent',{type:'keyUp',key:'End',code:'End',windowsVirtualKeyCode:35});
       assert.match(await evaluate('getComputedStyle(externalRoot).filter'),/blur\(8px\)/);
