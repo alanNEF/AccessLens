@@ -21,7 +21,7 @@ Use the `accesslens_scan` tool whenever you change how a page looks (colors, typ
 
 - `wcag` `1.4.3`: text contrast (AA: 4.5:1, or 3:1 for large text). `1.4.6`: enhanced contrast (AAA: 7:1 / 4.5:1). `1.4.1`: a link inside text that differs from the text only by color; the fix is an underline.
 - `status: "review"`: AccessLens could not measure it (gradient or image background, overlapping elements, transparency). Tell the user it needs a human check; do not invent a pass or fail.
-- `ratio` / `required`: measured contrast and the target.
+- `ratio` / `required`: measured contrast and the target. For `link-color-only` issues the ratio is between `link_color` and `surrounding_text_color` (two text colors), not against the background; the link's own contrast is checked separately as a text-contrast issue. Don't recompute colors yourself; trust the reported values.
 
 ## Limits to state honestly
 

@@ -55,6 +55,7 @@ try {
   assert.equal(link?.kind, 'link-color-only', 'T9 color-only link found');
   assert.equal(link.wcag, '1.4.1');
   assert.equal(link.fix?.value, 'underline');
+  assert.ok(link.link_color && link.surrounding_text_color && !('background' in link), 'link colors are named so agents do not mistake them for a background');
   assert.ok(aa.issues.some(issue => issue.status === 'review'), 'gradient hero needs review');
   assert.ok(aa.summary.fail >= 2);
   if (process.env.ACCESSLENS_DEBUG) console.log(JSON.stringify(aa, null, 1));

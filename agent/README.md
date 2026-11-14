@@ -19,8 +19,8 @@ Example issue:
 
 ```json
 {"id":"link-in-text-block-failed-0","status":"fail","wcag":"1.4.1","kind":"link-color-only",
- "selector":".policy-link","element":"<a> “vendor safety policy”","text_color":"#1e40af",
- "background":"#1f2937","ratio":1.68,"required":3,
+ "selector":".policy-link","element":"<a> “vendor safety policy”","link_color":"#1e40af",
+ "surrounding_text_color":"#1f2937","ratio":1.68,"required":3,
  "fix":{"property":"text-decoration-line","value":"underline","css":".policy-link { text-decoration-line: underline; }"}}
 ```
 

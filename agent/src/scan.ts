@@ -12,9 +12,13 @@ export interface AgentIssue {
   kind: 'text-contrast' | 'link-color-only';
   selector: string;
   element: string;
+  /** Text-contrast issues: text vs background. */
   text_color?: string;
-  /** For links: the surrounding text color. Otherwise: the background. */
   background?: string;
+  /** Color-only links: the link color vs the color of the text around it (not the background). */
+  link_color?: string;
+  surrounding_text_color?: string;
+  /** Text vs background, or for links: link color vs surrounding text color. */
   ratio?: number;
   required: number;
   large_text?: true;
@@ -96,8 +100,10 @@ export function toReport(url: string, level: ContrastLevel, raws: readonly RawNo
       kind: issue.kind ?? 'text-contrast',
       selector: issue.selector,
       element: issue.elementLabel,
-      ...(issue.textColor ? { text_color: issue.textColor } : {}),
-      ...(issue.backgroundColor ? { background: issue.backgroundColor } : {}),
+      // Links compare two text colors; name them so agents don't read the second as a background.
+      ...(issue.kind === 'link-color-only'
+        ? { ...(issue.textColor ? { link_color: issue.textColor } : {}), ...(issue.backgroundColor ? { surrounding_text_color: issue.backgroundColor } : {}) }
+        : { ...(issue.textColor ? { text_color: issue.textColor } : {}), ...(issue.backgroundColor ? { background: issue.backgroundColor } : {}) }),
       ...(issue.contrastRatio !== null ? { ratio: round(issue.contrastRatio) } : {}),
       required: issue.requiredRatio,
       ...(issue.isLargeText ? { large_text: true as const } : {}),
