@@ -1,63 +1,63 @@
 # Overview
 ---
-The **Inspector** identifies and explains measurable accessibility problems on a developer's current webpage. For the hackathon MVP, it focuses on **WCAG text contrast**, highlights affected elements, and lets developers select an element to see its colors, calculated contrast ratio, and applicable threshold. It feeds a structured issue to Fixer.
+The **Simulator** lets developers experience approximate visual barriers on a live webpage through the AccessLens Chrome extension. The hackathon MVP supports three color-vision-deficiency modes (protanopia, deuteranopia, tritanopia) and adjustable low-acuity blur. Simulations are educational approximations, not representations of any individual's vision.
 
 # Problem
 ---
-A visual simulation can reveal that something is hard to read, but it does not tell a developer exactly which element or style causes the problem.
+Developers often cannot tell how color and visual clarity choices affect usability by looking at their websites normally.
 
 **Current Pain Points**
-- Accessibility reports often feel disconnected from the actual webpage.
-- Developers need to find the specific element and CSS property responsible.
-- Some accessibility problems cannot be confirmed by simple automated rules.
+- It is hard to notice interfaces that rely on distinguishing particular colors.
+- Small or visually dense elements may become unusable when clarity is reduced.
+- Existing checks rarely let developers *interact* with their own page under these conditions.
 
 **Impact**
-- Developers can locate concrete readability problems quickly.
-- Issues become understandable and actionable rather than just numerical scores.
-- Verified issues can flow directly into a reversible fix preview.
+- Developers can encounter potential barriers before release.
+- Visual accessibility becomes easier to discuss and prioritize.
+- Developers can move directly from a simulation to inspecting a problem.
 
 # User Stories
 ---
 ## User Definitions
-- **Frontend Developer** - Investigates accessibility issues in rendered elements.
-- **UI/UX Designer** - Reviews whether chosen text/background colors are readable.
-- **Student Developer** - Learns the relationship between contrast and accessibility.
+- **Frontend Developer** - Tests a website while building or debugging it.
+- **UI/UX Designer** - Evaluates visual decisions in a working interface.
+- **Student Developer** - Learns how design choices can affect accessibility.
 
 ## User Stories
 ### Frontend Developer
-- As a developer, I want to highlight failing text elements so I can find the problem on the page.
-- As a developer, I want to click an element and see its computed colors and contrast ratio so I can understand the underlying issue.
+- As a developer, I want to select a vision mode so I can explore my website under an approximate visual constraint.
+- As a developer, I want to disable the mode instantly so I can compare it with the original appearance.
 
-### Student Developer
-- As a student, I want a short explanation and standard reference so I know why the issue matters.
+### UI/UX Designer
+- As a designer, I want to adjust blur intensity so I can explore how readability changes.
 
 # Requirements
 ---
 ## Functional Requirements
-- **INS-01:** Provide an **Inspect** action to select a rendered text element on a supported webpage.
-- **INS-02:** For supported solid-color text/background combinations, calculate the WCAG contrast ratio using the page's original computed colors (not simulation-filtered pixels).
-- **INS-03:** Check standard text against **4.5:1** and qualifying large text against **3:1** (WCAG AA); report the threshold used.
-- **INS-04:** Show a concise issue panel: element label/selector, foreground color, effective background color, contrast ratio, threshold, pass/fail, and plain-language explanation.
-- **INS-05:** Add a non-destructive highlight around confidently failing elements; clicking an issue focuses the matching element.
-- **INS-06:** Mark ambiguous cases (e.g., image/gradient backgrounds, complex transparency, pseudo-elements) as **Needs manual review** rather than claiming failure or success.
-- **INS-07:** Pass a stable element reference plus verified contrast issue data to Fixer; work whether or not Simulator is enabled.
+- **SIM-01:** Provide a Simulator tab with modes: Off, Protanopia, Deuteranopia, Tritanopia, and Low Acuity.
+- **SIM-02:** Apply the chosen visual effect to the active supported webpage without reloading it.
+- **SIM-03:** Provide an intensity slider for Low Acuity; only one simulation mode is active at a time.
+- **SIM-04:** Allow switching modes and restoring the unmodified page appearance immediately.
+- **SIM-05:** Keep the AccessLens controls legible and outside the visual effect; preserve ordinary page interactions where technically possible.
+- **SIM-06:** Display the active mode and an explicit *approximation, not lived experience* disclaimer.
+- **SIM-07:** Expose the active mode to the Inspector/Fixer without making issue-detection claims based solely on the simulation.
 
 ## Non-Functional Requirements
-- **Performance:** Initial scan of the controlled demo page should complete within about 2 seconds; scan on demand rather than on every visual change.
-- **Scalability:** Keep detection rules modular for future checks (focus, resizing, keyboard navigation), but do not implement those in the MVP.
-- **Accuracy:** Do not equate a clean scan with an accessible website. Clearly distinguish measured results from uncertain cases.
-- **Compatibility:** Support the controlled demo site first; unsupported layouts should fail gracefully rather than producing misleading results.
+- **Performance:** Mode changes should feel immediate on the controlled demo site (target under 300 ms); avoid continuous expensive DOM scanning.
+- **Scalability:** Implement simulations as separate presets so new modes can be added later without rewriting the controls.
+- **Compatibility:** Prioritize a controlled demonstration page and ordinary top-level HTML pages in Chrome Manifest V3; restricted Chrome pages and cross-origin frames are out of scope.
+- **Safety:** Do not persist changes to website source code; disabling the extension restores appearance.
 
 # Design
 ---
 ## UX Flow
-1. Developer optionally enables a Simulator mode.
-2. Developer opens **Inspector** and clicks **Scan text contrast** or selects an individual element.
-3. AccessLens highlights confirmed failures and shows an issue list.
-4. Developer selects an issue to locate the element and inspect its contrast details.
-5. Developer clicks **Preview fix** to send that issue to Fixer.
+1. Developer opens a supported webpage and launches AccessLens.
+2. Developer opens **Simulator** and chooses a mode.
+3. The page updates in place; the developer navigates it normally.
+4. For Low Acuity, the developer adjusts blur intensity.
+5. Developer clicks **Off** or changes the mode, then optionally opens Inspector.
 
 ## UI
-- Inspector tab with **Scan text contrast**, issue count, and selectable issue cards.
-- Compact detail view displaying color swatches, ratio, required threshold, and a **Preview fix** handoff.
-- Clearly distinguish **Fail**, **Pass**, and **Needs manual review** without relying on color alone.
+- Small extension panel with mode selector, active-mode label, blur slider (only when relevant), and **Reset** action.
+- Keep the panel unaffected by visual effects and keyboard accessible.
+- Show a short disclaimer below the controls.
