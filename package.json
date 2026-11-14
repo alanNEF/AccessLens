@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test:phase0": "node tests/e2e/phase1.mjs",
     "test:phase1": "node tests/e2e/phase1.mjs",
+    "test:phase2": "node --test tests/unit/simulator-controller.test.mjs && node tests/e2e/phase1.mjs",
     "demo": "python3 -m http.server 8081 --bind 127.0.0.1 --directory demo-site",
     "postinstall": "wxt prepare"
   },

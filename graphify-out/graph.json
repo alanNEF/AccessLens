@@ -17,7 +17,7 @@
       "label": "main()",
       "file_type": "code",
       "source_file": "entrypoints/accesslens.content/index.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "entrypoints_accesslens_content_index_main",
       "community": 1,
@@ -110,7 +110,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "package_scripts",
-      "community": 2,
+      "community": 17,
       "norm_label": "scripts"
     },
     {
@@ -120,7 +120,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "package_scripts_dev",
-      "community": 2,
+      "community": 17,
       "norm_label": "dev"
     },
     {
@@ -130,7 +130,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "package_scripts_build",
-      "community": 2,
+      "community": 17,
       "norm_label": "build"
     },
     {
@@ -140,7 +140,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "package_scripts_zip",
-      "community": 2,
+      "community": 17,
       "norm_label": "zip"
     },
     {
@@ -150,7 +150,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "package_scripts_typecheck",
-      "community": 2,
+      "community": 17,
       "norm_label": "typecheck"
     },
     {
@@ -160,24 +160,54 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "package_scripts_test_phase0",
-      "community": 2,
+      "community": 17,
       "norm_label": "test:phase0"
+    },
+    {
+      "label": "test:phase1",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "package_scripts_test_phase1",
+      "community": 17,
+      "norm_label": "test:phase1"
+    },
+    {
+      "label": "test:phase2",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "package_scripts_test_phase2",
+      "community": 17,
+      "norm_label": "test:phase2"
+    },
+    {
+      "label": "demo",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "package_scripts_demo",
+      "community": 17,
+      "norm_label": "demo"
     },
     {
       "label": "postinstall",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L13",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "package_scripts_postinstall",
-      "community": 2,
+      "community": 17,
       "norm_label": "postinstall"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "package_dependencies",
       "community": 2,
@@ -187,7 +217,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "package_dependencies_react",
       "community": 2,
@@ -197,7 +227,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "package_dependencies_react_dom",
       "community": 2,
@@ -207,60 +237,60 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "package_devdependencies",
-      "community": 4,
+      "community": 2,
       "norm_label": "devdependencies"
     },
     {
       "label": "@types/react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "package_devdependencies_types_react",
-      "community": 4,
+      "community": 2,
       "norm_label": "@types/react"
     },
     {
       "label": "@types/react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "package_devdependencies_types_react_dom",
-      "community": 4,
+      "community": 2,
       "norm_label": "@types/react-dom"
     },
     {
       "label": "@wxt-dev/module-react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "package_devdependencies_wxt_dev_module_react",
-      "community": 4,
+      "community": 2,
       "norm_label": "@wxt-dev/module-react"
     },
     {
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "package_devdependencies_typescript",
-      "community": 4,
+      "community": 2,
       "norm_label": "typescript"
     },
     {
       "label": "wxt",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "package_devdependencies_wxt",
-      "community": 4,
+      "community": 2,
       "norm_label": "wxt"
     },
     {
@@ -277,7 +307,7 @@
       "label": "AccessLensPanel()",
       "file_type": "code",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "_origin": "ast",
       "id": "src_components_accesslenspanel_accesslenspanel",
       "community": 1,
@@ -377,7 +407,7 @@
       "label": "SimulatorTab()",
       "file_type": "code",
       "source_file": "src/features/simulator/SimulatorTab.tsx",
-      "source_location": "L4",
+      "source_location": "L6",
       "_origin": "ast",
       "id": "src_features_simulator_simulatortab_simulatortab",
       "community": 1,
@@ -394,6 +424,26 @@
       "norm_label": "filters.ts"
     },
     {
+      "label": "BLUR",
+      "file_type": "code",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "src_features_simulator_filters_blur",
+      "community": 1,
+      "norm_label": "blur"
+    },
+    {
+      "label": "normalizeBlur()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "src_features_simulator_filters_normalizeblur",
+      "community": 1,
+      "norm_label": "normalizeblur()"
+    },
+    {
       "label": "simulation-engine.ts",
       "file_type": "code",
       "source_file": "src/features/simulator/simulation-engine.ts",
@@ -402,16 +452,6 @@
       "id": "src_features_simulator_simulation_engine",
       "community": 1,
       "norm_label": "simulation-engine.ts"
-    },
-    {
-      "label": "SpikeMode",
-      "file_type": "code",
-      "source_file": "src/features/simulator/simulation-engine.ts",
-      "source_location": "L3",
-      "_origin": "ast",
-      "id": "src_features_simulator_simulation_engine_spikemode",
-      "community": 1,
-      "norm_label": "spikemode"
     },
     {
       "label": "createSimulationEngine()",
@@ -427,11 +467,111 @@
       "label": "SimulationEngine",
       "file_type": "code",
       "source_file": "src/features/simulator/simulation-engine.ts",
-      "source_location": "L81",
+      "source_location": "L93",
       "_origin": "ast",
       "id": "src_features_simulator_simulation_engine_simulationengine",
       "community": 1,
       "norm_label": "simulationengine"
+    },
+    {
+      "label": "simulator-controller.ts",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_controller",
+      "community": 1,
+      "norm_label": "simulator-controller.ts"
+    },
+    {
+      "label": "createSimulatorController()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "community": 1,
+      "norm_label": "createsimulatorcontroller()"
+    },
+    {
+      "label": "SimulatorController",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_controller_simulatorcontroller",
+      "community": 1,
+      "norm_label": "simulatorcontroller"
+    },
+    {
+      "label": "simulator-state.ts",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state",
+      "community": 1,
+      "norm_label": "simulator-state.ts"
+    },
+    {
+      "label": "SimulationSettings",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_simulationsettings",
+      "community": 1,
+      "norm_label": "simulationsettings"
+    },
+    {
+      "label": "SimulationStatus",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_simulationstatus",
+      "community": 1,
+      "norm_label": "simulationstatus"
+    },
+    {
+      "label": "SimulatorState",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_simulatorstate",
+      "community": 1,
+      "norm_label": "simulatorstate"
+    },
+    {
+      "label": "DEFAULT_SETTINGS",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_default_settings",
+      "community": 1,
+      "norm_label": "default_settings"
+    },
+    {
+      "label": "validateMode()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_validatemode",
+      "community": 1,
+      "norm_label": "validatemode()"
+    },
+    {
+      "label": "snapshot()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_snapshot",
+      "community": 1,
+      "norm_label": "snapshot()"
     },
     {
       "label": "constants.ts",
@@ -460,7 +600,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_shared_types",
-      "community": 21,
+      "community": 1,
       "norm_label": "types.ts"
     },
     {
@@ -470,98 +610,128 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_shared_types_featureid",
-      "community": 21,
+      "community": 1,
       "norm_label": "featureid"
     },
     {
-      "label": "phase0.mjs",
+      "label": "SimulationMode",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
+      "source_file": "src/shared/types.ts",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "src_shared_types_simulationmode",
+      "community": 1,
+      "norm_label": "simulationmode"
+    },
+    {
+      "label": "phase1.mjs",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tests_e2e_phase0",
-      "community": 17,
-      "norm_label": "phase0.mjs"
+      "id": "tests_e2e_phase1",
+      "community": 18,
+      "norm_label": "phase1.mjs"
     },
     {
       "label": "profile",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L11",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L12",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_profile",
-      "community": 17,
+      "id": "tests_e2e_phase1_profile",
+      "community": 18,
       "norm_label": "profile"
     },
     {
       "label": "server",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L13",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L14",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_server",
-      "community": 17,
+      "id": "tests_e2e_phase1_server",
+      "community": 18,
       "norm_label": "server"
     },
     {
       "label": "chrome",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L19",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L20",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_chrome",
-      "community": 17,
+      "id": "tests_e2e_phase1_chrome",
+      "community": 18,
       "norm_label": "chrome"
     },
     {
       "label": "cdp()",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L48",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L49",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_cdp",
-      "community": 17,
+      "id": "tests_e2e_phase1_cdp",
+      "community": 18,
       "norm_label": "cdp()"
     },
     {
       "label": "evaluate()",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L59",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L60",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_evaluate",
-      "community": 17,
+      "id": "tests_e2e_phase1_evaluate",
+      "community": 18,
       "norm_label": "evaluate()"
     },
     {
       "label": "waitFor()",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L64",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L65",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_waitfor",
-      "community": 17,
+      "id": "tests_e2e_phase1_waitfor",
+      "community": 18,
       "norm_label": "waitfor()"
     },
     {
       "label": "select()",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L74",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L75",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_select",
-      "community": 17,
+      "id": "tests_e2e_phase1_select",
+      "community": 18,
       "norm_label": "select()"
     },
     {
       "label": "screenshot()",
       "file_type": "code",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L78",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L79",
       "_origin": "ast",
-      "id": "tests_e2e_phase0_screenshot",
-      "community": 17,
+      "id": "tests_e2e_phase1_screenshot",
+      "community": 18,
       "norm_label": "screenshot()"
+    },
+    {
+      "label": "simulator-controller.test.mjs",
+      "file_type": "code",
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_unit_simulator_controller_test",
+      "community": 1,
+      "norm_label": "simulator-controller.test.mjs"
+    },
+    {
+      "label": "fixture()",
+      "file_type": "code",
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "tests_unit_simulator_controller_test_fixture",
+      "community": 1,
+      "norm_label": "fixture()"
     },
     {
       "label": "tsconfig.json",
@@ -624,6 +794,136 @@
       "norm_label": "wxt.config.ts"
     },
     {
+      "label": "AGENTS.md",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents",
+      "community": 4,
+      "norm_label": "agents.md"
+    },
+    {
+      "label": "AccessLens \u2014 Coding Agent Instructions",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents_accesslens_coding_agent_instructions",
+      "community": 4,
+      "norm_label": "accesslens \u2014 coding agent instructions"
+    },
+    {
+      "label": "Mission",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "agents_mission",
+      "community": 4,
+      "norm_label": "mission"
+    },
+    {
+      "label": "Sources of truth",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "agents_sources_of_truth",
+      "community": 4,
+      "norm_label": "sources of truth"
+    },
+    {
+      "label": "Stack",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "agents_stack",
+      "community": 4,
+      "norm_label": "stack"
+    },
+    {
+      "label": "Expected repository layout",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "agents_expected_repository_layout",
+      "community": 4,
+      "norm_label": "expected repository layout"
+    },
+    {
+      "label": "Required Graphify workflow",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "agents_required_graphify_workflow",
+      "community": 4,
+      "norm_label": "required graphify workflow"
+    },
+    {
+      "label": "Architecture and feature ownership",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "agents_architecture_and_feature_ownership",
+      "community": 4,
+      "norm_label": "architecture and feature ownership"
+    },
+    {
+      "label": "Simulator (`src/features/simulator/`)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "agents_simulator_src_features_simulator",
+      "community": 4,
+      "norm_label": "simulator (`src/features/simulator/`)"
+    },
+    {
+      "label": "Inspector (`src/features/inspector/`)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "agents_inspector_src_features_inspector",
+      "community": 4,
+      "norm_label": "inspector (`src/features/inspector/`)"
+    },
+    {
+      "label": "Fixer (`src/features/fixer/`)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L90",
+      "_origin": "ast",
+      "id": "agents_fixer_src_features_fixer",
+      "community": 4,
+      "norm_label": "fixer (`src/features/fixer/`)"
+    },
+    {
+      "label": "Coding conventions",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L94",
+      "_origin": "ast",
+      "id": "agents_coding_conventions",
+      "community": 4,
+      "norm_label": "coding conventions"
+    },
+    {
+      "label": "Testing and delivery",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L103",
+      "_origin": "ast",
+      "id": "agents_testing_and_delivery",
+      "community": 4,
+      "norm_label": "testing and delivery"
+    },
+    {
       "label": "README.md",
       "file_type": "document",
       "source_file": "README.md",
@@ -664,14 +964,14 @@
       "norm_label": "project layout"
     },
     {
-      "label": "Phase 0 demo",
+      "label": "Phase 2 demo",
       "file_type": "document",
       "source_file": "README.md",
       "source_location": "L33",
       "_origin": "ast",
-      "id": "readme_phase_0_demo",
+      "id": "readme_phase_2_demo",
       "community": 3,
-      "norm_label": "phase 0 demo"
+      "norm_label": "phase 2 demo"
     },
     {
       "label": "fixer-prd.md",
@@ -1240,7 +1540,7 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "docs_simulator_implementation_plan_7_delivery_plan",
-      "community": 18,
+      "community": 5,
       "norm_label": "7. delivery plan"
     },
     {
@@ -1250,7 +1550,7 @@
       "source_location": "L219",
       "_origin": "ast",
       "id": "docs_simulator_implementation_plan_phase_0_feasibility_spike_highest_risk",
-      "community": 18,
+      "community": 5,
       "norm_label": "phase 0 \u2014 feasibility spike (highest risk)"
     },
     {
@@ -1260,7 +1560,7 @@
       "source_location": "L229",
       "_origin": "ast",
       "id": "docs_simulator_implementation_plan_phase_1_presets_and_engine_sim_02_sim_03_sim_04",
-      "community": 18,
+      "community": 5,
       "norm_label": "phase 1 \u2014 presets and engine (sim-02, sim-03, sim-04)"
     },
     {
@@ -1270,7 +1570,7 @@
       "source_location": "L237",
       "_origin": "ast",
       "id": "docs_simulator_implementation_plan_phase_2_controller_and_ui_sim_01_sim_03_sim_04_sim_06",
-      "community": 18,
+      "community": 5,
       "norm_label": "phase 2 \u2014 controller and ui (sim-01, sim-03, sim-04, sim-06)"
     },
     {
@@ -1280,7 +1580,7 @@
       "source_location": "L244",
       "_origin": "ast",
       "id": "docs_simulator_implementation_plan_phase_3_read_only_integration_and_qa_sim_05_sim_07_nfrs",
-      "community": 18,
+      "community": 5,
       "norm_label": "phase 3 \u2014 read-only integration and qa (sim-05, sim-07, nfrs)"
     },
     {
@@ -1362,6 +1662,66 @@
       "id": "docs_simulator_phase_0_feasibility_manual_demo_regression",
       "community": 3,
       "norm_label": "manual-demo regression"
+    },
+    {
+      "label": "phase-1-validation.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-1-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_1_validation",
+      "community": 21,
+      "norm_label": "phase-1-validation.md"
+    },
+    {
+      "label": "Phase 1 \u2014 presets and engine",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-1-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_1_validation_phase_1_presets_and_engine",
+      "community": 21,
+      "norm_label": "phase 1 \u2014 presets and engine"
+    },
+    {
+      "label": "phase-2-validation.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation",
+      "community": 3,
+      "norm_label": "phase-2-validation.md"
+    },
+    {
+      "label": "Phase 2 \u2014 controller and Simulator UI",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "community": 3,
+      "norm_label": "phase 2 \u2014 controller and simulator ui"
+    },
+    {
+      "label": "Run the local demo",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation_run_the_local_demo",
+      "community": 3,
+      "norm_label": "run the local demo"
+    },
+    {
+      "label": "Verification",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation_verification",
+      "community": 3,
+      "norm_label": "verification"
     },
     {
       "label": "WXT extension build",
@@ -1687,7 +2047,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "entrypoints/accesslens.content/index.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0,
       "source": "entrypoints_accesslens_content_index",
       "target": "entrypoints_accesslens_content_index_main",
@@ -1738,21 +2098,43 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_features_simulator_simulator_controller",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "entrypoints/accesslens.content/index.tsx",
-      "source_location": "L3",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "entrypoints_accesslens_content_index",
-      "target": "src_features_simulator_simulation_engine_simulationengine",
+      "target": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "package",
       "target": "package_dependencies",
@@ -1772,7 +2154,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "package",
       "target": "package_devdependencies",
@@ -1842,6 +2224,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_demo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
       "source_location": "L8",
       "weight": 1.0,
       "source": "package_scripts",
@@ -1852,7 +2244,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L13",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "package_scripts",
       "target": "package_scripts_postinstall",
@@ -1866,6 +2258,26 @@
       "weight": 1.0,
       "source": "package_scripts",
       "target": "package_scripts_test_phase0",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test_phase1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test_phase2",
       "confidence_score": 1.0
     },
     {
@@ -1892,7 +2304,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L19",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_react",
@@ -1902,7 +2314,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_react_dom",
@@ -1912,7 +2324,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_types_react",
@@ -1922,7 +2334,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L24",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_types_react_dom",
@@ -1932,7 +2344,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_typescript",
@@ -1942,7 +2354,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L24",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_wxt",
@@ -1952,7 +2364,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_wxt_dev_module_react",
@@ -1962,7 +2374,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L5",
+      "source_location": "L6",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
       "target": "src_components_accesslenspanel_accesslenspanel",
@@ -1973,10 +2385,10 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
-      "target": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_simulator_controller",
       "confidence_score": 1.0
     },
     {
@@ -1984,10 +2396,10 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
-      "target": "src_features_simulator_simulation_engine_simulationengine",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
       "confidence_score": 1.0
     },
     {
@@ -1995,7 +2407,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L1",
+      "source_location": "L2",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
       "target": "src_features_simulator_simulatortab",
@@ -2006,7 +2418,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L1",
+      "source_location": "L2",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
       "target": "src_features_simulator_simulatortab_simulatortab",
@@ -2017,7 +2429,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L3",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
       "target": "src_shared_constants",
@@ -2048,10 +2460,10 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/features/simulator/SimulatorTab.tsx",
-      "source_location": "L2",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "src_features_simulator_simulatortab",
-      "target": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_filters",
       "confidence_score": 1.0
     },
     {
@@ -2059,10 +2471,21 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/features/simulator/SimulatorTab.tsx",
-      "source_location": "L2",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "src_features_simulator_simulatortab",
-      "target": "src_features_simulator_simulation_engine_simulationengine",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_features_simulator_simulator_controller",
       "confidence_score": 1.0
     },
     {
@@ -2070,20 +2493,84 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/features/simulator/SimulatorTab.tsx",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0,
       "source": "src_features_simulator_simulatortab",
-      "target": "src_features_simulator_simulation_engine_spikemode",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/features/simulator/SimulatorTab.tsx",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0,
       "source": "src_features_simulator_simulatortab",
       "target": "src_features_simulator_simulatortab_simulatortab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_features_simulator_filters_normalizeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_shared_types_simulationmode",
       "confidence_score": 1.0
     },
     {
@@ -2095,6 +2582,72 @@
       "weight": 1.0,
       "source": "src_features_simulator_simulation_engine",
       "target": "src_features_simulator_filters",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "re_exports",
+      "context": "export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_filters",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_filters_normalizeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_filters_normalizeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_filters_normalizeblur",
       "confidence_score": 1.0
     },
     {
@@ -2111,20 +2664,277 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/features/simulator/simulation-engine.ts",
-      "source_location": "L81",
+      "source_location": "L93",
       "weight": 1.0,
       "source": "src_features_simulator_simulation_engine",
       "target": "src_features_simulator_simulation_engine_simulationengine",
       "confidence_score": 1.0
     },
     {
-      "relation": "contains",
+      "relation": "imports_from",
+      "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/features/simulator/simulation-engine.ts",
-      "source_location": "L3",
+      "source_location": "L2",
       "weight": 1.0,
       "source": "src_features_simulator_simulation_engine",
-      "target": "src_features_simulator_simulation_engine_spikemode",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulation_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulation_engine_simulationengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_default_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_simulationsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_simulatorstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_snapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_validatemode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "target": "src_features_simulator_simulator_state_snapshot"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tests_unit_simulator_controller_test_fixture",
+      "target": "src_features_simulator_simulator_controller_createsimulatorcontroller"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_default_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_simulationsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_simulationstatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_simulatorstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_snapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_validatemode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state_simulationsettings",
+      "target": "src_shared_types_simulationmode",
       "confidence_score": 1.0
     },
     {
@@ -2140,114 +2950,134 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L48",
+      "source_file": "src/shared/types.ts",
+      "source_location": "L3",
       "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_cdp",
+      "source": "src_shared_types",
+      "target": "src_shared_types_simulationmode",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L19",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L49",
       "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_chrome",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_cdp",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L59",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L20",
       "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_evaluate",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_chrome",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L11",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L60",
       "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_profile",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_evaluate",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L78",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L12",
       "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_screenshot",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_profile",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L74",
-      "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_select",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L13",
-      "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_server",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L64",
-      "weight": 1.0,
-      "source": "tests_e2e_phase0",
-      "target": "tests_e2e_phase0_waitfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
+      "source_file": "tests/e2e/phase1.mjs",
       "source_location": "L79",
       "weight": 1.0,
-      "source": "tests_e2e_phase0_screenshot",
-      "target": "tests_e2e_phase0_evaluate",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_screenshot",
       "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
+      "source_file": "tests/e2e/phase1.mjs",
       "source_location": "L75",
       "weight": 1.0,
-      "source": "tests_e2e_phase0_select",
-      "target": "tests_e2e_phase0_evaluate",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_select",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_server",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_waitfor",
       "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
-      "source_file": "tests/e2e/phase0.mjs",
-      "source_location": "L66",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L80",
       "weight": 1.0,
-      "source": "tests_e2e_phase0_waitfor",
-      "target": "tests_e2e_phase0_evaluate",
+      "source": "tests_e2e_phase1_screenshot",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_select",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_waitfor",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "tests_unit_simulator_controller_test",
+      "target": "tests_unit_simulator_controller_test_fixture",
       "confidence_score": 1.0
     },
     {
@@ -2291,6 +3121,126 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "agents",
+      "target": "agents_accesslens_coding_agent_instructions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_architecture_and_feature_ownership",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_coding_conventions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_expected_repository_layout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_mission",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_required_graphify_workflow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_sources_of_truth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_stack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_testing_and_delivery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "agents_architecture_and_feature_ownership",
+      "target": "agents_fixer_src_features_fixer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L86",
+      "weight": 1.0,
+      "source": "agents_architecture_and_feature_ownership",
+      "target": "agents_inspector_src_features_inspector",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "agents_architecture_and_feature_ownership",
+      "target": "agents_simulator_src_features_simulator",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "README.md",
@@ -2298,6 +3248,16 @@
       "weight": 1.0,
       "source": "readme",
       "target": "docs_simulator_phase_0_feasibility",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "docs_simulator_phase_2_validation",
       "confidence_score": 1.0
     },
     {
@@ -2337,7 +3297,7 @@
       "source_location": "L33",
       "weight": 1.0,
       "source": "readme_accesslens",
-      "target": "readme_phase_0_demo",
+      "target": "readme_phase_2_demo",
       "confidence_score": 1.0
     },
     {
@@ -2989,8 +3949,48 @@
       "source": "docs_simulator_phase_0_feasibility_phase_0_feasibility_report",
       "target": "docs_simulator_phase_0_feasibility_tested_layouts_and_evidence",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-1-validation.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_1_validation",
+      "target": "docs_simulator_phase_1_validation_phase_1_presets_and_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_2_validation",
+      "target": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "target": "docs_simulator_phase_2_validation_run_the_local_demo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "target": "docs_simulator_phase_2_validation_verification",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "bfed57e5da0ab474bc4f398ea4555386851a39bf"
+  "built_at_commit": "4232fb9ef4c58acb827dc97253f597d50adcf763"
 }

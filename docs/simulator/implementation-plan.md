@@ -236,10 +236,10 @@ export interface SimulatorModeReader {
 
 ### Phase 2 — Controller and UI (SIM-01, SIM-03, SIM-04, SIM-06)
 
-- [ ] Build controller with typed state and single-mode invariants.
-- [ ] Build accessible five-mode selector and conditional slider.
-- [ ] Display active-mode label, Reset, disclaimer, and errors.
-- [ ] Keyboard test all controls; confirm excluded panel remains visually unaffected.
+- [x] Build controller with typed state and single-mode invariants.
+- [x] Build accessible five-mode selector and conditional slider.
+- [x] Display active-mode label, Reset, disclaimer, and errors.
+- [x] Keyboard test all controls; confirm excluded panel remains visually unaffected.
 
 ### Phase 3 — Read-only integration and QA (SIM-05, SIM-07, NFRs)
 
