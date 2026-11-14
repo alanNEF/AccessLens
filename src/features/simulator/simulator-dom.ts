@@ -32,7 +32,7 @@ export function createSimulatorDom(doc: Document, panelHost: HTMLElement, owner:
     // Only the extension host is reattached after a body replacement.
     if (panelHost.parentElement !== doc.body) doc.body.append(panelHost);
     if ([doc.documentElement, doc.body].some(node => view.getComputedStyle(node).filter !== 'none')) {
-      throw new Error('Unsupported layout: an html/body filter would also affect the AccessLens panel.');
+      throw new Error('Unsupported layout: an html/body filter would also affect the Perspective panel.');
     }
     if ([...doc.body.childNodes].some(node => node.nodeType === 3 && node.textContent?.trim())) {
       throw new Error('Unsupported layout: bare body text cannot be filtered safely without moving page nodes.');

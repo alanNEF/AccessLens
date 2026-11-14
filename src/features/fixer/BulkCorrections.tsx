@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Wrench } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import type { InspectorStore } from '../inspector/inspector-store';
 import type { FixerController } from './fixer-controller';
@@ -20,7 +20,7 @@ export function BulkCorrections({ controller, inspector }: { controller: FixerCo
       <Button type="button" className="w-full" disabled={busy} onClick={() => {
         const items = inspected.picked ? [inspected.picked, ...inspected.issues] : inspected.issues;
         void controller.bulk.run(items);
-      }}><Sparkles aria-hidden="true" />{generating ? 'Generating corrections…' : 'Run All Corrections'}</Button>
+      }}><Wrench aria-hidden="true" />{generating ? 'Generating corrections…' : 'Run All Corrections'}</Button>
 
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
         {generating ? 'Generating and validating supported corrections…'

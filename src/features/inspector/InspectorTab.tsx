@@ -1,5 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
-import { CircleCheck, CircleHelp, CircleX, Crosshair, ExternalLink, Info, LocateFixed, ScanLine, Sparkles, Underline, X } from 'lucide-react';
+import { CircleCheck, CircleHelp, CircleX, Crosshair, ExternalLink, Info, LocateFixed, ScanLine, Wrench, Underline, X } from 'lucide-react';
 import type { InspectorStore } from './inspector-store';
 import type { InspectedIssue } from './axe-runner';
 import { explainIssue, formatRatio } from './contrast-mapping';
@@ -143,7 +143,7 @@ function IssueDetail({ item, onPreviewFix }: { item: InspectedIssue; onPreviewFi
             <Button type="button" size="sm" onClick={() => onPreviewFix(item)}>
               {isLink(issue)
                 ? <><Underline className="size-3.5" aria-hidden="true" />Preview underline</>
-                : <><Sparkles className="size-3.5" aria-hidden="true" />Preview fix</>}
+                : <><Wrench className="size-3.5" aria-hidden="true" />Preview fix</>}
             </Button>
           )}
         </div>

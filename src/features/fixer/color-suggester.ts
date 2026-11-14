@@ -3,6 +3,7 @@ import {
   parse, wcagContrast, differenceCiede2000, toGamut, formatHex, type Color,
 } from 'culori/fn';
 import type { SuggestedFix, VerifiedContrastFailure } from '../../shared/types';
+import { simulatedRatios } from './color-vision';
 
 // Tree-shakeable Culori: register only the modes needed to parse computed CSS
 // colors (rgb/hex, lab, lch, oklab, oklch) and to measure contrast/difference.
@@ -22,12 +23,15 @@ const SEARCH_STEPS = 20;
 
 export type UnsupportedReason = 'invalid-color' | 'transparent-color' | 'already-passes' | 'no-compliant-color' | 'too-transparent';
 type SuggestionResult =
-  | { readonly ok: true; readonly fix: SuggestedFix }
+  /** `alternative`: the other good option (site color vs. adjusted shade), if there is one. */
+  | { readonly ok: true; readonly fix: SuggestedFix; readonly alternative?: SuggestedFix }
   | { readonly ok: false; readonly reason: UnsupportedReason; readonly message: string };
 
 type SuggestionInput = Pick<VerifiedContrastFailure, 'id' | 'textColor' | 'backgroundColor' | 'requiredRatio'> & {
   /** Combined CSS opacity the text is drawn with, 0–1. The CSS color is faded by it. */
   readonly opacity?: number;
+  /** Colors the page already uses (see site-palette.ts); preferred when one passes. */
+  readonly palette?: readonly string[];
 };
 
 /** Parses a CSS color, accepting only fully opaque values. */
@@ -66,16 +70,17 @@ export function floorRatio(ratio: number): number {
   return Math.floor(ratio * 100) / 100;
 }
 
+/** Decides whether a candidate hex value is good enough. */
+type Accept = (hex: string) => boolean;
+
 /**
- * Smallest OKLCH lightness change (hue and chroma kept) that makes `adjustable`
- * reach `target` against `fixed`, moving toward black or white. Candidates are
- * judged on their rounded hex value as drawn at `opacity`, so neither rounding
- * nor fading can produce a failure.
+ * Smallest OKLCH lightness change (hue and chroma kept) that `passes`, moving
+ * toward black or white. Candidates are judged on their rounded hex value, so
+ * rounding can never produce a failure.
  */
-function searchLightness(adjustable: Color, fixed: Color, target: number, opacity: number, toward: 0 | 1): string | undefined {
+function searchLightness(adjustable: Color, passes: Accept, toward: 0 | 1): string | undefined {
   const start = toOklch(adjustable);
   const hexAt = (l: number) => toHex({ ...start, l });
-  const passes = (hex: string) => contrastRatio(renderedColor(hex, fixed, opacity), fixed) >= target;
   if (!passes(hexAt(toward))) return undefined;
   let failing = start.l;
   let passing: number = toward;
@@ -87,17 +92,39 @@ function searchLightness(adjustable: Color, fixed: Color, target: number, opacit
   return hexAt(passing);
 }
 
+interface Candidate { readonly hex: string; readonly difference: number }
+
 /** Closest passing candidate by CIEDE2000, trying darker and lighter. */
-function closestReplacement(adjustable: Color, fixed: Color, target: number, opacity: number): string | undefined {
-  let best: { hex: string; difference: number } | undefined;
+function closestReplacement(adjustable: Color, passes: Accept): Candidate | undefined {
+  let best: Candidate | undefined;
   for (const toward of [0, 1] as const) {
-    const hex = searchLightness(adjustable, fixed, target, opacity, toward);
+    const hex = searchLightness(adjustable, passes, toward);
     if (!hex) continue;
     const difference = colorDifference(adjustable, hex);
     if (!best || difference < best.difference) best = { hex, difference };
   }
-  return best?.hex;
+  return best;
 }
+
+/** Closest passing color from the page's own palette, if any. */
+function closestPaletteColor(original: Color, palette: readonly string[], passes: Accept): Candidate | undefined {
+  let best: Candidate | undefined;
+  for (const value of palette) {
+    const color = parseOpaque(value);
+    if (typeof color === 'string') continue;
+    const hex = toHex(color);
+    if (!passes(hex)) continue;
+    const difference = colorDifference(original, hex);
+    if (!best || difference < best.difference) best = { hex, difference };
+  }
+  return best;
+}
+
+/**
+ * A site color is preferred when it is at most this much further (CIEDE2000)
+ * from the original than the computed shade: on-brand beats marginally closer.
+ */
+export const PALETTE_PREFERENCE = 12;
 
 const MESSAGES: Record<UnsupportedReason, string> = {
   'invalid-color': 'The element’s colors could not be read reliably.',
@@ -126,6 +153,13 @@ function unsupported(reason: UnsupportedReason): SuggestionResult {
  * backgrounds, so for opaque text the background color is tried next (FIX-02's
  * "solid background color" option). Faded text is not given a background fix:
  * its drawn color depends on the background too.
+ *
+ * Color vision: a color that also meets the target under protanopia,
+ * deuteranopia and tritanopia simulation is preferred. If none exists, the
+ * WCAG-only fix is returned with `colorBlindSafe: false` and its ratios.
+ *
+ * Site palette: a passing color the page already uses is preferred when it is
+ * within PALETTE_PREFERENCE of the computed shade; the other is the alternative.
  */
 export function suggestFix(issue: SuggestionInput): SuggestionResult {
   const opacity = issue.opacity ?? 1;
@@ -135,38 +169,56 @@ export function suggestFix(issue: SuggestionInput): SuggestionResult {
   const background = parseOpaque(issue.backgroundColor);
   if (typeof background === 'string') return unsupported(background);
 
-  const drawnRatio = (color: Color | string) => contrastRatio(renderedColor(color, background, opacity), background);
-  const original = drawnRatio(text);
+  const backgroundHex = toHex(background);
+  const drawn = (color: Color | string) => renderedColor(color, background, opacity);
+  const original = contrastRatio(drawn(text), background);
   if (original >= issue.requiredRatio) return unsupported('already-passes');
 
   const target = issue.requiredRatio + TARGET_MARGIN;
-  const suggestedValue = closestReplacement(text, background, target, opacity);
-  if (!suggestedValue && opacity >= 1) {
-    const backgroundFix = closestReplacement(background, text, target, 1);
-    if (backgroundFix) {
-      return {
-        ok: true,
-        fix: {
-          issueId: issue.id,
-          property: 'background-color',
-          originalValue: toHex(background),
-          suggestedValue: backgroundFix,
-          originalContrastRatio: floorRatio(original),
-          expectedContrastRatio: floorRatio(contrastRatio(text, backgroundFix)),
-        },
-      };
-    }
-  }
-  if (!suggestedValue) return unsupported(opacity < 1 ? 'too-transparent' : 'no-compliant-color');
-  return {
-    ok: true,
-    fix: {
+  const safeUnderSimulation = (textHex: string, backHex: string) =>
+    Object.values(simulatedRatios(textHex, backHex, contrastRatio)).every(ratio => ratio >= target);
+  const describe = (property: 'color' | 'background-color', originalValue: string, suggestedValue: string, textHex: string, backHex: string, source: SuggestedFix['source']): SuggestedFix => {
+    const simulated = simulatedRatios(textHex, backHex, contrastRatio);
+    return {
       issueId: issue.id,
-      property: 'color',
-      originalValue: toHex(text),
+      property,
+      originalValue,
       suggestedValue,
       originalContrastRatio: floorRatio(original),
-      expectedContrastRatio: floorRatio(drawnRatio(suggestedValue)),
-    },
+      expectedContrastRatio: floorRatio(contrastRatio(textHex, backHex)),
+      source,
+      colorBlindSafe: Object.values(simulated).every(ratio => ratio >= issue.requiredRatio),
+      simulatedRatios: Object.fromEntries(Object.entries(simulated).map(([check, ratio]) => [check, floorRatio(ratio)])),
+    };
   };
+
+  // Text color: color-blind-safe if any shade allows it, otherwise WCAG only.
+  const meets: Accept = hex => contrastRatio(drawn(hex), background) >= target;
+  const meetsSafely: Accept = hex => meets(hex) && safeUnderSimulation(drawn(hex), backgroundHex);
+  const safeShade = closestReplacement(text, meetsSafely);
+  const accept = safeShade ? meetsSafely : meets;
+  const shade = safeShade ?? closestReplacement(text, meets);
+  const site = issue.palette?.length ? closestPaletteColor(text, issue.palette, accept) : undefined;
+  if (shade || site) {
+    const textFix = (candidate: Candidate, source: SuggestedFix['source']) =>
+      describe('color', toHex(text), candidate.hex, drawn(candidate.hex), backgroundHex, source);
+    const preferSite = site !== undefined && (shade === undefined || site.difference <= shade.difference + PALETTE_PREFERENCE);
+    const primary = preferSite ? textFix(site, 'site-palette') : textFix(shade!, 'adjusted');
+    const other = preferSite ? shade : site;
+    const alternative = other && other.hex !== primary.suggestedValue
+      ? textFix(other, preferSite ? 'adjusted' : 'site-palette')
+      : undefined;
+    return { ok: true, fix: primary, ...(alternative ? { alternative } : {}) };
+  }
+
+  if (opacity >= 1) {
+    const textHex = toHex(text);
+    const backgroundMeets: Accept = hex => contrastRatio(textHex, hex) >= target;
+    const backgroundFix = closestReplacement(background, hex => backgroundMeets(hex) && safeUnderSimulation(textHex, hex))
+      ?? closestReplacement(background, backgroundMeets);
+    if (backgroundFix) {
+      return { ok: true, fix: describe('background-color', backgroundHex, backgroundFix.hex, textHex, backgroundFix.hex, 'adjusted') };
+    }
+  }
+  return unsupported(opacity < 1 ? 'too-transparent' : 'no-compliant-color');
 }
