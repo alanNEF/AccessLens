@@ -1,25 +1,26 @@
 import { createRoot } from 'react-dom/client';
 import { AccessLensPanel } from '../../src/components/AccessLensPanel';
-import { createSimulationEngine, type SimulationEngine } from '../../src/features/simulator/simulation-engine';
+import { createSimulationEngine } from '../../src/features/simulator/simulation-engine';
+import { createSimulatorController, type SimulatorController } from '../../src/features/simulator/simulator-controller';
 import './style.css';
 
 export default defineContentScript({
   matches: ['*://*/*'],
   cssInjectionMode: 'ui',
   async main(ctx) {
-    let engine: SimulationEngine | undefined;
+    let controller: SimulatorController | undefined;
     const ui = await createShadowRootUi(ctx, {
       name: 'accesslens-panel',
       position: 'inline',
       anchor: 'body',
       onMount(container, _shadow, host) {
-        engine = createSimulationEngine(document, host);
+        controller = createSimulatorController(createSimulationEngine(document, host));
         const root = createRoot(container);
-        root.render(<AccessLensPanel engine={engine} />);
+        root.render(<AccessLensPanel controller={controller} />);
         return root;
       },
       onRemove(root) {
-        engine?.dispose();
+        controller?.dispose();
         root?.unmount();
       },
     });

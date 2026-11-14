@@ -160,6 +160,29 @@ try {
   assert.equal(await evaluate(owned), 0);
   assert.equal(await evaluate(`document.querySelectorAll('accesslens-panel').length`), 1);
   console.log('PASS keyboard activation, 40 switches, duplicate requests, Off/Reset ownership cleanup');
+  // Verify the complete Phase 2 keyboard order and selected-state semantics.
+  assert.equal(await evaluate(`${shadow}.querySelector('[role=tab]').getAttribute('aria-selected')`), 'true');
+  assert.match(await evaluate(`${shadow}.textContent`), /approximations.*not anyone’s lived experience/s);
+  await evaluate(`${button('Off')}.focus()`);
+  for (const label of ['Protanopia','Deuteranopia','Tritanopia','Low Acuity']) {
+    await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+    await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+    assert.equal(await evaluate(`${shadow}.activeElement.textContent`), label);
+    await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',text:'\r',windowsVirtualKeyCode:13});
+    await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), new RegExp(label));
+    assert.equal(await evaluate(`${shadow}.querySelectorAll('button[aria-pressed=true]').length`), 1);
+  }
+  await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  assert.equal(await evaluate(`${shadow}.activeElement.type`), 'range');
+  assert.ok(await evaluate(`${shadow}.activeElement.labels.length > 0`));
+  await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  assert.equal(await evaluate(`${shadow}.activeElement.textContent`), 'Reset');
+  await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',text:'\r',windowsVirtualKeyCode:13});
+  await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  assert.equal(await evaluate(owned), 0);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), /Off/);
+  console.log('PASS Simulator tab, disclaimer, all mode buttons, slider and Reset keyboard order');
   // Test the React-independent engine through a bundled test-only entrypoint.
   const bundle = await build({ stdin: { contents: "export { createSimulationEngine } from './src/features/simulator/simulation-engine';", resolveDir: process.cwd() }, bundle:true, write:false, format:'iife', globalName:'engineTest' });
   await evaluate(bundle.outputFiles[0].text);
@@ -201,6 +224,8 @@ try {
   await select('Protanopia');
   assert.equal(await evaluate(owned), 0);
   assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /Unsupported layout/);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), /Off/);
+  assert.equal(await evaluate(`${button('Off')}.getAttribute('aria-pressed')`), 'true');
   assert.equal(await evaluate(`document.querySelector('main').style.filter`), 'sepia(1)');
   await evaluate(`document.querySelector('main').style.removeProperty('filter')`);
   await select('Low Acuity');
