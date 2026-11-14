@@ -1,4 +1,8 @@
 import { inspectElement, scanTextContrast, type InspectedIssue } from './axe-runner';
+import {
+  scanImageAccessibility,
+  type ImageIssue,
+} from "./image-runner";
 
 export interface InspectorState {
   readonly status: 'idle' | 'scanning' | 'done' | 'error';
@@ -11,10 +15,11 @@ export interface InspectorState {
   /** Element under the pointer while picking, for the hover outline. */
   readonly hovered: Element | null;
   readonly message: string | null;
+  readonly imageIssues: readonly ImageIssue[];
 }
 
 const INITIAL: InspectorState = Object.freeze({
-  status: 'idle', issues: [], picked: null, selectedId: null, picking: false, hovered: null, message: null,
+  status: 'idle', issues: [], picked: null, selectedId: null, picking: false, hovered: null, message: null, imageIssues: [],
 });
 
 /**
@@ -59,9 +64,20 @@ export function createInspectorStore(panelHost: Element) {
     const id = ++runId;
     set({ status: 'scanning', message: null });
     try {
-      const issues = await withPanelHidden(() => scanTextContrast(panelHost));
+      const { issues, imageIssues } = await withPanelHidden(async () => {
+        const issues = await scanTextContrast(panelHost);
+        const imageIssues = await scanImageAccessibility(panelHost);
+
+        return { issues, imageIssues };
+      });
       if (id !== runId) return;
-      set({ status: 'done', issues, selectedId: issues[0]?.issue.id ?? null, picked: null });
+      set({
+        status: 'done',
+        issues,
+        imageIssues,
+        selectedId: issues[0]?.issue.id ?? null,
+        picked: null,
+      });
     } catch (cause) {
       if (id !== runId) return;
       set({ status: 'error', message: errorText(cause) });

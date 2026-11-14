@@ -128,6 +128,7 @@ export function InspectorTab({ store, modeReader, onPreviewFix }: {
   onPreviewFix: (item: InspectedIssue) => void;
 }) {
   const state = useSyncExternalStore(store.subscribe, store.getState);
+  const imageIssues = state.imageIssues;
   const simulationMode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const failures = state.issues.filter(item => item.issue.status === 'failed');
   const reviews = state.issues.filter(item => item.issue.status === 'needs-review');
@@ -178,6 +179,34 @@ export function InspectorTab({ store, modeReader, onPreviewFix }: {
       {selected && <IssueDetail item={selected} onPreviewFix={onPreviewFix} />}
 
       <IssueList title="Failures" items={failures} selectedId={state.selectedId} onSelect={select} />
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase">
+          Images missing alt text ({imageIssues.length})
+        </h3>
+
+        {imageIssues.map((item) => (
+          <div 
+            key={item.id}
+            className="rounded-lg border p-3 space-y-2"
+          >
+            <p className="text-sm font-medium break-all">
+              {item.selector}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {item.description}
+            </p>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => revealElement(item.element)}
+            >
+              Show image on page
+            </Button>
+          </div>
+          ))}
+      </section>
       <IssueList title="Needs manual review" items={reviews} selectedId={state.selectedId} onSelect={select} />
 
       {state.status === 'idle' && !state.picked && !state.picking && (
