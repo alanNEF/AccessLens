@@ -30,7 +30,7 @@ export function SimulatorTab({ controller, modeReader }: { controller: Simulator
       <button type="button" className="simulator-reset" onClick={() => controller.reset()}>Reset</button>
       {state.error && <p role="alert" className="simulator-error">{state.error} Use Reset to return to Off.</p>}
       <p className="simulator-disclaimer">These simulations are approximations of visual barriers, not anyone’s lived experience. They do not determine whether a website is accessible.</p>
-      <small>Only marked demo content is simulated. Other overlays stay unchanged.</small>
+      <small>Page sections are simulated separately. Backgrounds, overlays and embedded frames may differ; Reset restores the page.</small>
     </div>
   );
 }

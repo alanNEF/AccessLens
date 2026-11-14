@@ -19,6 +19,9 @@ export function createSimulatorController(engine: SimulationEngine) {
     }
     for (const listener of [...listeners]) listener(state);
   }
+  const unsubscribeErrors = engine.subscribeErrors?.(cause => {
+    publish(snapshot({ ...state.settings, mode: 'none' }, cause.message));
+  });
   function transition(settings: () => SimulationSettings) {
     if (disposed) return;
     let next: SimulatorState;
@@ -49,9 +52,13 @@ export function createSimulatorController(engine: SimulationEngine) {
     setBlurPx(value: number) {
       transition(() => ({ ...state.settings, blurPx: normalizeBlur(value) }));
     },
+    refresh() {
+      if (state.settings.mode !== 'none') transition(() => state.settings);
+    },
     reset() { transition(() => DEFAULT_SETTINGS); },
     dispose() {
       if (disposed) return;
+      unsubscribeErrors?.();
       engine.dispose();
       disposed = true;
       publish(snapshot(DEFAULT_SETTINGS));

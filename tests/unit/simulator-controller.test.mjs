@@ -6,12 +6,14 @@ const { createSimulatorController } = await import('data:text/javascript;base64,
 function fixture() {
   const calls = [];
   let fail = false;
+  let onError;
   const engine = {
     apply(mode, blur) { calls.push(['apply', mode, blur]); if (fail) throw new Error('Blocked effect'); },
     reset() { calls.push(['reset']); },
+    subscribeErrors(listener) { onError = listener; return () => { onError = undefined; }; },
     dispose() { calls.push(['dispose']); },
   };
-  return { controller: createSimulatorController(engine), calls, fail() { fail = true; } };
+  return { controller: createSimulatorController(engine), calls, fail() { fail = true; }, asyncFail() { onError?.(new Error('Dynamic layout unsupported')); } };
 }
 test('immutable, stable snapshots; exactly one mode; settings retained and Reset defaults', () => {
   const { controller: c, calls } = fixture();
@@ -92,4 +94,26 @@ test('mode reader emits only applied changes, Off on errors/dispose, and unsubsc
   other.controller.setMode('tritanopia'); other.controller.dispose();
   other.controller.setMode('deuteranopia');
   assert.deepEqual(changes, ['blur','none','tritanopia','none']);
+});
+
+
+test('dynamic failures publish Off and unsubscribe on dispose; refresh preserves mode/intensity', () => {
+  const f = fixture();
+  const modes = [];
+  f.controller.subscribeActiveMode(mode=>modes.push(mode));
+  f.controller.setBlurPx(5);
+  f.controller.setMode('blur');
+  f.controller.refresh();
+  assert.deepEqual(f.calls.at(-1), ['apply','blur',5]);
+  assert.deepEqual(modes,['blur']);
+  f.asyncFail();
+  assert.equal(f.controller.getActiveMode(),'none');
+  assert.equal(f.controller.getState().status,'error');
+  assert.deepEqual(modes,['blur','none']);
+  const count = f.calls.length;
+  f.controller.refresh();
+  assert.equal(f.calls.length,count);
+  f.controller.dispose();
+  f.asyncFail();
+  assert.equal(f.controller.getState().status,'idle');
 });
