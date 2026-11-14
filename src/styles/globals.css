@@ -1,0 +1,33 @@
+.accesslens-panel {
+  box-sizing: border-box;
+  width: 360px;
+  padding: 16px;
+  background: #fff;
+  color: #172033;
+  font: 14px/1.5 system-ui, sans-serif;
+}
+
+.accesslens-panel h1 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.accesslens-panel nav {
+  display: flex;
+  gap: 8px;
+}
+
+.accesslens-panel button {
+  padding: 6px 10px;
+  border: 1px solid #526077;
+  border-radius: 4px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  cursor: pointer;
+}
+
+.accesslens-panel button[aria-pressed='true'] {
+  background: #172033;
+  color: #fff;
+}

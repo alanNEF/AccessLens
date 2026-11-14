@@ -1,0 +1,5 @@
+@import '../../src/styles/globals.css';
+
+:host {
+  all: initial;
+}
