@@ -2,6 +2,7 @@
 // CHROME_PATH can select another Chrome binary supporting Extensions.loadUnpacked.
 import assert from 'node:assert/strict';
 import { runCrossSite } from './cross-site.mjs';
+import { runUiRedesign } from './ui-redesign.mjs';
 import { build } from 'esbuild';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -107,7 +108,7 @@ try {
     throw new Error(`Timed out: ${expression}`);
   }
   const shadow = `document.querySelector('accesslens-panel')?.shadowRoot`;
-  const button = label => `[...${shadow}.querySelectorAll('button')].find(b => b.textContent === ${JSON.stringify(label)})`;
+  const button = label => `[...${shadow}.querySelectorAll('button')].find(b => (b.getAttribute('aria-label') || b.textContent) === ${JSON.stringify(label)})`;
   const owned = `document.querySelectorAll('[data-accesslens-simulator-owned]').length`;
   async function select(label) {
     await evaluate(`${button(label)}.click()`);
@@ -124,6 +125,7 @@ try {
   if (process.env.ACCESSLENS_CROSS_SITE) await runCrossSite({call,evaluate,waitFor,select,shadow,owned,work,extensionErrors});
   await call('Page.navigate', { url });
   await waitFor(`${shadow}?.querySelector('button')`);
+  await runUiRedesign({call,evaluate,waitFor,select,shadow,triggerToolbar,work});
   await evaluate(`window.originalNodes = [...document.body.children].filter(n => n.localName !== 'accesslens-panel'); window.originalParents = originalNodes.map(n=>n.parentNode)`);
   assert.equal(await evaluate(owned), 0);
   await select('Low Acuity');
@@ -147,7 +149,7 @@ try {
   }
   assert.ok(staleOpened,'Switching to a site opened before extension load must open its panel without refresh');
   assert.equal(await staleValue(`document.querySelectorAll('accesslens-panel').length`),1);
-  await staleValue(`[...document.querySelector('accesslens-panel').shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Low Acuity').click()`);
+  await staleValue(`[...document.querySelector('accesslens-panel').shadowRoot.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Low Acuity').click()`);
   assert.equal(await staleValue(`getComputedStyle(document.querySelector('main')).filter`),'blur(2px)');
   assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`),/Protanopia/);
   await triggerToolbar(); // closes only the first tab's panel and effects
@@ -242,7 +244,7 @@ try {
   // Keyboard-operate simulator controls. Repeated selections do not add nodes.
   await call('Emulation.setFocusEmulationEnabled', { enabled: true });
   await evaluate(`${button('Protanopia')}.focus()`);
-  assert.equal(await evaluate(`${shadow}.activeElement?.textContent`), 'Protanopia');
+  assert.equal(await evaluate(`${shadow}.activeElement?.getAttribute('aria-label')`), 'Protanopia');
   await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', text: '\r', windowsVirtualKeyCode: 13 });
   await call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
   assert.equal(await evaluate(owned), 2);
@@ -256,20 +258,20 @@ try {
   console.log('PASS keyboard activation, 40 switches, duplicate requests, Off/Reset ownership cleanup');
   // Verify the complete Phase 2 keyboard order and selected-state semantics.
   assert.equal(await evaluate(`${shadow}.querySelector('[role=tab]').getAttribute('aria-selected')`), 'true');
-  assert.match(await evaluate(`${shadow}.textContent`), /approximations.*not anyone’s lived experience/s);
+  assert.match(await evaluate(`${shadow}.textContent`), /approximations.*do not represent any individual.s lived visual experience/s);
   await evaluate(`${button('Off')}.focus()`);
   for (const label of ['Protanopia','Deuteranopia','Tritanopia','Low Acuity']) {
     await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
     await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
-    assert.equal(await evaluate(`${shadow}.activeElement.textContent`), label);
+    assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`), label);
     await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',text:'\r',windowsVirtualKeyCode:13});
     await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
     assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), new RegExp(label));
     assert.equal(await evaluate(`${shadow}.querySelectorAll('button[aria-pressed=true]').length`), 1);
   }
   await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
-  assert.equal(await evaluate(`${shadow}.activeElement.type`), 'range');
-  assert.ok(await evaluate(`${shadow}.activeElement.labels.length > 0`));
+  assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('role')`), 'slider');
+  assert.ok(await evaluate(`Boolean(${shadow}.getElementById(${shadow}.activeElement.getAttribute('aria-labelledby')))`));
   await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
   assert.equal(await evaluate(`${shadow}.activeElement.textContent`), 'Reset');
   await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',text:'\r',windowsVirtualKeyCode:13});
@@ -327,12 +329,12 @@ try {
   console.log('PASS max blur halo pixel comparison, color/reset clipping removal, author clip-path preservation');
   // Real range keyboard interaction updates the active effect without a reload.
   await select('Low Acuity');
-  await evaluate(`${shadow}.querySelector('input[type=range]').focus()`);
+  await evaluate(`${shadow}.querySelector('[role=slider]').focus()`);
   await call('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
   await call('Input.dispatchKeyEvent', {type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(2.5px)');
   await select('Protanopia');
-  assert.equal(await evaluate(`${shadow}.querySelector('input[type=range]')`), null);
+  assert.equal(await evaluate(`${shadow}.querySelector('[role=slider]')`), null);
   await select('Reset');
   await select('Low Acuity');
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(2px)');
