@@ -1,6 +1,6 @@
 export type FeatureId = 'simulator' | 'inspector' | 'fixer';
 
-export type SimulationMode = 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'blur';
+export type SimulationMode = 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'blur' | 'visionless';
 
 /** failed = measured and below threshold; needs-review = could not be measured reliably. */
 export type ContrastStatus = 'failed' | 'needs-review' | 'passed';

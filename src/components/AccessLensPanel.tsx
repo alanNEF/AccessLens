@@ -58,7 +58,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
         <TooltipProvider delayDuration={350}>
           <HighlightLayer store={inspector} />
           {collapsed && <Button ref={expandButton} onClick={toggleCollapsed} aria-label="Expand AccessLens" aria-expanded={false}
-            className="relative size-12 rounded-xl border border-border bg-primary text-primary-foreground shadow-xl hover:bg-primary/90">
+            className="relative z-10 size-12 rounded-xl border border-border bg-primary text-primary-foreground shadow-xl hover:bg-primary/90">
             <Eye className="size-5" aria-hidden="true" /><ChevronUp className="absolute right-1 bottom-1 size-3" aria-hidden="true" />
           </Button>}
           <section hidden={collapsed} className="accesslens-panel flex flex-col overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-xl" aria-label={APP_NAME}>
