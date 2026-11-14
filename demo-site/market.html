@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hilltop Farmers Market — AccessLens demo</title>
+  <!--
+    AccessLens hackathon demo page. Fictional market, deliberately flawed.
+
+    TEST CASES (ratios checked with the WCAG formula; keep this table in sync):
+      id   element                      colors                     ratio   expected
+      T1   .fine-print (14px)           #a3a3a3 on #ffffff         2.52    FAIL 4.5   -> Fixer target
+      T2   .section-title (28px)        #8c8c8c on #ffffff         3.36    PASS 3 (large text)
+      T3   .tagline (16px, normal)      #8c8c8c on #ffffff         3.36    FAIL 4.5   (same color as T2 — shows threshold logic)
+      T4   .btn-subscribe               #ffffff on #f59e0b         2.15    FAIL 4.5   -> Fixer target (white on orange)
+      T5   .hours-note on cream card    #9aa5b1 on #f4f1ea         2.22    FAIL 4.5
+      T6   .hero text on gradient       white on green->yellow     n/a     NEEDS MANUAL REVIEW
+      T7   .chip.open / .chip.closed    #fff on #2f7d32 / #c62828  5.12 / 5.62  PASS contrast,
+           but open/closed is shown by color only -> look alike under protanopia/deuteranopia
+           (the Simulator catches what the contrast checker can't)
+      T8   .vendor-meta (12px, dense)   #4b5563 on #f4f1ea         6.70    PASS, but unreadable under Low Acuity blur
+      PASS controls: body text #1f2937 on #fff (14.68), nav white on #1f5135 (9.18)
+
+    Simulator constraints (from simulator-dom.ts): all content lives inside direct
+    <body> children (header/main/footer), no bare text in <body>, no filter on html/body.
+  -->
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #ffffff; color: #1f2937; font: 16px/1.5 system-ui, sans-serif; }
+
+    header { background: #1f5135; color: #ffffff; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+    header .logo { font-weight: 700; font-size: 20px; }
+    header nav a { color: #ffffff; margin-left: 20px; text-decoration: none; }
+
+    main { max-width: 1000px; margin: 0 auto; padding: 0 24px 48px; }
+
+    /* T6: text over a gradient — Inspector should say "Needs manual review" */
+    .hero { margin-top: 24px; padding: 56px 40px; border-radius: 16px; background: linear-gradient(120deg, #2f7d32, #facc15); color: #ffffff; }
+    .hero h1 { margin: 0 0 8px; font-size: 40px; }
+    .hero p { margin: 0; font-size: 18px; }
+
+    /* T2 (pass as large text) and T3 (fail as normal text) share a color */
+    .section-title { color: #8c8c8c; font-size: 28px; font-weight: 400; margin: 40px 0 4px; }
+    .tagline { color: #8c8c8c; font-size: 16px; margin: 0 0 20px; }
+
+    .vendors { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .card { background: #f4f1ea; border-radius: 12px; padding: 18px; }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    /* T8: small dense text — fine for contrast, falls apart under blur */
+    .vendor-meta { font-size: 12px; line-height: 1.25; color: #4b5563; margin: 0 0 10px; }
+
+    /* T7: status communicated by color alone */
+    .chip { display: inline-block; padding: 4px 12px; border-radius: 999px; color: #ffffff; font-size: 14px; font-weight: 600; }
+    .chip.open { background: #2f7d32; }
+    .chip.closed { background: #c62828; }
+
+    /* T5: low-contrast note on the cream card */
+    .hours-note { color: #9aa5b1; font-size: 14px; margin: 10px 0 0; }
+
+    .newsletter { margin-top: 40px; padding: 28px; border: 1px solid #e5e7eb; border-radius: 12px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .newsletter input { padding: 10px 12px; font: inherit; border: 1px solid #d1d5db; border-radius: 8px; min-width: 240px; }
+    /* T4: white text on orange */
+    .btn-subscribe { padding: 10px 20px; font: inherit; font-weight: 600; color: #ffffff; background: #f59e0b; border: 0; border-radius: 8px; cursor: pointer; }
+
+    /* T1: light gray fine print */
+    .fine-print { color: #a3a3a3; font-size: 14px; margin-top: 32px; }
+
+    footer { background: #1f5135; color: #ffffff; padding: 20px 32px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="logo">Hilltop Farmers Market</span>
+    <nav aria-label="Main"><a href="#vendors">Vendors</a><a href="#newsletter">Newsletter</a></nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Fresh from the hills, every Saturday</h1>
+      <p>Over 30 local growers, bakers and makers. 8 am – 1 pm on the town green.</p>
+    </section>
+
+    <section id="vendors" aria-labelledby="vendors-title">
+      <h2 id="vendors-title" class="section-title">This week's vendors</h2>
+      <p class="tagline">Status updates live from each stall — check before you head over.</p>
+
+      <div class="vendors">
+        <article class="card">
+          <h3>Maple Row Orchard</h3>
+          <p class="vendor-meta">Honeycrisp, Gala, Macoun apples · cider donuts · Stall 4, north lawn · cash, card · bulk discount over 10 lb · pre-orders close Friday 6 pm</p>
+          <span class="chip open">Open</span>
+          <p class="hours-note">Sells out by 11 am most weeks.</p>
+        </article>
+        <article class="card">
+          <h3>Two Creeks Bakery</h3>
+          <p class="vendor-meta">Sourdough, rye, seeded loaves · croissants (Sat only) · Stall 9, near fountain · card only · gluten-free list at stall</p>
+          <span class="chip closed">Closed</span>
+          <p class="hours-note">Back next Saturday after a family event.</p>
+        </article>
+        <article class="card">
+          <h3>Greenleaf Microgreens</h3>
+          <p class="vendor-meta">Pea shoots, radish, sunflower, mixed trays · Stall 12, east path · cash, card, Venmo · returnable trays: $1 deposit</p>
+          <span class="chip open">Open</span>
+          <p class="hours-note">Ask about restaurant wholesale.</p>
+        </article>
+        <article class="card">
+          <h3>Stonewall Dairy</h3>
+          <p class="vendor-meta">Raw-milk cheddar, chèvre, yogurt · Stall 2, south gate · coolers on site · card only · tasting 9–10 am</p>
+          <span class="chip closed">Closed</span>
+          <p class="hours-note">Seasonal break until spring.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="newsletter" class="newsletter" aria-labelledby="newsletter-title">
+      <h2 id="newsletter-title" style="margin:0; font-size:20px; width:100%;">Get the Friday stall list</h2>
+      <label for="email" style="position:absolute; left:-9999px;">Email address</label>
+      <input id="email" type="email" placeholder="you@example.com" />
+      <button class="btn-subscribe" type="button">Subscribe</button>
+    </section>
+
+    <p class="fine-print">Hilltop Farmers Market is a volunteer-run, fictional organization created for the AccessLens demo. Vendor status may change without notice. Rain or shine.</p>
+  </main>
+
+  <footer>
+    <span>© 2026 Hilltop Farmers Market (fictional) · Built to test AccessLens</span>
+  </footer>
+</body>
+</html>
