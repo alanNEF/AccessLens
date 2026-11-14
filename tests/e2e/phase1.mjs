@@ -4,15 +4,16 @@ import assert from 'node:assert/strict';
 import { build } from 'esbuild';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
-import { readFile, mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { readFile, mkdtemp, writeFile, rm, mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve, join } from 'node:path';
 
-const work = await mkdtemp(join(tmpdir(), 'accesslens-phase0-'));
+const work = await mkdtemp(join(tmpdir(), 'accesslens-simulator-'));
 const profile = join(work, 'profile');
 const html = await readFile('demo-site/index.html');
 const server = createServer((req, res) => {
   res.setHeader('Content-Type', 'text/html');
+  if (req.url === '/base') return res.end(html.toString().replace('<head>', '<head><base href="/">'));
   res.end(req.url === '/unsupported' ? '<!doctype html><body><h1>Unmarked page</h1></body>' : html);
 });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
@@ -96,6 +97,25 @@ try {
   await select('Reset');
   assert.equal(await evaluate(owned), 0);
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('accesslens-panel')).position`), 'fixed');
+  // Real pointer event -> applied state and a completed intervening paint
+  // opportunity (two rAFs). This is a paint proxy, not a GPU presentation trace.
+  const timings = {};
+  for (let round=0; round<4; round++) {
+    for (const label of ['Protanopia','Deuteranopia','Tritanopia','Low Acuity','Off']) {
+      const point = await evaluate(`(() => {const b=${button(label)}; const r=b.getBoundingClientRect(); window.modeLatency=new Promise(resolve=>b.addEventListener('click',()=>{const start=performance.now();requestAnimationFrame(()=>requestAnimationFrame(()=>resolve({ms:performance.now()-start,selected:b.getAttribute('aria-pressed'),filter:getComputedStyle(document.querySelector('main')).filter})));},{once:true,capture:true})); return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+      await call('Input.dispatchMouseEvent', {type:'mousePressed',button:'left',clickCount:1,...point});
+      await call('Input.dispatchMouseEvent', {type:'mouseReleased',button:'left',clickCount:1,...point});
+      const sample = await evaluate('modeLatency');
+      assert.equal(sample.selected, 'true');
+      assert.equal(sample.filter === 'none', label === 'Off');
+      assert.ok(sample.ms < 300, `${label} exceeded 300 ms: ${sample.ms}`);
+      (timings[label] ??= []).push(sample.ms);
+    }
+  }
+  const performanceReport = Object.fromEntries(Object.entries(timings).map(([label, samples])=>[label,{samples:samples.length, maxMs:Math.max(...samples), meanMs:samples.reduce((a,b)=>a+b,0)/samples.length}]));
+  await writeFile(join(work,'performance.json'), JSON.stringify(performanceReport,null,2));
+  console.log('PASS action-to-paint proxy <300ms:', JSON.stringify(performanceReport));
+  await select('Reset');
   const panelBefore = await screenshot('panel-off', `${shadow}.querySelector('h1')`);
   const swatchBefore = await screenshot('swatch-off', `document.querySelector('.red')`);
   const baselineHeight = await evaluate('document.documentElement.scrollHeight');
@@ -132,6 +152,9 @@ try {
     assert.ok(await evaluate('scrollY') > 0);
     assert.equal(await evaluate(`Math.round(document.querySelector('header').getBoundingClientRect().top)`), 0);
     assert.equal(await evaluate(`Math.round(document.querySelector('.sticky').getBoundingClientRect().top)`), 78);
+    await evaluate('scrollTo(0,0)');
+    await call('Input.dispatchMouseEvent', {type:'mouseWheel',x:100,y:300,deltaX:0,deltaY:400});
+    await waitFor('scrollY > 0');
     await evaluate(`document.querySelector('.scroll-box').scrollTop=200`);
     const scroll = await evaluate(`({window:scrollY,nested:document.querySelector('.scroll-box').scrollTop})`);
     await select('Reset');
@@ -206,6 +229,31 @@ try {
   await evaluate(`testEngine.apply('blur');testEngine.dispose();testEngine.dispose()`);
   assert.equal(await evaluate(owned), 0);
   assert.ok(await evaluate(`(() => {try{testEngine.apply('blur');return false;}catch{return true;}})()`));
+  // Compare max-blur paint immediately below the fixed header boundary.
+  await evaluate('scrollTo(0,0)');
+  async function edgeCapture(name) {
+    const {data} = await call('Page.captureScreenshot');
+    await writeFile(join(work, name + '.png'), Buffer.from(data, 'base64'));
+    const y = await evaluate(`Math.ceil(document.querySelector('header').getBoundingClientRect().bottom) + 6`);
+    return evaluate(`(async () => {const b=await (await fetch('data:image/png;base64,${data}')).blob();const img=await createImageBitmap(b);const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(200,${y},1,1).data];})()`);
+  }
+  const edgeOff = await edgeCapture('header-off');
+  await evaluate(`window.clipEngine=engineTest.createSimulationEngine(document,document.querySelector('accesslens-panel'));clipEngine.apply('blur',8)`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('header')).clipPath`), 'inset(0px)');
+  const edgeClipped = await edgeCapture('header-max-blur-clipped');
+  assert.deepEqual(edgeClipped, edgeOff, 'No blur paint may leak below header');
+  await evaluate(`document.querySelector('style[data-accesslens-simulator-owned]').textContent=document.querySelector('style[data-accesslens-simulator-owned]').textContent.replace('clip-path: inset(0) !important;', '')`);
+  const edgeUnclipped = await edgeCapture('header-max-blur-before');
+  assert.notDeepEqual(edgeUnclipped, edgeOff, 'Comparison must reproduce original halo');
+  await evaluate(`clipEngine.apply('protanopia')`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('header')).clipPath`), 'none');
+  await evaluate(`clipEngine.reset();document.querySelector('header').style.clipPath='inset(1px)'`);
+  assert.ok(await evaluate(`(() => {try{clipEngine.apply('blur',8);return false;}catch{return true;}})()`));
+  assert.equal(await evaluate(owned), 0);
+  assert.equal(await evaluate(`document.querySelector('header').style.clipPath`), 'inset(1px)');
+  await evaluate(`document.querySelector('header').style.removeProperty('clip-path');clipEngine.dispose()`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('header')).clipPath`), 'none');
+  console.log('PASS max blur halo pixel comparison, color/reset clipping removal, author clip-path preservation');
   // Real range keyboard interaction updates the active effect without a reload.
   await select('Low Acuity');
   await evaluate(`${shadow}.querySelector('input[type=range]').focus()`);
@@ -240,6 +288,11 @@ try {
   await evaluate(`dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))`);
   await waitFor(`${shadow}?.querySelector('button')`);
   assert.equal(await evaluate(owned), 0);
+  await call('Page.navigate', { url: url + '/base' });
+  await waitFor(`${shadow}?.querySelector('button')`);
+  await select('Protanopia');
+  assert.equal(await evaluate(owned), 0);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=alert]').textContent`), /base element/);
   await call('Page.navigate', { url: url + '/unsupported' });
   await waitFor(`${shadow}?.querySelector('button')`);
   await select('Low Acuity');
@@ -257,9 +310,39 @@ try {
   const capture = await call('Page.captureScreenshot');
   await writeFile(join(work, 'narrow-blur.png'), Buffer.from(capture.data, 'base64'));
   await select('Protanopia');
+  // A temporary management-capable extension controls ONLY our test extension.
+  // This checks real disable/re-enable behavior without touching user profiles.
+  const helperDir = join(work,'management-helper');
+  await mkdir(helperDir);
+  await writeFile(join(helperDir,'manifest.json'), JSON.stringify({manifest_version:3,name:'AccessLens test lifecycle helper',version:'1.0',permissions:['management']}));
+  await writeFile(join(helperDir,'control.html'), '<!doctype html><title>Test helper</title>');
+  const helper = await cdp('Extensions.loadUnpacked', {path:helperDir});
+  const helperTarget = await cdp('Target.createTarget', {url:`chrome-extension://${helper.id}/control.html`});
+  const helperSession = await cdp('Target.attachToTarget', {targetId:helperTarget.targetId,flatten:true});
+  for (let attempt=0; attempt<100; attempt++) {
+    const ready = await cdp('Runtime.evaluate', {expression:'Boolean(globalThis.chrome?.management?.setEnabled)',returnByValue:true},helperSession.sessionId);
+    if (ready.result.value) break;
+    if (attempt === 99) throw new Error('Management helper did not become ready');
+    await new Promise(r=>setTimeout(r,50));
+  }
+  async function setEnabled(enabled) {
+    const result = await cdp('Runtime.evaluate', {expression:`chrome.management.setEnabled(${JSON.stringify(extension.id)},${enabled})`,awaitPromise:true,userGesture:true,returnByValue:true},helperSession.sessionId);
+    assert.equal(result.exceptionDetails, undefined);
+  }
+  await select('Low Acuity');
+  await setEnabled(false);
+  await waitFor(`${owned} === 0 && !document.querySelector('accesslens-panel')`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'none');
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).clipPath`), 'none');
+  await setEnabled(true);
+  await call('Page.reload');
+  await waitFor(`${shadow}?.querySelector('button')`);
+  assert.equal(await evaluate(owned),0);
+  assert.match(await evaluate(`${shadow}.querySelector('[role=status]').textContent`), /Off/);
+  await select('Low Acuity');
   await cdp('Extensions.uninstall', { id: extension.id });
   await waitFor(`${owned} === 0 && !document.querySelector('accesslens-panel')`);
-  console.log('PASS narrow viewport panel bounds and actual extension uninstall cleanup');
+  console.log('PASS narrow viewport panel bounds and actual extension disable/re-enable/uninstall cleanup');
   console.log('Chrome:', (await cdp('Browser.getVersion')).product);
   console.log('Screenshots:', work);
 } finally {

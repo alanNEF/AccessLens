@@ -68,3 +68,28 @@ test('dispose removes effects, clears subscriptions, and prevents later updates'
   assert.equal(count, 2);
   assert.deepEqual(calls.at(-1), ['dispose']);
 });
+
+test('mode reader emits only applied changes, Off on errors/dispose, and unsubscribes', async () => {
+  const bundle = await build({ entryPoints: ['src/shared/simulator-mode-reader.ts'], bundle:true, write:false, format:'esm' });
+  const { createSimulatorModeReader } = await import('data:text/javascript;base64,' + Buffer.from(bundle.outputFiles[0].text).toString('base64'));
+  const { controller: c, fail } = fixture();
+  const reader = createSimulatorModeReader(c);
+  assert.deepEqual(Object.keys(reader).sort(), ['getActiveMode', 'subscribeActiveMode']);
+  assert.ok(Object.isFrozen(reader));
+  assert.equal(reader.getActiveMode(), 'none');
+  const modes = [];
+  const unsubscribe = reader.subscribeActiveMode(mode => { assert.equal(mode, reader.getActiveMode()); modes.push(mode); });
+  c.setMode('protanopia'); c.setMode('protanopia'); c.setBlurPx(4);
+  assert.deepEqual(modes, ['protanopia']);
+  fail(); c.setMode('blur');
+  assert.deepEqual(modes, ['protanopia', 'none']);
+  assert.ok(!modes.includes('blur'), 'Failed request must never be published');
+  unsubscribe(); c.dispose(); assert.equal(modes.length, 2);
+  const other = fixture();
+  const changes = [];
+  other.controller.subscribeActiveMode(mode => changes.push(mode));
+  other.controller.setMode('blur'); other.controller.reset();
+  other.controller.setMode('tritanopia'); other.controller.dispose();
+  other.controller.setMode('deuteranopia');
+  assert.deepEqual(changes, ['blur','none','tritanopia','none']);
+});

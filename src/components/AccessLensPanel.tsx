@@ -1,9 +1,10 @@
 import { useId } from 'react';
 import { SimulatorTab } from '../features/simulator/SimulatorTab';
 import type { SimulatorController } from '../features/simulator/simulator-controller';
+import type { SimulatorModeReader } from '../shared/simulator-mode-reader';
 import { APP_NAME } from '../shared/constants';
 
-export function AccessLensPanel({ controller }: { controller: SimulatorController }) {
+export function AccessLensPanel({ controller, modeReader }: { controller: SimulatorController; modeReader: SimulatorModeReader }) {
   const tabId = useId();
   const panelId = useId();
   return (
@@ -13,7 +14,7 @@ export function AccessLensPanel({ controller }: { controller: SimulatorControlle
         <button role="tab" id={tabId} aria-selected="true" aria-controls={panelId} type="button">Simulator</button>
       </div>
       <div role="tabpanel" id={panelId} aria-labelledby={tabId}>
-        <SimulatorTab controller={controller} />
+        <SimulatorTab controller={controller} modeReader={modeReader} />
       </div>
     </section>
   );

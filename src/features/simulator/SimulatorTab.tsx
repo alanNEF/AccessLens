@@ -1,15 +1,17 @@
 import { useId, useSyncExternalStore } from 'react';
 import type { SimulationMode } from '../../shared/types';
 import type { SimulatorController } from './simulator-controller';
+import type { SimulatorModeReader } from '../../shared/simulator-mode-reader';
 import { PRESETS, BLUR } from './filters';
 
-export function SimulatorTab({ controller }: { controller: SimulatorController }) {
+export function SimulatorTab({ controller, modeReader }: { controller: SimulatorController; modeReader: SimulatorModeReader }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
+  const activeMode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const { mode, blurPx } = state.settings;
   const intensityId = useId();
   return (
     <div>
-      <p role="status" aria-live="polite" aria-atomic="true" className="simulator-status">Active: <strong>{PRESETS[mode].label}</strong></p>
+      <p role="status" aria-live="polite" aria-atomic="true" className="simulator-status">Active: <strong>{PRESETS[activeMode].label}</strong></p>
       <fieldset className="simulator-modes">
         <legend>Vision mode</legend>
         <div className="simulator-controls">
