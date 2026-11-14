@@ -3,12 +3,80 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AccessLens demo</title>
+    <title>AccessLens Phase 0 demo</title>
+    <style>
+      * { box-sizing: border-box; }
+      html { scroll-padding-top: 90px; }
+      body { margin: 0; background: #f5f6fa; color: #172033; font: 17px/1.6 system-ui, sans-serif; }
+      header { position: fixed; inset: 0 0 auto; z-index: 10; padding: 14px 24px; background: #172033; color: white; }
+      header a { color: #b8d8ff; margin-left: 24px; }
+      main { max-width: 960px; margin: auto; padding: 100px 24px 360px; }
+      section { margin: 24px 0; padding: 24px; background: white; border: 1px solid #bfc7d2; }
+      h1, h2 { line-height: 1.2; }
+      .swatches { display: flex; flex-wrap: wrap; gap: 12px; }
+      .swatch { width: 140px; height: 110px; padding: 12px; color: white; font-weight: bold; }
+      .red { background: #e00000; } .green { background: #008000; } .blue { background: #0000ff; }
+      .sticky { position: sticky; top: 78px; background: #ffdf80; padding: 8px; z-index: 2; }
+      label { display: block; margin: 12px 0; }
+      input, select, button { padding: 8px; font: inherit; }
+      .scroll-box { height: 160px; overflow: auto; border: 2px solid #526077; padding: 12px; }
+      .scroll-content { height: 500px; background: linear-gradient(white, #9bcfff); }
+      img { display: block; width: 320px; max-width: 100%; }
+      .existing-filter { filter: grayscale(1); }
+      dialog { width: min(440px, 85vw); border: 2px solid #172033; }
+      dialog::backdrop { background: #17203366; }
+      footer { padding: 24px; background: #172033; color: white; }
+    </style>
   </head>
-  <body>
-    <main>
-      <h1>AccessLens demo site</h1>
-      <p>Add accessibility test scenarios here as features are implemented.</p>
+  <!-- Explicit controlled-layout contract; roots remain siblings of the WXT host. -->
+  <body data-accesslens-simulator-demo="phase-0">
+    <header data-accesslens-simulator-target>
+      <strong>AccessLens demo</strong><a href="#form">Form</a><a href="#bottom">Bottom</a>
+    </header>
+    <main data-accesslens-simulator-target>
+      <h1>Simulator feasibility playground</h1>
+      <p>Test color, blur, Off and Reset while using ordinary page controls. The AccessLens panel should stay crisp.</p>
+      <div class="sticky">Sticky within the main content root</div>
+      <section>
+        <h2>Reference swatches and text</h2>
+        <div class="swatches"><div class="swatch red">Red</div><div class="swatch green">Green</div><div class="swatch blue">Blue</div></div>
+        <p>Large text, small text, and overlapping sticky content show per-root compositing limits.</p>
+        <small>Small text: The quick brown fox jumps over the lazy dog.</small>
+      </section>
+      <section>
+        <h2>Image and existing descendant filter</h2>
+        <img alt="Red, green and blue geometric landscape" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Crect width='320' height='160' fill='%230080ff'/%3E%3Ccircle cx='80' cy='60' r='40' fill='red'/%3E%3Cpath d='M0 160L160 40L320 160' fill='green'/%3E%3C/svg%3E" />
+        <p class="existing-filter"><span style="color: red">Page-owned grayscale(1) remains applied here.</span></p>
+      </section>
+      <section id="form">
+        <h2>Form and modal</h2>
+        <form id="demo-form">
+          <label>Name <input name="name" autocomplete="off" /></label>
+          <label>Priority <select name="priority"><option>Normal</option><option>Urgent</option></select></label>
+          <label><input name="updates" type="checkbox" /> Send updates</label>
+          <button type="submit">Save locally</button>
+          <output id="saved" aria-live="polite"></output>
+        </form>
+        <button id="open-dialog" type="button">Open modal</button>
+      </section>
+      <section>
+        <h2>Nested scrolling</h2>
+        <div class="scroll-box" tabindex="0" aria-label="Scrollable sample"><div class="scroll-content">Scroll this region.<p style="padding-top: 350px">End of nested content</p></div></div>
+      </section>
+      <section id="bottom"><h2>Anchor destination</h2><a href="#form">Return to form</a></section>
     </main>
+    <!-- Top-layer modal is a separate target, not a descendant of filtered main. -->
+    <dialog id="demo-dialog" data-accesslens-simulator-target>
+      <h2>Native modal</h2><p>The dialog content is filtered; its backdrop is outside this spike’s coverage.</p>
+      <form method="dialog"><label>Modal input <input name="note" /></label><button>Close modal</button></form>
+    </dialog>
+    <footer data-accesslens-simulator-target>End of demo · ordinary document scrolling</footer>
+    <script>
+      document.querySelector('#demo-form').addEventListener('submit', event => {
+        event.preventDefault();
+        document.querySelector('#saved').textContent = ' Saved: ' + new FormData(event.target).get('name');
+      });
+      document.querySelector('#open-dialog').addEventListener('click', () => document.querySelector('#demo-dialog').showModal());
+    </script>
   </body>
 </html>

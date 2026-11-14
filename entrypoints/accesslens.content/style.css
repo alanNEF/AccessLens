@@ -3,3 +3,23 @@
 :host {
   all: initial;
 }
+
+:host {
+  position: fixed !important;
+  right: 16px !important;
+  bottom: 16px !important;
+  z-index: 2147483647 !important;
+}
+
+.accesslens-panel {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  border: 2px solid #526077;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px #0004;
+}
+
+.spike-controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.accesslens-panel h2 { font-size: 16px; }
+.accesslens-panel button:focus-visible { outline: 3px solid #1767dc; outline-offset: 2px; }
