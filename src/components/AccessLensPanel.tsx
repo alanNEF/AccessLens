@@ -1,31 +1,21 @@
-import { useState } from 'react';
+import { useId } from 'react';
 import { SimulatorTab } from '../features/simulator/SimulatorTab';
-import { InspectorTab } from '../features/inspector/InspectorTab';
-import { FixerTab } from '../features/fixer/FixerTab';
+import type { SimulatorController } from '../features/simulator/simulator-controller';
+import type { SimulatorModeReader } from '../shared/simulator-mode-reader';
 import { APP_NAME } from '../shared/constants';
-import type { FeatureId } from '../shared/types';
 
-export function AccessLensPanel() {
-  const [feature, setFeature] = useState<FeatureId>('simulator');
-
+export function AccessLensPanel({ controller, modeReader }: { controller: SimulatorController; modeReader: SimulatorModeReader }) {
+  const tabId = useId();
+  const panelId = useId();
   return (
     <section className="accesslens-panel" aria-label={APP_NAME}>
       <h1>{APP_NAME}</h1>
-      <nav aria-label="Features">
-        {(['simulator', 'inspector', 'fixer'] as const).map((id) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={feature === id}
-            onClick={() => setFeature(id)}
-          >
-            {id[0].toUpperCase() + id.slice(1)}
-          </button>
-        ))}
-      </nav>
-      {feature === 'simulator' && <SimulatorTab />}
-      {feature === 'inspector' && <InspectorTab />}
-      {feature === 'fixer' && <FixerTab />}
+      <div role="tablist" aria-label="AccessLens features">
+        <button role="tab" id={tabId} aria-selected="true" aria-controls={panelId} type="button">Simulator</button>
+      </div>
+      <div role="tabpanel" id={panelId} aria-labelledby={tabId}>
+        <SimulatorTab controller={controller} modeReader={modeReader} />
+      </div>
     </section>
   );
 }

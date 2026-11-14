@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AccessLens cross-site playground</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f5f6fa; color: #172033; font: 17px/1.6 system-ui, sans-serif; }
+    header { background: #172033; color: white; padding: 18px 24px; position: sticky; top: 0; z-index: 10; }
+    header a { color: #b8d8ff; margin-right: 20px; }
+    main { max-width: 880px; margin: auto; padding: 32px 24px 380px; min-height: 150vh; }
+    button,input { padding: 8px; font: inherit; }
+    label { display: block; margin: 16px 0; }
+    .swatches { display: flex; gap: 12px; margin: 24px 0; }
+    .swatches span { padding: 24px; color: white; }
+    aside { padding: 16px 24px; background: #ffdf80; filter: contrast(1.05); }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Cross-site playground</strong><br>
+    <a href="index.html">Original demo</a>
+    <button id="navigate" type="button">Replace page content / SPA route</button>
+    <button id="overlay" type="button">Add a top-level overlay</button>
+  </header>
+  <main id="route">
+    <h1>Ordinary HTML, without AccessLens markers</h1>
+    <p>Select a simulation, then use the buttons above. Replaced and newly added content should receive the same effect while the AccessLens panel stays crisp.</p>
+    <div class="swatches"><span style="background:#e00000">Red</span><span style="background:#008000">Green</span><span style="background:#0000ff">Blue</span></div>
+    <label>Type here, switch modes, then Reset <input name="sample" autocomplete="off"></label>
+    <p>Reset should retain this value. Replacing this page content intentionally creates a new input, like a website changing routes.</p>
+    <h2>Try external sites</h2>
+    <p>After reloading the extension, try <a href="https://en.wikipedia.org/wiki/Accessibility">Wikipedia</a>, <a href="https://news.ycombinator.com/">Hacker News</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility">MDN</a>, <a href="https://github.com/microsoft/TypeScript">GitHub</a>, or <a href="https://www.youtube.com/">YouTube</a>.</p>
+  </main>
+  <script>
+    let route = 0;
+    document.querySelector('#navigate').addEventListener('click', () => {
+      route++;
+      const next = document.createElement('main');
+      next.id = 'route';
+      next.innerHTML = `<h1>Client-side route ${route}</h1><p>This entire top-level content node is new. The selected simulation should remain active.</p><div class="swatches"><span style="background:#e00000">Red</span><span style="background:#008000">Green</span><span style="background:#0000ff">Blue</span></div><label>New route input <input name="sample"></label>`;
+      document.querySelector('#route').replaceWith(next);
+      history.pushState({}, '', `?route=${route}`);
+    });
+    document.querySelector('#overlay').addEventListener('click', () => {
+      if (document.querySelector('aside')) return;
+      const aside = document.createElement('aside');
+      aside.innerHTML = 'New top-level content with a page-owned contrast filter. <button type="button">Dismiss</button>';
+      aside.querySelector('button').addEventListener('click', () => aside.remove());
+      document.body.append(aside);
+    });
+  </script>
+</body>
+</html>

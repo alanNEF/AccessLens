@@ -17,7 +17,7 @@
       "label": "main()",
       "file_type": "code",
       "source_file": "entrypoints/accesslens.content/index.tsx",
-      "source_location": "L8",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "entrypoints_accesslens_content_index_main",
       "community": 1,
@@ -34,13 +34,23 @@
       "norm_label": "background.ts"
     },
     {
+      "label": "hasNoReceiver()",
+      "file_type": "code",
+      "source_file": "entrypoints/background.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "entrypoints_background_hasnoreceiver",
+      "community": 7,
+      "norm_label": "hasnoreceiver()"
+    },
+    {
       "label": "main.tsx",
       "file_type": "code",
       "source_file": "entrypoints/popup/main.tsx",
       "source_location": "L1",
       "_origin": "ast",
       "id": "entrypoints_popup_main",
-      "community": 1,
+      "community": 38,
       "norm_label": "main.tsx"
     },
     {
@@ -110,7 +120,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "package_scripts",
-      "community": 5,
+      "community": 17,
       "norm_label": "scripts"
     },
     {
@@ -120,7 +130,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "package_scripts_dev",
-      "community": 5,
+      "community": 17,
       "norm_label": "dev"
     },
     {
@@ -130,7 +140,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "package_scripts_build",
-      "community": 5,
+      "community": 17,
       "norm_label": "build"
     },
     {
@@ -140,7 +150,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "package_scripts_zip",
-      "community": 5,
+      "community": 17,
       "norm_label": "zip"
     },
     {
@@ -150,24 +160,84 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "package_scripts_typecheck",
-      "community": 5,
+      "community": 17,
       "norm_label": "typecheck"
+    },
+    {
+      "label": "test:phase0",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "package_scripts_test_phase0",
+      "community": 17,
+      "norm_label": "test:phase0"
+    },
+    {
+      "label": "test:phase1",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "package_scripts_test_phase1",
+      "community": 17,
+      "norm_label": "test:phase1"
+    },
+    {
+      "label": "test:phase2",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "package_scripts_test_phase2",
+      "community": 17,
+      "norm_label": "test:phase2"
+    },
+    {
+      "label": "test:phase3",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "package_scripts_test_phase3",
+      "community": 17,
+      "norm_label": "test:phase3"
+    },
+    {
+      "label": "test:phase4",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "package_scripts_test_phase4",
+      "community": 17,
+      "norm_label": "test:phase4"
+    },
+    {
+      "label": "demo",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "package_scripts_demo",
+      "community": 17,
+      "norm_label": "demo"
     },
     {
       "label": "postinstall",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L18",
       "_origin": "ast",
       "id": "package_scripts_postinstall",
-      "community": 5,
+      "community": 17,
       "norm_label": "postinstall"
     },
     {
       "label": "dependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L14",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "package_dependencies",
       "community": 2,
@@ -177,7 +247,7 @@
       "label": "react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L21",
       "_origin": "ast",
       "id": "package_dependencies_react",
       "community": 2,
@@ -187,7 +257,7 @@
       "label": "react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "package_dependencies_react_dom",
       "community": 2,
@@ -197,60 +267,60 @@
       "label": "devDependencies",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "package_devdependencies",
-      "community": 4,
+      "community": 2,
       "norm_label": "devdependencies"
     },
     {
       "label": "@types/react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "package_devdependencies_types_react",
-      "community": 4,
+      "community": 2,
       "norm_label": "@types/react"
     },
     {
       "label": "@types/react-dom",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "package_devdependencies_types_react_dom",
-      "community": 4,
+      "community": 2,
       "norm_label": "@types/react-dom"
     },
     {
       "label": "@wxt-dev/module-react",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "package_devdependencies_wxt_dev_module_react",
-      "community": 4,
+      "community": 2,
       "norm_label": "@wxt-dev/module-react"
     },
     {
       "label": "typescript",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "package_devdependencies_typescript",
-      "community": 4,
+      "community": 2,
       "norm_label": "typescript"
     },
     {
       "label": "wxt",
       "file_type": "code",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L29",
       "_origin": "ast",
       "id": "package_devdependencies_wxt",
-      "community": 4,
+      "community": 2,
       "norm_label": "wxt"
     },
     {
@@ -267,7 +337,7 @@
       "label": "AccessLensPanel()",
       "file_type": "code",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L8",
+      "source_location": "L7",
       "_origin": "ast",
       "id": "src_components_accesslenspanel_accesslenspanel",
       "community": 1,
@@ -280,7 +350,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_fixer_fixertab",
-      "community": 1,
+      "community": 19,
       "norm_label": "fixertab.tsx"
     },
     {
@@ -290,7 +360,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_fixer_fixertab_fixertab",
-      "community": 1,
+      "community": 19,
       "norm_label": "fixertab()"
     },
     {
@@ -320,7 +390,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_inspector_inspectortab",
-      "community": 1,
+      "community": 20,
       "norm_label": "inspectortab.tsx"
     },
     {
@@ -330,7 +400,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_inspector_inspectortab_inspectortab",
-      "community": 1,
+      "community": 20,
       "norm_label": "inspectortab()"
     },
     {
@@ -367,7 +437,7 @@
       "label": "SimulatorTab()",
       "file_type": "code",
       "source_file": "src/features/simulator/SimulatorTab.tsx",
-      "source_location": "L1",
+      "source_location": "L7",
       "_origin": "ast",
       "id": "src_features_simulator_simulatortab_simulatortab",
       "community": 1,
@@ -380,8 +450,28 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_simulator_filters",
-      "community": 12,
+      "community": 1,
       "norm_label": "filters.ts"
+    },
+    {
+      "label": "BLUR",
+      "file_type": "code",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "src_features_simulator_filters_blur",
+      "community": 1,
+      "norm_label": "blur"
+    },
+    {
+      "label": "normalizeBlur()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "src_features_simulator_filters_normalizeblur",
+      "community": 1,
+      "norm_label": "normalizeblur()"
     },
     {
       "label": "simulation-engine.ts",
@@ -390,8 +480,148 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_features_simulator_simulation_engine",
-      "community": 13,
+      "community": 1,
       "norm_label": "simulation-engine.ts"
+    },
+    {
+      "label": "createSimulationEngine()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulation_engine_createsimulationengine",
+      "community": 1,
+      "norm_label": "createsimulationengine()"
+    },
+    {
+      "label": "SimulationEngine",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulation_engine_simulationengine",
+      "community": 1,
+      "norm_label": "simulationengine"
+    },
+    {
+      "label": "simulator-controller.ts",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_controller",
+      "community": 1,
+      "norm_label": "simulator-controller.ts"
+    },
+    {
+      "label": "createSimulatorController()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "community": 1,
+      "norm_label": "createsimulatorcontroller()"
+    },
+    {
+      "label": "SimulatorController",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L70",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_controller_simulatorcontroller",
+      "community": 1,
+      "norm_label": "simulatorcontroller"
+    },
+    {
+      "label": "simulator-dom.ts",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-dom.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_dom",
+      "community": 1,
+      "norm_label": "simulator-dom.ts"
+    },
+    {
+      "label": "createSimulatorDom()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-dom.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_dom_createsimulatordom",
+      "community": 1,
+      "norm_label": "createsimulatordom()"
+    },
+    {
+      "label": "simulator-state.ts",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state",
+      "community": 1,
+      "norm_label": "simulator-state.ts"
+    },
+    {
+      "label": "SimulationSettings",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_simulationsettings",
+      "community": 1,
+      "norm_label": "simulationsettings"
+    },
+    {
+      "label": "SimulationStatus",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_simulationstatus",
+      "community": 1,
+      "norm_label": "simulationstatus"
+    },
+    {
+      "label": "SimulatorState",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_simulatorstate",
+      "community": 1,
+      "norm_label": "simulatorstate"
+    },
+    {
+      "label": "DEFAULT_SETTINGS",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_default_settings",
+      "community": 1,
+      "norm_label": "default_settings"
+    },
+    {
+      "label": "validateMode()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_validatemode",
+      "community": 1,
+      "norm_label": "validatemode()"
+    },
+    {
+      "label": "snapshot()",
+      "file_type": "code",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "src_features_simulator_simulator_state_snapshot",
+      "community": 1,
+      "norm_label": "snapshot()"
     },
     {
       "label": "constants.ts",
@@ -410,8 +640,68 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_shared_messages",
-      "community": 14,
+      "community": 7,
       "norm_label": "messages.ts"
+    },
+    {
+      "label": "TOGGLE_PANEL",
+      "file_type": "code",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L2",
+      "_origin": "ast",
+      "id": "src_shared_messages_toggle_panel",
+      "community": 7,
+      "norm_label": "toggle_panel"
+    },
+    {
+      "label": "TogglePanelMessage",
+      "file_type": "code",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "src_shared_messages_togglepanelmessage",
+      "community": 7,
+      "norm_label": "togglepanelmessage"
+    },
+    {
+      "label": "isTogglePanelMessage()",
+      "file_type": "code",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_shared_messages_istogglepanelmessage",
+      "community": 7,
+      "norm_label": "istogglepanelmessage()"
+    },
+    {
+      "label": "simulator-mode-reader.ts",
+      "file_type": "code",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_shared_simulator_mode_reader",
+      "community": 1,
+      "norm_label": "simulator-mode-reader.ts"
+    },
+    {
+      "label": "SimulatorModeReader",
+      "file_type": "code",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_shared_simulator_mode_reader_simulatormodereader",
+      "community": 1,
+      "norm_label": "simulatormodereader"
+    },
+    {
+      "label": "createSimulatorModeReader()",
+      "file_type": "code",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "src_shared_simulator_mode_reader_createsimulatormodereader",
+      "community": 1,
+      "norm_label": "createsimulatormodereader()"
     },
     {
       "label": "types.ts",
@@ -432,6 +722,186 @@
       "id": "src_shared_types_featureid",
       "community": 1,
       "norm_label": "featureid"
+    },
+    {
+      "label": "SimulationMode",
+      "file_type": "code",
+      "source_file": "src/shared/types.ts",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "src_shared_types_simulationmode",
+      "community": 1,
+      "norm_label": "simulationmode"
+    },
+    {
+      "label": "cross-site.mjs",
+      "file_type": "code",
+      "source_file": "tests/e2e/cross-site.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_e2e_cross_site",
+      "community": 18,
+      "norm_label": "cross-site.mjs"
+    },
+    {
+      "label": "runCrossSite()",
+      "file_type": "code",
+      "source_file": "tests/e2e/cross-site.mjs",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "tests_e2e_cross_site_runcrosssite",
+      "community": 18,
+      "norm_label": "runcrosssite()"
+    },
+    {
+      "label": "phase1.mjs",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1",
+      "community": 18,
+      "norm_label": "phase1.mjs"
+    },
+    {
+      "label": "profile",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_profile",
+      "community": 18,
+      "norm_label": "profile"
+    },
+    {
+      "label": "server",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_server",
+      "community": 18,
+      "norm_label": "server"
+    },
+    {
+      "label": "chrome",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_chrome",
+      "community": 18,
+      "norm_label": "chrome"
+    },
+    {
+      "label": "cdp()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_cdp",
+      "community": 18,
+      "norm_label": "cdp()"
+    },
+    {
+      "label": "staleValue()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_stalevalue",
+      "community": 18,
+      "norm_label": "stalevalue()"
+    },
+    {
+      "label": "evaluate()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_evaluate",
+      "community": 18,
+      "norm_label": "evaluate()"
+    },
+    {
+      "label": "triggerToolbar()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L91",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_triggertoolbar",
+      "community": 18,
+      "norm_label": "triggertoolbar()"
+    },
+    {
+      "label": "waitFor()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L99",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_waitfor",
+      "community": 18,
+      "norm_label": "waitfor()"
+    },
+    {
+      "label": "select()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L112",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_select",
+      "community": 18,
+      "norm_label": "select()"
+    },
+    {
+      "label": "screenshot()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L116",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_screenshot",
+      "community": 18,
+      "norm_label": "screenshot()"
+    },
+    {
+      "label": "edgeCapture()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L305",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_edgecapture",
+      "community": 18,
+      "norm_label": "edgecapture()"
+    },
+    {
+      "label": "setEnabled()",
+      "file_type": "code",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L451",
+      "_origin": "ast",
+      "id": "tests_e2e_phase1_setenabled",
+      "community": 18,
+      "norm_label": "setenabled()"
+    },
+    {
+      "label": "simulator-controller.test.mjs",
+      "file_type": "code",
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_unit_simulator_controller_test",
+      "community": 1,
+      "norm_label": "simulator-controller.test.mjs"
+    },
+    {
+      "label": "fixture()",
+      "file_type": "code",
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "tests_unit_simulator_controller_test_fixture",
+      "community": 1,
+      "norm_label": "fixture()"
     },
     {
       "label": "tsconfig.json",
@@ -494,17 +964,1194 @@
       "norm_label": "wxt.config.ts"
     },
     {
-      "label": "AccessLens accessibility simulator",
-      "file_type": "concept",
+      "label": "'build:manifestGenerated'()",
+      "file_type": "code",
+      "source_file": "wxt.config.ts",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "wxt_config_build_manifestgenerated",
+      "community": 15,
+      "norm_label": "'build:manifestgenerated'()"
+    },
+    {
+      "label": "AGENTS.md",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents",
+      "community": 4,
+      "norm_label": "agents.md"
+    },
+    {
+      "label": "AccessLens \u2014 Coding Agent Instructions",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "agents_accesslens_coding_agent_instructions",
+      "community": 4,
+      "norm_label": "accesslens \u2014 coding agent instructions"
+    },
+    {
+      "label": "Mission",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "agents_mission",
+      "community": 4,
+      "norm_label": "mission"
+    },
+    {
+      "label": "Sources of truth",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "agents_sources_of_truth",
+      "community": 4,
+      "norm_label": "sources of truth"
+    },
+    {
+      "label": "Stack",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "agents_stack",
+      "community": 4,
+      "norm_label": "stack"
+    },
+    {
+      "label": "Expected repository layout",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "agents_expected_repository_layout",
+      "community": 4,
+      "norm_label": "expected repository layout"
+    },
+    {
+      "label": "Required Graphify workflow",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L57",
+      "_origin": "ast",
+      "id": "agents_required_graphify_workflow",
+      "community": 4,
+      "norm_label": "required graphify workflow"
+    },
+    {
+      "label": "Architecture and feature ownership",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L73",
+      "_origin": "ast",
+      "id": "agents_architecture_and_feature_ownership",
+      "community": 4,
+      "norm_label": "architecture and feature ownership"
+    },
+    {
+      "label": "Simulator (`src/features/simulator/`)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L82",
+      "_origin": "ast",
+      "id": "agents_simulator_src_features_simulator",
+      "community": 4,
+      "norm_label": "simulator (`src/features/simulator/`)"
+    },
+    {
+      "label": "Inspector (`src/features/inspector/`)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L86",
+      "_origin": "ast",
+      "id": "agents_inspector_src_features_inspector",
+      "community": 4,
+      "norm_label": "inspector (`src/features/inspector/`)"
+    },
+    {
+      "label": "Fixer (`src/features/fixer/`)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L90",
+      "_origin": "ast",
+      "id": "agents_fixer_src_features_fixer",
+      "community": 4,
+      "norm_label": "fixer (`src/features/fixer/`)"
+    },
+    {
+      "label": "Coding conventions",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L94",
+      "_origin": "ast",
+      "id": "agents_coding_conventions",
+      "community": 4,
+      "norm_label": "coding conventions"
+    },
+    {
+      "label": "Testing and delivery",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": "L103",
+      "_origin": "ast",
+      "id": "agents_testing_and_delivery",
+      "community": 4,
+      "norm_label": "testing and delivery"
+    },
+    {
+      "label": "README.md",
+      "file_type": "document",
       "source_file": "README.md",
-      "source_location": "README.md:1",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "readme",
+      "community": 3,
+      "norm_label": "readme.md"
+    },
+    {
+      "label": "AccessLens",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "_origin": "ast",
       "id": "readme_accesslens",
       "community": 3,
-      "norm_label": "accesslens accessibility simulator"
+      "norm_label": "accesslens"
+    },
+    {
+      "label": "Development",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "readme_development",
+      "community": 3,
+      "norm_label": "development"
+    },
+    {
+      "label": "Project layout",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "readme_project_layout",
+      "community": 3,
+      "norm_label": "project layout"
+    },
+    {
+      "label": "Phase 4 demo",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "readme_phase_4_demo",
+      "community": 3,
+      "norm_label": "phase 4 demo"
+    },
+    {
+      "label": "fixer-prd.md",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_fixer_prd",
+      "community": 12,
+      "norm_label": "fixer-prd.md"
+    },
+    {
+      "label": "Overview",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_overview",
+      "community": 12,
+      "norm_label": "overview"
+    },
+    {
+      "label": "Problem",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_problem",
+      "community": 12,
+      "norm_label": "problem"
+    },
+    {
+      "label": "User Stories",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_user_stories",
+      "community": 12,
+      "norm_label": "user stories"
+    },
+    {
+      "label": "User Definitions",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_user_definitions",
+      "community": 12,
+      "norm_label": "user definitions"
+    },
+    {
+      "label": "User Stories",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_user_stories_26",
+      "community": 12,
+      "norm_label": "user stories"
+    },
+    {
+      "label": "Frontend Developer",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_frontend_developer",
+      "community": 12,
+      "norm_label": "frontend developer"
+    },
+    {
+      "label": "UI/UX Designer",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_ui_ux_designer",
+      "community": 12,
+      "norm_label": "ui/ux designer"
+    },
+    {
+      "label": "Requirements",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_requirements",
+      "community": 12,
+      "norm_label": "requirements"
+    },
+    {
+      "label": "Functional Requirements",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_functional_requirements",
+      "community": 12,
+      "norm_label": "functional requirements"
+    },
+    {
+      "label": "Non-Functional Requirements",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_non_functional_requirements",
+      "community": 12,
+      "norm_label": "non-functional requirements"
+    },
+    {
+      "label": "Design",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_design",
+      "community": 12,
+      "norm_label": "design"
+    },
+    {
+      "label": "UX Flow",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_ux_flow",
+      "community": 12,
+      "norm_label": "ux flow"
+    },
+    {
+      "label": "UI",
+      "file_type": "document",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L61",
+      "_origin": "ast",
+      "id": "docs_fixer_prd_ui",
+      "community": 12,
+      "norm_label": "ui"
+    },
+    {
+      "label": "inspector-prd.md",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_inspector_prd",
+      "community": 13,
+      "norm_label": "inspector-prd.md"
+    },
+    {
+      "label": "Overview",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_overview",
+      "community": 13,
+      "norm_label": "overview"
+    },
+    {
+      "label": "Problem",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_problem",
+      "community": 13,
+      "norm_label": "problem"
+    },
+    {
+      "label": "User Stories",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_user_stories",
+      "community": 13,
+      "norm_label": "user stories"
+    },
+    {
+      "label": "User Definitions",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_user_definitions",
+      "community": 13,
+      "norm_label": "user definitions"
+    },
+    {
+      "label": "User Stories",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_user_stories_26",
+      "community": 13,
+      "norm_label": "user stories"
+    },
+    {
+      "label": "Frontend Developer",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_frontend_developer",
+      "community": 13,
+      "norm_label": "frontend developer"
+    },
+    {
+      "label": "Student Developer",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_student_developer",
+      "community": 13,
+      "norm_label": "student developer"
+    },
+    {
+      "label": "Requirements",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_requirements",
+      "community": 13,
+      "norm_label": "requirements"
+    },
+    {
+      "label": "Functional Requirements",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_functional_requirements",
+      "community": 13,
+      "norm_label": "functional requirements"
+    },
+    {
+      "label": "Non-Functional Requirements",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_non_functional_requirements",
+      "community": 13,
+      "norm_label": "non-functional requirements"
+    },
+    {
+      "label": "Design",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L51",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_design",
+      "community": 13,
+      "norm_label": "design"
+    },
+    {
+      "label": "UX Flow",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L53",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_ux_flow",
+      "community": 13,
+      "norm_label": "ux flow"
+    },
+    {
+      "label": "UI",
+      "file_type": "document",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "docs_inspector_prd_ui",
+      "community": 13,
+      "norm_label": "ui"
+    },
+    {
+      "label": "simulator-prd.md",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_prd",
+      "community": 16,
+      "norm_label": "simulator-prd.md"
+    },
+    {
+      "label": "Overview",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_overview",
+      "community": 16,
+      "norm_label": "overview"
+    },
+    {
+      "label": "Problem",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_problem",
+      "community": 16,
+      "norm_label": "problem"
+    },
+    {
+      "label": "User Stories",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_user_stories",
+      "community": 16,
+      "norm_label": "user stories"
+    },
+    {
+      "label": "User Definitions",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_user_definitions",
+      "community": 16,
+      "norm_label": "user definitions"
+    },
+    {
+      "label": "User Stories",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_user_stories_26",
+      "community": 16,
+      "norm_label": "user stories"
+    },
+    {
+      "label": "Frontend Developer",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_frontend_developer",
+      "community": 16,
+      "norm_label": "frontend developer"
+    },
+    {
+      "label": "UI/UX Designer",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_ui_ux_designer",
+      "community": 16,
+      "norm_label": "ui/ux designer"
+    },
+    {
+      "label": "Requirements",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L34",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_requirements",
+      "community": 16,
+      "norm_label": "requirements"
+    },
+    {
+      "label": "Functional Requirements",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_functional_requirements",
+      "community": 16,
+      "norm_label": "functional requirements"
+    },
+    {
+      "label": "Non-Functional Requirements",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L45",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_non_functional_requirements",
+      "community": 16,
+      "norm_label": "non-functional requirements"
+    },
+    {
+      "label": "Design",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L51",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_design",
+      "community": 16,
+      "norm_label": "design"
+    },
+    {
+      "label": "UX Flow",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L53",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_ux_flow",
+      "community": 16,
+      "norm_label": "ux flow"
+    },
+    {
+      "label": "UI",
+      "file_type": "document",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "docs_simulator_prd_ui",
+      "community": 16,
+      "norm_label": "ui"
+    },
+    {
+      "label": "implementation-plan.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan",
+      "community": 3,
+      "norm_label": "implementation-plan.md"
+    },
+    {
+      "label": "AccessLens \u2014 Simulator Implementation Plan",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "community": 5,
+      "norm_label": "accesslens \u2014 simulator implementation plan"
+    },
+    {
+      "label": "1. Goal and product boundaries",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_1_goal_and_product_boundaries",
+      "community": 5,
+      "norm_label": "1. goal and product boundaries"
+    },
+    {
+      "label": "PRD requirement traceability",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_prd_requirement_traceability",
+      "community": 5,
+      "norm_label": "prd requirement traceability"
+    },
+    {
+      "label": "Nonfunctional requirements",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_nonfunctional_requirements",
+      "community": 5,
+      "norm_label": "nonfunctional requirements"
+    },
+    {
+      "label": "Explicit non-goals",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_explicit_non_goals",
+      "community": 5,
+      "norm_label": "explicit non-goals"
+    },
+    {
+      "label": "2. Architecture and execution boundaries",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_2_architecture_and_execution_boundaries",
+      "community": 5,
+      "norm_label": "2. architecture and execution boundaries"
+    },
+    {
+      "label": "Rendering approach and critical spike",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_rendering_approach_and_critical_spike",
+      "community": 5,
+      "norm_label": "rendering approach and critical spike"
+    },
+    {
+      "label": "Effect presets",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_effect_presets",
+      "community": 5,
+      "norm_label": "effect presets"
+    },
+    {
+      "label": "Simulation lifecycle",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L74",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_simulation_lifecycle",
+      "community": 5,
+      "norm_label": "simulation lifecycle"
+    },
+    {
+      "label": "3. Data model and contracts",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_3_data_model_and_contracts",
+      "community": 5,
+      "norm_label": "3. data model and contracts"
+    },
+    {
+      "label": "4. UI specification",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L149",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_4_ui_specification",
+      "community": 5,
+      "norm_label": "4. ui specification"
+    },
+    {
+      "label": "5. Folder changes",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L162",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_5_folder_changes",
+      "community": 5,
+      "norm_label": "5. folder changes"
+    },
+    {
+      "label": "6. External integration boundaries (SIM-07 only)",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L201",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_6_external_integration_boundaries_sim_07_only",
+      "community": 5,
+      "norm_label": "6. external integration boundaries (sim-07 only)"
+    },
+    {
+      "label": "7. Delivery plan",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L217",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_7_delivery_plan",
+      "community": 14,
+      "norm_label": "7. delivery plan"
+    },
+    {
+      "label": "Phase 0 \u2014 Feasibility spike (highest risk)",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L219",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_phase_0_feasibility_spike_highest_risk",
+      "community": 14,
+      "norm_label": "phase 0 \u2014 feasibility spike (highest risk)"
+    },
+    {
+      "label": "Phase 1 \u2014 Presets and engine (SIM-02, SIM-03, SIM-04)",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L229",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_phase_1_presets_and_engine_sim_02_sim_03_sim_04",
+      "community": 14,
+      "norm_label": "phase 1 \u2014 presets and engine (sim-02, sim-03, sim-04)"
+    },
+    {
+      "label": "Phase 2 \u2014 Controller and UI (SIM-01, SIM-03, SIM-04, SIM-06)",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L237",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_phase_2_controller_and_ui_sim_01_sim_03_sim_04_sim_06",
+      "community": 14,
+      "norm_label": "phase 2 \u2014 controller and ui (sim-01, sim-03, sim-04, sim-06)"
+    },
+    {
+      "label": "Phase 3 \u2014 Read-only integration and QA (SIM-05, SIM-07, NFRs)",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L244",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_phase_3_read_only_integration_and_qa_sim_05_sim_07_nfrs",
+      "community": 14,
+      "norm_label": "phase 3 \u2014 read-only integration and qa (sim-05, sim-07, nfrs)"
+    },
+    {
+      "label": "Phase 4 \u2014 Cross-Site Compatibility",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L252",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "community": 14,
+      "norm_label": "phase 4 \u2014 cross-site compatibility"
+    },
+    {
+      "label": "Objective",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L256",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_objective",
+      "community": 14,
+      "norm_label": "objective"
+    },
+    {
+      "label": "4.1 Expand Content Script Injection",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L262",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_4_1_expand_content_script_injection",
+      "community": 14,
+      "norm_label": "4.1 expand content script injection"
+    },
+    {
+      "label": "4.2 Make DOM Targeting Site-Agnostic",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L293",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_4_2_make_dom_targeting_site_agnostic",
+      "community": 14,
+      "norm_label": "4.2 make dom targeting site-agnostic"
+    },
+    {
+      "label": "4.3 Support Dynamic Websites and SPA Navigation",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L317",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_4_3_support_dynamic_websites_and_spa_navigation",
+      "community": 14,
+      "norm_label": "4.3 support dynamic websites and spa navigation"
+    },
+    {
+      "label": "4.4 Cross-Site Testing",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L339",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_4_4_cross_site_testing",
+      "community": 14,
+      "norm_label": "4.4 cross-site testing"
+    },
+    {
+      "label": "4.5 Performance and Compatibility",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L366",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_4_5_performance_and_compatibility",
+      "community": 14,
+      "norm_label": "4.5 performance and compatibility"
+    },
+    {
+      "label": "4.6 Completion Criteria",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L386",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_4_6_completion_criteria",
+      "community": 14,
+      "norm_label": "4.6 completion criteria"
+    },
+    {
+      "label": "Recommended Implementation Order",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L399",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_recommended_implementation_order",
+      "community": 14,
+      "norm_label": "recommended implementation order"
+    },
+    {
+      "label": "8. Testing matrix and acceptance checks",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L413",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_8_testing_matrix_and_acceptance_checks",
+      "community": 5,
+      "norm_label": "8. testing matrix and acceptance checks"
+    },
+    {
+      "label": "9. Risks and decisions to validate",
+      "file_type": "document",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L433",
+      "_origin": "ast",
+      "id": "docs_simulator_implementation_plan_9_risks_and_decisions_to_validate",
+      "community": 5,
+      "norm_label": "9. risks and decisions to validate"
+    },
+    {
+      "label": "phase-0-feasibility.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_0_feasibility",
+      "community": 3,
+      "norm_label": "phase-0-feasibility.md"
+    },
+    {
+      "label": "Phase 0 feasibility report",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_0_feasibility_phase_0_feasibility_report",
+      "community": 3,
+      "norm_label": "phase 0 feasibility report"
+    },
+    {
+      "label": "Target selection and ownership",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_0_feasibility_target_selection_and_ownership",
+      "community": 3,
+      "norm_label": "target selection and ownership"
+    },
+    {
+      "label": "Tested layouts and evidence",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_0_feasibility_tested_layouts_and_evidence",
+      "community": 3,
+      "norm_label": "tested layouts and evidence"
+    },
+    {
+      "label": "Known limitations and Phase 1 implications",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_0_feasibility_known_limitations_and_phase_1_implications",
+      "community": 3,
+      "norm_label": "known limitations and phase 1 implications"
+    },
+    {
+      "label": "Manual-demo regression",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L76",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_0_feasibility_manual_demo_regression",
+      "community": 3,
+      "norm_label": "manual-demo regression"
+    },
+    {
+      "label": "phase-1-validation.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-1-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_1_validation",
+      "community": 21,
+      "norm_label": "phase-1-validation.md"
+    },
+    {
+      "label": "Phase 1 \u2014 presets and engine",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-1-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_1_validation_phase_1_presets_and_engine",
+      "community": 21,
+      "norm_label": "phase 1 \u2014 presets and engine"
+    },
+    {
+      "label": "phase-2-validation.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation",
+      "community": 45,
+      "norm_label": "phase-2-validation.md"
+    },
+    {
+      "label": "Phase 2 \u2014 controller and Simulator UI",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "community": 45,
+      "norm_label": "phase 2 \u2014 controller and simulator ui"
+    },
+    {
+      "label": "Run the local demo",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation_run_the_local_demo",
+      "community": 45,
+      "norm_label": "run the local demo"
+    },
+    {
+      "label": "Verification",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation_verification",
+      "community": 45,
+      "norm_label": "verification"
+    },
+    {
+      "label": "Blur edge clipping",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_2_validation_blur_edge_clipping",
+      "community": 45,
+      "norm_label": "blur edge clipping"
+    },
+    {
+      "label": "phase-3-validation.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_3_validation",
+      "community": 47,
+      "norm_label": "phase-3-validation.md"
+    },
+    {
+      "label": "Phase 3 \u2014 read-only integration and QA",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_3_validation_phase_3_read_only_integration_and_qa",
+      "community": 47,
+      "norm_label": "phase 3 \u2014 read-only integration and qa"
+    },
+    {
+      "label": "Delivered scope",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_3_validation_delivered_scope",
+      "community": 47,
+      "norm_label": "delivered scope"
+    },
+    {
+      "label": "Verification and performance",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_3_validation_verification_and_performance",
+      "community": 47,
+      "norm_label": "verification and performance"
+    },
+    {
+      "label": "Run and validate locally",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L63",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_3_validation_run_and_validate_locally",
+      "community": 47,
+      "norm_label": "run and validate locally"
+    },
+    {
+      "label": "Compatibility limits",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L87",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_3_validation_compatibility_limits",
+      "community": 47,
+      "norm_label": "compatibility limits"
+    },
+    {
+      "label": "phase-4-validation.md",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation",
+      "community": 3,
+      "norm_label": "phase-4-validation.md"
+    },
+    {
+      "label": "Phase 4 \u2014 cross-site compatibility",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "community": 3,
+      "norm_label": "phase 4 \u2014 cross-site compatibility"
+    },
+    {
+      "label": "Implementation",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_implementation",
+      "community": 3,
+      "norm_label": "implementation"
+    },
+    {
+      "label": "Cross-site results",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_cross_site_results",
+      "community": 3,
+      "norm_label": "cross-site results"
+    },
+    {
+      "label": "Automated/local verification",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_automated_local_verification",
+      "community": 3,
+      "norm_label": "automated/local verification"
+    },
+    {
+      "label": "Manual validation",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_manual_validation",
+      "community": 3,
+      "norm_label": "manual validation"
+    },
+    {
+      "label": "Known limits",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L101",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_known_limits",
+      "community": 3,
+      "norm_label": "known limits"
+    },
+    {
+      "label": "Toolbar activation",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L125",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_toolbar_activation",
+      "community": 3,
+      "norm_label": "toolbar activation"
+    },
+    {
+      "label": "Tab-switch recovery",
+      "file_type": "document",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L140",
+      "_origin": "ast",
+      "id": "docs_simulator_phase_4_validation_tab_switch_recovery",
+      "community": 3,
+      "norm_label": "tab-switch recovery"
     },
     {
       "label": "WXT extension build",
@@ -515,9 +2162,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_wxt",
-      "community": 3,
-      "norm_label": "wxt extension build"
+      "community": 44,
+      "norm_label": "wxt extension build",
+      "id": "readme_wxt"
     },
     {
       "label": "Simulator module (implementation placeholder)",
@@ -528,9 +2175,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_simulator",
-      "community": 3,
-      "norm_label": "simulator module (implementation placeholder)"
+      "community": 42,
+      "norm_label": "simulator module (implementation placeholder)",
+      "id": "readme_simulator"
     },
     {
       "label": "Inspector module (implementation placeholder)",
@@ -541,9 +2188,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_inspector",
-      "community": 3,
-      "norm_label": "inspector module (implementation placeholder)"
+      "community": 40,
+      "norm_label": "inspector module (implementation placeholder)",
+      "id": "readme_inspector"
     },
     {
       "label": "Fixer module (implementation placeholder)",
@@ -554,9 +2201,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_fixer",
-      "community": 0,
-      "norm_label": "fixer module (implementation placeholder)"
+      "community": 39,
+      "norm_label": "fixer module (implementation placeholder)",
+      "id": "readme_fixer"
     },
     {
       "label": "Node.js 22 or newer",
@@ -567,9 +2214,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_nodejs",
-      "community": 3,
-      "norm_label": "node.js 22 or newer"
+      "community": 41,
+      "norm_label": "node.js 22 or newer",
+      "id": "readme_nodejs"
     },
     {
       "label": "Unit and end-to-end test directories",
@@ -580,9 +2227,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "readme_tests",
-      "community": 3,
-      "norm_label": "unit and end-to-end test directories"
+      "community": 43,
+      "norm_label": "unit and end-to-end test directories",
+      "id": "readme_tests"
     },
     {
       "label": "Inspector text-contrast requirements",
@@ -594,9 +2241,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Visual simulations do not identify the exact element or styling cause; measured text contrast should produce actionable issues.",
-      "id": "docs_inspector_prd_inspector",
-      "community": 0,
-      "norm_label": "inspector text-contrast requirements"
+      "community": 31,
+      "norm_label": "inspector text-contrast requirements",
+      "id": "docs_inspector_prd_inspector"
     },
     {
       "label": "WCAG AA text-contrast thresholds",
@@ -608,9 +2255,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Standard text requires 4.5:1 and qualifying large text requires 3:1, according to the PRD.",
-      "id": "docs_inspector_prd_wcag_aa",
-      "community": 0,
-      "norm_label": "wcag aa text-contrast thresholds"
+      "community": 36,
+      "norm_label": "wcag aa text-contrast thresholds",
+      "id": "docs_inspector_prd_wcag_aa"
     },
     {
       "label": "Original computed foreground and background colors",
@@ -621,9 +2268,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_inspector_prd_original_colors",
-      "community": 0,
-      "norm_label": "original computed foreground and background colors"
+      "community": 33,
+      "norm_label": "original computed foreground and background colors",
+      "id": "docs_inspector_prd_original_colors"
     },
     {
       "label": "Verified contrast issue and stable element reference",
@@ -634,9 +2281,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_inspector_prd_verified_issue",
-      "community": 0,
-      "norm_label": "verified contrast issue and stable element reference"
+      "community": 35,
+      "norm_label": "verified contrast issue and stable element reference",
+      "id": "docs_inspector_prd_verified_issue"
     },
     {
       "label": "Non-destructive failing-element highlights",
@@ -647,9 +2294,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_inspector_prd_highlight",
-      "community": 0,
-      "norm_label": "non-destructive failing-element highlights"
+      "community": 30,
+      "norm_label": "non-destructive failing-element highlights",
+      "id": "docs_inspector_prd_highlight"
     },
     {
       "label": "Needs manual review state",
@@ -661,9 +2308,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Image or gradient backgrounds, complex transparency, and pseudo-elements should not receive unsupported pass/fail claims.",
-      "id": "docs_inspector_prd_manual_review",
-      "community": 0,
-      "norm_label": "needs manual review state"
+      "community": 32,
+      "norm_label": "needs manual review state",
+      "id": "docs_inspector_prd_manual_review"
     },
     {
       "label": "Controlled demo on-demand scan",
@@ -674,9 +2321,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_inspector_prd_demo_scan",
-      "community": 0,
-      "norm_label": "controlled demo on-demand scan"
+      "community": 29,
+      "norm_label": "controlled demo on-demand scan",
+      "id": "docs_inspector_prd_demo_scan"
     },
     {
       "label": "Optional Simulator mode",
@@ -687,9 +2334,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_inspector_prd_simulator",
-      "community": 0,
-      "norm_label": "optional simulator mode"
+      "community": 34,
+      "norm_label": "optional simulator mode",
+      "id": "docs_inspector_prd_simulator"
     },
     {
       "label": "Fixer reversible contrast-preview requirements",
@@ -701,9 +2348,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Let developers evaluate a concrete contrast improvement in context before changing their source code.",
-      "id": "docs_fixer_prd_fixer",
-      "community": 0,
-      "norm_label": "fixer reversible contrast-preview requirements"
+      "community": 26,
+      "norm_label": "fixer reversible contrast-preview requirements",
+      "id": "docs_fixer_prd_fixer"
     },
     {
       "label": "Replacement foreground or solid background color",
@@ -714,9 +2361,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_fixer_prd_color_suggestion",
-      "community": 0,
-      "norm_label": "replacement foreground or solid background color"
+      "community": 22,
+      "norm_label": "replacement foreground or solid background color",
+      "id": "docs_fixer_prd_color_suggestion"
     },
     {
       "label": "Selected-element temporary style override",
@@ -727,9 +2374,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_fixer_prd_temporary_override",
-      "community": 0,
-      "norm_label": "selected-element temporary style override"
+      "community": 27,
+      "norm_label": "selected-element temporary style override",
+      "id": "docs_fixer_prd_temporary_override"
     },
     {
       "label": "Exact prior inline-style restoration",
@@ -740,9 +2387,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_fixer_prd_exact_restore",
-      "community": 0,
-      "norm_label": "exact prior inline-style restoration"
+      "community": 25,
+      "norm_label": "exact prior inline-style restoration",
+      "id": "docs_fixer_prd_exact_restore"
     },
     {
       "label": "Original/fixed comparison preserving Simulator mode",
@@ -753,9 +2400,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_fixer_prd_comparison",
-      "community": 0,
-      "norm_label": "original/fixed comparison preserving simulator mode"
+      "community": 23,
+      "norm_label": "original/fixed comparison preserving simulator mode",
+      "id": "docs_fixer_prd_comparison"
     },
     {
       "label": "Copyable CSS declaration",
@@ -766,9 +2413,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "docs_fixer_prd_copy_css",
-      "community": 0,
-      "norm_label": "copyable css declaration"
+      "community": 24,
+      "norm_label": "copyable css declaration",
+      "id": "docs_fixer_prd_copy_css"
     },
     {
       "label": "Unsupported fix state",
@@ -780,9 +2427,9 @@
       "author": null,
       "contributor": null,
       "rationale": "Detached elements, uncertain colors, or unreliable compliant suggestions must not receive misleading fixes.",
-      "id": "docs_fixer_prd_unsupported",
-      "community": 0,
-      "norm_label": "unsupported fix state"
+      "community": 28,
+      "norm_label": "unsupported fix state",
+      "id": "docs_fixer_prd_unsupported"
     },
     {
       "label": "Inspector requirements in simulator-prd.md",
@@ -794,9 +2441,9 @@
       "author": null,
       "contributor": null,
       "rationale": "This file currently contains Inspector requirements and duplicates docs/inspector-prd.md rather than specifying Simulator behavior.",
-      "id": "docs_simulator_prd_inspector",
-      "community": 0,
-      "norm_label": "inspector requirements in simulator-prd.md"
+      "community": 37,
+      "norm_label": "inspector requirements in simulator-prd.md",
+      "id": "docs_simulator_prd_inspector"
     },
     {
       "label": "AccessLens demo page",
@@ -807,9 +2454,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "demo_site_index_demo",
       "community": 0,
-      "norm_label": "accesslens demo page"
+      "norm_label": "accesslens demo page",
+      "id": "demo_site_index_demo"
     },
     {
       "label": "AccessLens popup HTML",
@@ -820,9 +2467,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "entrypoints_popup_index_popup",
       "community": 3,
-      "norm_label": "accesslens popup html"
+      "norm_label": "accesslens popup html",
+      "id": "entrypoints_popup_index_popup"
     }
   ],
   "links": [
@@ -830,7 +2477,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "entrypoints/accesslens.content/index.tsx",
-      "source_location": "L8",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "entrypoints_accesslens_content_index",
       "target": "entrypoints_accesslens_content_index_main",
@@ -841,7 +2488,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "entrypoints/accesslens.content/index.tsx",
-      "source_location": "L2",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "entrypoints_accesslens_content_index",
       "target": "src_components_accesslenspanel",
@@ -852,7 +2499,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "entrypoints/accesslens.content/index.tsx",
-      "source_location": "L2",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "entrypoints_accesslens_content_index",
       "target": "src_components_accesslenspanel_accesslenspanel",
@@ -862,29 +2509,149 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "entrypoints/popup/main.tsx",
-      "source_location": "L3",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L5",
       "weight": 1.0,
-      "source": "entrypoints_popup_main",
-      "target": "src_components_accesslenspanel",
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_features_simulator_simulation_engine",
       "confidence_score": 1.0
     },
     {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "entrypoints/popup/main.tsx",
-      "source_location": "L3",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L5",
       "weight": 1.0,
-      "source": "entrypoints_popup_main",
-      "target": "src_components_accesslenspanel_accesslenspanel",
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_features_simulator_simulation_engine_createsimulationengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_features_simulator_simulator_controller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_shared_messages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_shared_messages_istogglepanelmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_shared_simulator_mode_reader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/accesslens.content/index.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "entrypoints_accesslens_content_index",
+      "target": "src_shared_simulator_mode_reader_createsimulatormodereader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/background.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "entrypoints_background",
+      "target": "entrypoints_background_hasnoreceiver",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/background.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "entrypoints_background",
+      "target": "src_shared_messages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/background.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "entrypoints_background",
+      "target": "src_shared_messages_toggle_panel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "entrypoints/background.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "entrypoints_background",
+      "target": "src_shared_messages_togglepanelmessage",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L14",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "package",
       "target": "package_dependencies",
@@ -904,7 +2671,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L18",
+      "source_location": "L24",
       "weight": 1.0,
       "source": "package",
       "target": "package_devdependencies",
@@ -974,6 +2741,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_demo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
       "source_location": "L8",
       "weight": 1.0,
       "source": "package_scripts",
@@ -984,10 +2761,60 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "package_scripts",
       "target": "package_scripts_postinstall",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test_phase0",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test_phase1",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test_phase2",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test_phase3",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test_phase4",
       "confidence_score": 1.0
     },
     {
@@ -1014,7 +2841,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_react",
@@ -1024,7 +2851,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L22",
       "weight": 1.0,
       "source": "package_dependencies",
       "target": "package_dependencies_react_dom",
@@ -1034,7 +2861,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L19",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_types_react",
@@ -1044,7 +2871,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L20",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_types_react_dom",
@@ -1054,7 +2881,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L22",
+      "source_location": "L28",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_typescript",
@@ -1064,7 +2891,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L23",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_wxt",
@@ -1074,7 +2901,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
-      "source_location": "L21",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "package_devdependencies",
       "target": "package_devdependencies_wxt_dev_module_react",
@@ -1084,7 +2911,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
       "target": "src_components_accesslenspanel_accesslenspanel",
@@ -1095,32 +2922,10 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "src_components_accesslenspanel",
-      "target": "src_features_fixer_fixertab",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L4",
-      "weight": 1.0,
-      "source": "src_components_accesslenspanel",
-      "target": "src_features_fixer_fixertab_fixertab",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "src/components/AccessLensPanel.tsx",
       "source_location": "L3",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
-      "target": "src_features_inspector_inspectortab",
+      "target": "src_features_simulator_simulator_controller",
       "confidence_score": 1.0
     },
     {
@@ -1131,7 +2936,7 @@
       "source_location": "L3",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
-      "target": "src_features_inspector_inspectortab_inspectortab",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
       "confidence_score": 1.0
     },
     {
@@ -1172,10 +2977,10 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L6",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
-      "target": "src_shared_types",
+      "target": "src_shared_simulator_mode_reader",
       "confidence_score": 1.0
     },
     {
@@ -1183,10 +2988,10 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/components/AccessLensPanel.tsx",
-      "source_location": "L6",
+      "source_location": "L4",
       "weight": 1.0,
       "source": "src_components_accesslenspanel",
-      "target": "src_shared_types_featureid",
+      "target": "src_shared_simulator_mode_reader_simulatormodereader",
       "confidence_score": 1.0
     },
     {
@@ -1210,13 +3015,633 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_features_simulator_filters",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_features_simulator_simulator_controller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/features/simulator/SimulatorTab.tsx",
-      "source_location": "L1",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "src_features_simulator_simulatortab",
       "target": "src_features_simulator_simulatortab_simulatortab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_shared_simulator_mode_reader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_shared_simulator_mode_reader_simulatormodereader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/SimulatorTab.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulatortab",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_features_simulator_filters_normalizeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/filters.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_filters",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_filters",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "re_exports",
+      "context": "export",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_filters",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_filters_blur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_filters_normalizeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_filters_normalizeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_filters_normalizeblur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_simulation_engine_createsimulationengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_simulation_engine_simulationengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_simulator_dom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_features_simulator_simulator_dom_createsimulatordom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulation_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/features/simulator/simulation-engine.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulation_engine_createsimulationengine",
+      "target": "src_features_simulator_simulator_dom_createsimulatordom"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulation_engine_simulationengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_controller_simulatorcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_default_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_simulationsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_simulatorstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_snapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_features_simulator_simulator_state_validatemode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/features/simulator/simulator-controller.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_controller_createsimulatorcontroller",
+      "target": "src_features_simulator_simulator_state_snapshot"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tests_unit_simulator_controller_test_fixture",
+      "target": "src_features_simulator_simulator_controller_createsimulatorcontroller"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-dom.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_dom",
+      "target": "src_features_simulator_simulator_dom_createsimulatordom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_default_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_simulationsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_simulationstatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_simulatorstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_snapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_features_simulator_simulator_state_validatemode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/features/simulator/simulator-state.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_features_simulator_simulator_state_simulationsettings",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_shared_messages",
+      "target": "src_shared_messages_istogglepanelmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_shared_messages",
+      "target": "src_shared_messages_toggle_panel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/messages.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_shared_messages",
+      "target": "src_shared_messages_togglepanelmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "src_shared_simulator_mode_reader",
+      "target": "src_shared_simulator_mode_reader_createsimulatormodereader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_shared_simulator_mode_reader",
+      "target": "src_shared_simulator_mode_reader_simulatormodereader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_shared_simulator_mode_reader",
+      "target": "src_shared_types",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "src_shared_simulator_mode_reader",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/simulator-mode-reader.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_shared_simulator_mode_reader_simulatormodereader",
+      "target": "src_shared_types_simulationmode",
       "confidence_score": 1.0
     },
     {
@@ -1227,6 +3652,302 @@
       "weight": 1.0,
       "source": "src_shared_types",
       "target": "src_shared_types_featureid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/shared/types.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_shared_types",
+      "target": "src_shared_types_simulationmode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/cross-site.mjs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "tests_e2e_cross_site",
+      "target": "tests_e2e_cross_site_runcrosssite",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_cross_site",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/e2e/cross-site.mjs",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "tests_e2e_cross_site_runcrosssite",
+      "target": "tests_e2e_phase1_evaluate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/e2e/cross-site.mjs",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "tests_e2e_cross_site_runcrosssite",
+      "target": "tests_e2e_phase1_select"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/e2e/cross-site.mjs",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tests_e2e_cross_site_runcrosssite",
+      "target": "tests_e2e_phase1_waitfor"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_cross_site_runcrosssite",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_cdp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_chrome",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L305",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_edgecapture",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "confidence": "INFERRED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L124",
+      "weight": 1.0,
+      "context": "collection",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_profile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_screenshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "confidence": "INFERRED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L124",
+      "weight": 1.0,
+      "context": "collection",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_select",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_server",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L451",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_setenabled",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_stalevalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L91",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_triggertoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "indirect_call",
+      "confidence": "INFERRED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L124",
+      "weight": 1.0,
+      "context": "collection",
+      "source": "tests_e2e_phase1",
+      "target": "tests_e2e_phase1_waitfor",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L452",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_setenabled",
+      "target": "tests_e2e_phase1_cdp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_triggertoolbar",
+      "target": "tests_e2e_phase1_cdp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L308",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_edgecapture",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_screenshot",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_select",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L93",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_triggertoolbar",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_waitfor",
+      "target": "tests_e2e_phase1_evaluate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/e2e/phase1.mjs",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "tests_e2e_phase1_waitfor",
+      "target": "tests_e2e_phase1_triggertoolbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/unit/simulator-controller.test.mjs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "tests_unit_simulator_controller_test",
+      "target": "tests_unit_simulator_controller_test_fixture",
       "confidence_score": 1.0
     },
     {
@@ -1270,6 +3991,166 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "wxt.config.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "wxt_config",
+      "target": "wxt_config_build_manifestgenerated",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "agents",
+      "target": "agents_accesslens_coding_agent_instructions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L73",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_architecture_and_feature_ownership",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_coding_conventions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_expected_repository_layout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_mission",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_required_graphify_workflow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_sources_of_truth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_stack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "agents_accesslens_coding_agent_instructions",
+      "target": "agents_testing_and_delivery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "agents_architecture_and_feature_ownership",
+      "target": "agents_fixer_src_features_fixer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L86",
+      "weight": 1.0,
+      "source": "agents_architecture_and_feature_ownership",
+      "target": "agents_inspector_src_features_inspector",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "AGENTS.md",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "agents_architecture_and_feature_ownership",
+      "target": "agents_simulator_src_features_simulator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "docs_simulator_phase_0_feasibility",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "docs_simulator_phase_4_validation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "readme",
+      "target": "readme_accesslens",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -1280,266 +4161,956 @@
       "target": "readme_accesslens"
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": null,
+      "source_location": "L5",
       "weight": 1.0,
       "source": "readme_accesslens",
-      "target": "readme_fixer"
+      "target": "readme_development",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": null,
+      "source_location": "L33",
       "weight": 1.0,
       "source": "readme_accesslens",
-      "target": "readme_inspector"
+      "target": "readme_phase_4_demo",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "README.md",
-      "source_location": null,
+      "source_location": "L22",
       "weight": 1.0,
       "source": "readme_accesslens",
-      "target": "readme_nodejs"
+      "target": "readme_project_layout",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_accesslens",
-      "target": "readme_simulator"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_accesslens",
-      "target": "readme_tests"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_accesslens",
-      "target": "readme_wxt"
-    },
-    {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "readme_inspector",
-      "target": "docs_inspector_prd_inspector"
-    },
-    {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
       "source_file": "docs/fixer-prd.md",
-      "source_location": null,
+      "source_location": "L52",
       "weight": 1.0,
-      "source": "readme_fixer",
-      "target": "docs_fixer_prd_fixer"
+      "source": "docs_fixer_prd",
+      "target": "docs_fixer_prd_design",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L1",
       "weight": 1.0,
-      "source": "docs_inspector_prd_inspector",
-      "target": "docs_inspector_prd_demo_scan"
+      "source": "docs_fixer_prd",
+      "target": "docs_fixer_prd_overview",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L5",
       "weight": 1.0,
-      "source": "docs_inspector_prd_inspector",
-      "target": "docs_inspector_prd_highlight"
+      "source": "docs_fixer_prd",
+      "target": "docs_fixer_prd_problem",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L34",
       "weight": 1.0,
-      "source": "docs_inspector_prd_inspector",
-      "target": "docs_inspector_prd_manual_review"
+      "source": "docs_fixer_prd",
+      "target": "docs_fixer_prd_requirements",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L19",
       "weight": 1.0,
-      "source": "docs_inspector_prd_inspector",
-      "target": "docs_inspector_prd_original_colors"
+      "source": "docs_fixer_prd",
+      "target": "docs_fixer_prd_user_stories",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L21",
       "weight": 1.0,
-      "source": "docs_inspector_prd_inspector",
-      "target": "docs_inspector_prd_simulator"
+      "source": "docs_fixer_prd_user_stories",
+      "target": "docs_fixer_prd_user_definitions",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L26",
       "weight": 1.0,
-      "source": "docs_inspector_prd_inspector",
-      "target": "docs_inspector_prd_verified_issue"
+      "source": "docs_fixer_prd_user_stories",
+      "target": "docs_fixer_prd_user_stories_26",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L27",
       "weight": 1.0,
-      "source": "docs_inspector_prd_inspector",
-      "target": "docs_inspector_prd_wcag_aa"
+      "source": "docs_fixer_prd_user_stories_26",
+      "target": "docs_fixer_prd_frontend_developer",
+      "confidence_score": 1.0
     },
     {
-      "relation": "semantically_similar_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "docs_fixer_prd_user_stories_26",
+      "target": "docs_fixer_prd_ui_ux_designer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "docs_fixer_prd_requirements",
+      "target": "docs_fixer_prd_functional_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "docs_fixer_prd_requirements",
+      "target": "docs_fixer_prd_non_functional_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "docs_fixer_prd_design",
+      "target": "docs_fixer_prd_ui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/fixer-prd.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "docs_fixer_prd_design",
+      "target": "docs_fixer_prd_ux_flow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "docs_inspector_prd",
+      "target": "docs_inspector_prd_design",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_inspector_prd",
+      "target": "docs_inspector_prd_overview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "docs_inspector_prd",
+      "target": "docs_inspector_prd_problem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "docs_inspector_prd",
+      "target": "docs_inspector_prd_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "docs_inspector_prd",
+      "target": "docs_inspector_prd_user_stories",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_user_stories",
+      "target": "docs_inspector_prd_user_definitions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_user_stories",
+      "target": "docs_inspector_prd_user_stories_26",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_user_stories_26",
+      "target": "docs_inspector_prd_frontend_developer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_user_stories_26",
+      "target": "docs_inspector_prd_student_developer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_requirements",
+      "target": "docs_inspector_prd_functional_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_requirements",
+      "target": "docs_inspector_prd_non_functional_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_design",
+      "target": "docs_inspector_prd_ui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/inspector-prd.md",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "docs_inspector_prd_design",
+      "target": "docs_inspector_prd_ux_flow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/simulator-prd.md",
-      "source_location": null,
+      "source_location": "L51",
       "weight": 1.0,
-      "source": "docs_simulator_prd_inspector",
-      "target": "docs_inspector_prd_inspector"
+      "source": "docs_simulator_prd",
+      "target": "docs_simulator_prd_design",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_prd",
+      "target": "docs_simulator_prd_overview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "docs_simulator_prd",
+      "target": "docs_simulator_prd_problem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "docs_simulator_prd",
+      "target": "docs_simulator_prd_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "docs_simulator_prd",
+      "target": "docs_simulator_prd_user_stories",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_user_stories",
+      "target": "docs_simulator_prd_user_definitions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_user_stories",
+      "target": "docs_simulator_prd_user_stories_26",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_user_stories_26",
+      "target": "docs_simulator_prd_frontend_developer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_user_stories_26",
+      "target": "docs_simulator_prd_ui_ux_designer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_requirements",
+      "target": "docs_simulator_prd_functional_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_requirements",
+      "target": "docs_simulator_prd_non_functional_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_design",
+      "target": "docs_simulator_prd_ui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator-prd.md",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "docs_simulator_prd_design",
+      "target": "docs_simulator_prd_ux_flow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": "FIX-02",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L254",
       "weight": 1.0,
-      "source": "docs_fixer_prd_color_suggestion",
-      "target": "docs_inspector_prd_wcag_aa"
+      "source": "docs_simulator_implementation_plan",
+      "target": "docs_simulator_phase_4_validation",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": "FIX-01",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L8",
       "weight": 1.0,
-      "source": "docs_fixer_prd_fixer",
-      "target": "docs_inspector_prd_verified_issue"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_1_goal_and_product_boundaries",
+      "confidence_score": 1.0
     },
     {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "docs/inspector-prd.md",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "docs_inspector_prd_demo_scan",
-      "target": "demo_site_index_demo"
-    },
-    {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": "FIX-05",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L36",
       "weight": 1.0,
-      "source": "docs_fixer_prd_comparison",
-      "target": "docs_inspector_prd_simulator"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_2_architecture_and_execution_boundaries",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": null,
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L85",
       "weight": 1.0,
-      "source": "docs_fixer_prd_fixer",
-      "target": "docs_fixer_prd_color_suggestion"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_3_data_model_and_contracts",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": null,
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L149",
       "weight": 1.0,
-      "source": "docs_fixer_prd_fixer",
-      "target": "docs_fixer_prd_comparison"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_4_ui_specification",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": null,
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L162",
       "weight": 1.0,
-      "source": "docs_fixer_prd_fixer",
-      "target": "docs_fixer_prd_copy_css"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_5_folder_changes",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": null,
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L201",
       "weight": 1.0,
-      "source": "docs_fixer_prd_fixer",
-      "target": "docs_fixer_prd_exact_restore"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_6_external_integration_boundaries_sim_07_only",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": null,
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L217",
       "weight": 1.0,
-      "source": "docs_fixer_prd_fixer",
-      "target": "docs_fixer_prd_temporary_override"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_7_delivery_plan",
+      "confidence_score": 1.0
     },
     {
-      "relation": "references",
+      "relation": "contains",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "docs/fixer-prd.md",
-      "source_location": null,
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L413",
       "weight": 1.0,
-      "source": "docs_fixer_prd_fixer",
-      "target": "docs_fixer_prd_unsupported"
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_8_testing_matrix_and_acceptance_checks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L433",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_accesslens_simulator_implementation_plan",
+      "target": "docs_simulator_implementation_plan_9_risks_and_decisions_to_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_1_goal_and_product_boundaries",
+      "target": "docs_simulator_implementation_plan_explicit_non_goals",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_1_goal_and_product_boundaries",
+      "target": "docs_simulator_implementation_plan_nonfunctional_requirements",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_1_goal_and_product_boundaries",
+      "target": "docs_simulator_implementation_plan_prd_requirement_traceability",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_2_architecture_and_execution_boundaries",
+      "target": "docs_simulator_implementation_plan_effect_presets",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_2_architecture_and_execution_boundaries",
+      "target": "docs_simulator_implementation_plan_rendering_approach_and_critical_spike",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_2_architecture_and_execution_boundaries",
+      "target": "docs_simulator_implementation_plan_simulation_lifecycle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L219",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_7_delivery_plan",
+      "target": "docs_simulator_implementation_plan_phase_0_feasibility_spike_highest_risk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L229",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_7_delivery_plan",
+      "target": "docs_simulator_implementation_plan_phase_1_presets_and_engine_sim_02_sim_03_sim_04",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_7_delivery_plan",
+      "target": "docs_simulator_implementation_plan_phase_2_controller_and_ui_sim_01_sim_03_sim_04_sim_06",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L244",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_7_delivery_plan",
+      "target": "docs_simulator_implementation_plan_phase_3_read_only_integration_and_qa_sim_05_sim_07_nfrs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L252",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_7_delivery_plan",
+      "target": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L262",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_4_1_expand_content_script_injection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L293",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_4_2_make_dom_targeting_site_agnostic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L317",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_4_3_support_dynamic_websites_and_spa_navigation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L339",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_4_4_cross_site_testing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L366",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_4_5_performance_and_compatibility",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L386",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_4_6_completion_criteria",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L256",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_objective",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/implementation-plan.md",
+      "source_location": "L399",
+      "weight": 1.0,
+      "source": "docs_simulator_implementation_plan_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_implementation_plan_recommended_implementation_order",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_0_feasibility",
+      "target": "docs_simulator_phase_0_feasibility_phase_0_feasibility_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_0_feasibility_phase_0_feasibility_report",
+      "target": "docs_simulator_phase_0_feasibility_known_limitations_and_phase_1_implications",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_0_feasibility_phase_0_feasibility_report",
+      "target": "docs_simulator_phase_0_feasibility_manual_demo_regression",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_0_feasibility_phase_0_feasibility_report",
+      "target": "docs_simulator_phase_0_feasibility_target_selection_and_ownership",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-0-feasibility.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_0_feasibility_phase_0_feasibility_report",
+      "target": "docs_simulator_phase_0_feasibility_tested_layouts_and_evidence",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-1-validation.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_1_validation",
+      "target": "docs_simulator_phase_1_validation_phase_1_presets_and_engine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_2_validation",
+      "target": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "target": "docs_simulator_phase_2_validation_blur_edge_clipping",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "target": "docs_simulator_phase_2_validation_run_the_local_demo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-2-validation.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_2_validation_phase_2_controller_and_simulator_ui",
+      "target": "docs_simulator_phase_2_validation_verification",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_3_validation",
+      "target": "docs_simulator_phase_3_validation_phase_3_read_only_integration_and_qa",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_3_validation_phase_3_read_only_integration_and_qa",
+      "target": "docs_simulator_phase_3_validation_compatibility_limits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_3_validation_phase_3_read_only_integration_and_qa",
+      "target": "docs_simulator_phase_3_validation_delivered_scope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_3_validation_phase_3_read_only_integration_and_qa",
+      "target": "docs_simulator_phase_3_validation_run_and_validate_locally",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-3-validation.md",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_3_validation_phase_3_read_only_integration_and_qa",
+      "target": "docs_simulator_phase_3_validation_verification_and_performance",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation",
+      "target": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_phase_4_validation_automated_local_verification",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_phase_4_validation_cross_site_results",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_phase_4_validation_implementation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_phase_4_validation_known_limits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_phase_4_validation_manual_validation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_phase_4_validation_tab_switch_recovery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/simulator/phase-4-validation.md",
+      "source_location": "L125",
+      "weight": 1.0,
+      "source": "docs_simulator_phase_4_validation_phase_4_cross_site_compatibility",
+      "target": "docs_simulator_phase_4_validation_toolbar_activation",
+      "confidence_score": 1.0
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b3dcc6435d9d951939993af6756777fae4a16570"
+  "built_at_commit": "a3d403c35e11e15e0629598042a4a59c1f985a5b"
 }
