@@ -72,6 +72,13 @@ tooltip overlays stay within the extension's Shadow DOM.
 See [UI implementation and validation](docs/ui-redesign.md) for changed files,
 dependencies, accessibility details and browser checks.
 
+## Simulator modes
+
+Protanopia, Deuteranopia and Tritanopia use the Machado et al. (2009) matrices. Achromatopsia maps every
+color to its luminance (grayscale) in linear RGB. Cataracts (hazy, faded, yellowed) and Low Contrast
+(washed-out light and dark) are illustrative CSS filter approximations, not calibrated clinical models.
+Low Acuity is an adjustable blur; Visionless blacks out the page and narrates keyboard focus.
+
 ## Inspector
 
 Open the Inspector tab and click **Scan text contrast**, or **Pick element** and click any text.

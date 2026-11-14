@@ -235,19 +235,20 @@ try {
   const swatchBefore = await screenshot('swatch-off', `document.querySelector('.red')`);
   const baselineHeight = await evaluate('document.documentElement.scrollHeight');
   const painted = new Set();
-  for (const mode of ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Low Acuity']) {
+  const svgModes = ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Achromatopsia'];
+  for (const mode of ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Achromatopsia', 'Cataracts', 'Low Contrast', 'Low Acuity']) {
     await select(mode);
-    assert.equal(await evaluate(owned), mode === 'Low Acuity' ? 1 : 2);
+    assert.equal(await evaluate(owned), svgModes.includes(mode) ? 2 : 1);
     assert.equal(await evaluate(`${shadow}.querySelector('[role=alert]')?.textContent || ''`), '');
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('accesslens-panel')).filter`), 'none');
     assert.equal(await screenshot(`panel-${mode === 'Low Acuity' ? 'blur' : 'color'}`, `${shadow}.querySelector('h1')`), panelBefore, 'Panel heading pixels must remain identical');
     assert.notEqual(await screenshot(`swatch-${mode === 'Low Acuity' ? 'blur' : 'color'}`, `document.querySelector('.red')`), swatchBefore, 'Page pixels must change');
-    if (mode !== 'Low Acuity') {
+    if (svgModes.includes(mode)) {
       const crop = await screenshot('reference-' + mode, `document.querySelector('.red')`);
       painted.add(crop);
       const pixel = await evaluate(`(async () => {const b=await (await fetch('data:image/png;base64,${crop}')).blob(); const img=await createImageBitmap(b); const c=document.createElement('canvas'); c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(120,85,1,1).data];})()`);
       // Independent reference fixture: linear-light matrix output for #e00000.
-      const expected = { Protanopia: [94,82,0,255], Deuteranopia: [142,125,0,255], Tritanopia: [248,0,12,255] }[mode];
+      const expected = { Protanopia: [94,82,0,255], Deuteranopia: [142,125,0,255], Tritanopia: [248,0,12,255], Achromatopsia: [111,111,111,255] }[mode];
       assert.ok(pixel.every((v,i)=>Math.abs(v-expected[i])<=3), `${mode} reference ${pixel} vs ${expected}`);
     }
     assert.equal(await evaluate('document.documentElement.scrollHeight'), baselineHeight);
@@ -282,7 +283,7 @@ try {
     assert.equal(await screenshot('swatch-restored', `document.querySelector('.red')`), swatchBefore);
     console.log(`PASS ${mode}: painted page, identical panel pixels, forms, modal, anchors, fixed header, scrolling and Reset`);
   }
-  assert.equal(painted.size, 3, 'Three presets must paint distinctly');
+  assert.equal(painted.size, 4, 'Four color-matrix presets must paint distinctly');
   // Keyboard-operate simulator controls. Repeated selections do not add nodes.
   await call('Emulation.setFocusEmulationEnabled', { enabled: true });
   await evaluate(`${button('Protanopia')}.focus()`);
@@ -302,7 +303,7 @@ try {
   assert.equal(await evaluate(`${shadow}.querySelector('[role=tab]').getAttribute('aria-selected')`), 'true');
   assert.match(await evaluate(`${shadow}.textContent`), /approximations.*do not represent any individual.s lived visual experience/s);
   await evaluate(`${button('Off')}.focus()`);
-  for (const label of ['Protanopia','Deuteranopia','Tritanopia','Visionless','Low Acuity']) {
+  for (const label of ['Protanopia','Deuteranopia','Tritanopia','Visionless','Achromatopsia','Cataracts','Low Contrast','Low Acuity']) {
     await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
     await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
     assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`), label);
