@@ -16,8 +16,8 @@ npm run typecheck
 npm run build
 ```
 
-WXT builds the browser extension into `.output/`. The Simulator has a Phase 4 cross-site support. Inspector and Fixer remain
-placeholders. See [the feasibility report](docs/simulator/phase-0-feasibility.md).
+WXT builds the browser extension into `.output/`. The Simulator has a Phase 4 cross-site support. The Inspector scans text
+contrast with axe-core (see below). Fixer remains a placeholder. See [the feasibility report](docs/simulator/phase-0-feasibility.md).
 
 ## Project layout
 
@@ -40,7 +40,7 @@ starts in Off. Already-open tabs initialize on the first icon click without a re
 
 Open `http://127.0.0.1:8081` and click the icon; the in-page panel offers Off, three color-vision presets, adjustable
 Low Acuity (0–8 px in 0.5 px steps), and Reset. Ordinary HTTP/HTTPS pages are supported through direct-body content targeting;
-unsafe layouts show a limitation message. No Inspector or Fixer functionality is included.
+unsafe layouts show a limitation message.
 
 Run `npm run test:phase4` after building for the real Chrome smoke test. It uses
 a temporary profile and local server, installs/removes only its own test
@@ -66,3 +66,13 @@ tooltip overlays stay within the extension's Shadow DOM.
 
 See [UI implementation and validation](docs/ui-redesign.md) for changed files,
 dependencies, accessibility details and browser checks.
+
+## Inspector
+
+Open the Inspector tab and click **Scan text contrast**, or **Pick element** and click any text.
+Failures (measured below WCAG AA 4.5:1, or 3:1 for large text) and cases that need manual review
+(gradients, background images, overlaps) are outlined on the page and listed with colors, ratio,
+threshold and an explanation. **Preview fix** hands a verified failure to Fixer through
+`src/shared/issue-handoff.ts`. Outlines are drawn inside the AccessLens shadow root, so page styles are
+never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
+runs the contrast-mapping and simulator unit tests.

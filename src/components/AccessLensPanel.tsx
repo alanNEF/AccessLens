@@ -5,6 +5,11 @@ import { InspectorTab } from '../features/inspector/InspectorTab';
 import { FixerTab } from '../features/fixer/FixerTab';
 import type { SimulatorController } from '../features/simulator/simulator-controller';
 import type { SimulatorModeReader } from '../shared/simulator-mode-reader';
+import { HighlightLayer } from '../features/inspector/HighlightLayer';
+import type { InspectorStore } from '../features/inspector/inspector-store';
+import type { InspectedIssue } from '../features/inspector/axe-runner';
+import type { IssueHandoffStore } from '../shared/issue-handoff';
+import { isVerifiedFailure, type FeatureId } from '../shared/types';
 import { APP_NAME } from '../shared/constants';
 import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -14,11 +19,23 @@ import { Switch } from './ui/switch';
 import { OverlayContainerContext } from './shared/overlay-container';
 import { useTheme } from './shared/use-theme';
 
-export function AccessLensPanel({ controller, modeReader }: { controller: SimulatorController; modeReader: SimulatorModeReader }) {
+export function AccessLensPanel({ controller, modeReader, inspector, handoff }: {
+  controller: SimulatorController;
+  modeReader: SimulatorModeReader;
+  inspector: InspectorStore;
+  handoff: IssueHandoffStore;
+}) {
   const { ready, theme, preference, changeTheme, storageError } = useTheme();
   const [overlayContainer, setOverlayContainer] = useState<HTMLDivElement | null>(null);
 
   const [collapsed, setCollapsed] = useState(false);
+  const [activeTab, setActiveTab] = useState<FeatureId>('simulator');
+  // Inspector → Fixer handoff (INS-07): store the verified issue, then show the Fixer tab.
+  function previewFix(item: InspectedIssue) {
+    if (!isVerifiedFailure(item.issue)) return;
+    handoff.set({ issue: item.issue, element: item.element });
+    setActiveTab('fixer');
+  }
   const expandButton = useRef<HTMLButtonElement>(null);
   const collapseButton = useRef<HTMLButtonElement>(null);
   const userToggled = useRef(false);
@@ -37,6 +54,7 @@ export function AccessLensPanel({ controller, modeReader }: { controller: Simula
     <div className={`accesslens-ui ${theme === 'dark' ? 'dark' : ''}`} data-theme={theme}>
       <OverlayContainerContext.Provider value={overlayContainer}>
         <TooltipProvider delayDuration={350}>
+          <HighlightLayer store={inspector} />
           {collapsed && <Button ref={expandButton} onClick={toggleCollapsed} aria-label="Expand AccessLens" aria-expanded={false}
             className="relative size-12 rounded-xl border border-border bg-primary text-primary-foreground shadow-xl hover:bg-primary/90">
             <Eye className="size-5" aria-hidden="true" /><ChevronUp className="absolute right-1 bottom-1 size-3" aria-hidden="true" />
@@ -62,7 +80,7 @@ export function AccessLensPanel({ controller, modeReader }: { controller: Simula
               </div>
             </header>
             <Separator />
-            <Tabs defaultValue="simulator" className="flex min-h-0 flex-1 flex-col gap-0">
+            <Tabs value={activeTab} onValueChange={value => setActiveTab(value as FeatureId)} className="flex min-h-0 flex-1 flex-col gap-0">
               <div className="shrink-0 px-5 pt-4 pb-1">
                 <TabsList className="grid h-10 w-full grid-cols-3 rounded-lg bg-secondary p-1" aria-label="AccessLens features">
                   <TabsTrigger value="simulator"><SlidersHorizontal aria-hidden="true" />Simulator</TabsTrigger>
@@ -72,7 +90,7 @@ export function AccessLensPanel({ controller, modeReader }: { controller: Simula
               </div>
               <div className="accesslens-scroll min-h-0 overflow-y-auto overscroll-contain px-5 pt-4 pb-5">
                 <TabsContent value="simulator" className="m-0"><SimulatorTab controller={controller} modeReader={modeReader} /></TabsContent>
-                <TabsContent value="inspector" className="m-0"><InspectorTab /></TabsContent>
+                <TabsContent value="inspector" className="m-0"><InspectorTab store={inspector} modeReader={modeReader} onPreviewFix={previewFix} /></TabsContent>
                 <TabsContent value="fixer" className="m-0"><FixerTab /></TabsContent>
               </div>
             </Tabs>

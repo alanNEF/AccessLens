@@ -15,9 +15,11 @@
     "test:phase3": "node --test tests/unit/simulator-controller.test.mjs && node tests/e2e/phase1.mjs",
     "test:phase4": "node --test tests/unit/simulator-controller.test.mjs && ACCESSLENS_CROSS_SITE=1 node tests/e2e/phase1.mjs",
     "demo": "python3 -m http.server 8081 --bind 127.0.0.1 --directory demo-site",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "test:unit": "node --test tests/unit/*.test.mjs"
   },
   "dependencies": {
+    "axe-core": "^4.14.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.73.0",

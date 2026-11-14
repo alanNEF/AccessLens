@@ -20,3 +20,16 @@
   [data-slot='tabs-trigger'] { font-size: 12px; gap: 4px; padding-inline: 6px; }
   [data-slot='tabs-trigger'] svg { width: 14px; height: 14px; }
 }
+
+/* Inspector outlines: drawn in the shadow root over the page, never by changing page styles.
+   Fail and Review differ by line style and label text, not only by color. */
+.inspector-highlights { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.inspector-highlight { position: fixed; box-sizing: border-box; border: 3px solid #c2410c; border-radius: 4px; pointer-events: none; }
+.inspector-highlight--review { border-style: dashed; border-color: #7c3aed; }
+.inspector-highlight--pass { border-color: #15803d; }
+.inspector-highlight--hover { border: 2px dotted #2563eb; background: #2563eb14; }
+.inspector-highlight.is-selected { border-width: 5px; box-shadow: 0 0 0 3px #fff, 0 0 0 5px #0f172a; }
+.inspector-highlight-label { position: absolute; top: -22px; left: -3px; padding: 1px 6px; font: 700 11px/18px ui-sans-serif, system-ui, sans-serif; color: #fff; background: #c2410c; border-radius: 3px; white-space: nowrap; }
+.inspector-highlight--review .inspector-highlight-label { background: #7c3aed; }
+.inspector-highlight--pass .inspector-highlight-label { background: #15803d; }
+.accesslens-panel { position: relative; z-index: 1; }
