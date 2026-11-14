@@ -45,5 +45,6 @@ export interface SuggestedFix {
   property: 'color' | 'background-color';
   originalValue: string;
   suggestedValue: string;
+  originalContrastRatio: number;
   expectedContrastRatio: number;
 }

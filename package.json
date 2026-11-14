@@ -14,6 +14,7 @@
     "test:phase2": "node --test tests/unit/simulator-controller.test.mjs && node tests/e2e/phase1.mjs",
     "test:phase3": "node --test tests/unit/simulator-controller.test.mjs && node tests/e2e/phase1.mjs",
     "test:phase4": "node --test tests/unit/simulator-controller.test.mjs && ACCESSLENS_CROSS_SITE=1 node tests/e2e/phase1.mjs",
+    "test:fixer": "node --test tests/unit/color-suggester.test.mjs tests/unit/preview-manager.test.mjs tests/unit/fixer-controller.test.mjs",
     "demo": "python3 -m http.server 8081 --bind 127.0.0.1 --directory demo-site",
     "postinstall": "wxt prepare",
     "test:unit": "node --test tests/unit/*.test.mjs"
@@ -22,6 +23,7 @@
     "axe-core": "^4.14.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "culori": "^4.0.2",
     "lucide-react": "^1.73.0",
     "radix-ui": "^1.8.1",
     "react": "^19.0.0",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.5",
+    "@types/culori": "^4.0.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@wxt-dev/module-react": "^1.0.0",
