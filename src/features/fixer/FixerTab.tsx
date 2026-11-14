@@ -7,6 +7,8 @@ import { Card, CardContent } from '../../components/ui/card';
 import { cn } from '../../components/shared/utils';
 import type { FixerController } from './fixer-controller';
 import type { FixerState } from './fixer-state';
+import { BulkCorrections } from './BulkCorrections';
+import type { InspectorStore } from '../inspector/inspector-store';
 
 // Local labels keep the Fixer independent of simulator internals.
 const MODE_LABELS: Record<SimulationMode, string> = {
@@ -34,7 +36,7 @@ function Swatch({ label, color, background, ratio, opacity = 1 }: { label: strin
   );
 }
 
-export function FixerTab({ controller, modeReader }: { controller: FixerController; modeReader: SimulatorModeReader }) {
+export function FixerTab({ controller, modeReader, inspector }: { controller: FixerController; modeReader: SimulatorModeReader; inspector: InspectorStore }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const mode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const [copyStatus, setCopyStatus] = useState('');
@@ -62,6 +64,8 @@ export function FixerTab({ controller, modeReader }: { controller: FixerControll
         <h2 className="mb-1 text-lg font-semibold tracking-tight">Preview a fix</h2>
         <p className="text-sm text-muted-foreground">Try a clearer text color on the page, then copy the CSS.</p>
       </div>
+
+      <BulkCorrections controller={controller} inspector={inspector} />
 
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
         Status: <strong className="font-medium text-foreground">{statusText(state)}</strong>

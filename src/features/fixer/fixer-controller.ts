@@ -2,11 +2,14 @@ import { isVerifiedFailure, type ContrastIssue } from '../../shared/types';
 import { contrastRatio, floorRatio, renderedColor, suggestFix } from './color-suggester';
 import type { PreviewFailure, PreviewManager, PreviewResult, StylableElement } from './preview-manager';
 import { EMPTY_STATE, snapshot, type FixerState } from './fixer-state';
+import { generateCorrection, DETACHED_MESSAGE } from './correction-generator';
+import { createBulkCorrections } from './bulk-corrections';
 
 const PREVIEW_MESSAGES: Record<PreviewFailure, string> = {
-  detached: 'The element is no longer on the page, so no preview was applied.',
+  detached: DETACHED_MESSAGE,
   'not-applied': 'The browser did not accept the preview style.',
   'page-changed': 'The page changed this element’s color itself, so AccessLens left the page’s value in place.',
+  conflict: 'Another correction already owns this element’s CSS property.',
 };
 
 interface FixerDependencies {
@@ -58,6 +61,12 @@ export function createFixerController({
   let element: StylableElement | undefined;
   let disposed = false;
   const listeners = new Set<(state: FixerState) => void>();
+  const bulk = createBulkCorrections({ previewManager, readComputed,
+    beforeRun: revert,
+    beforeEnable: (target, property) => {
+      if (target === element && property === state.fix?.property) revert();
+    },
+  });
 
   function publish(next: FixerState) {
     state = snapshot(next);
@@ -95,7 +104,14 @@ export function createFixerController({
     publish({ phase: 'previewing', issue, fix, opacity, view: 'fixed', measuredRatio, meetsTarget: measuredRatio !== undefined && ratio >= issue.requiredRatio });
   }
 
+  function revert() {
+    if (state.phase !== 'previewing') return;
+    const result = previewManager.revert();
+    backToReady(result.ok ? undefined : PREVIEW_MESSAGES[result.reason]);
+  }
+
   return {
+    bulk,
     getState: () => state,
     subscribe(listener: (state: FixerState) => void) {
       if (!disposed) listeners.add(listener);
@@ -125,6 +141,7 @@ export function createFixerController({
     /** Preview fix: apply the temporary override and measure it. */
     preview() {
       if (disposed || !element || !state.fix || (state.phase !== 'ready' && state.phase !== 'previewing')) return;
+      bulk.release(element, state.fix.property);
       onPreviewResult(previewManager.apply(element, state.fix.property, state.fix.suggestedValue), measure);
     },
     /** Compare: show the page's own color while keeping the preview. */
@@ -138,20 +155,20 @@ export function createFixerController({
       onPreviewResult(previewManager.showFixed(), measure);
     },
     /** Revert: end the preview; the suggestion stays available. */
-    revert() {
-      if (state.phase !== 'previewing') return;
-      const result = previewManager.revert();
-      backToReady(result.ok ? undefined : PREVIEW_MESSAGES[result.reason]);
-    },
+    revert,
+    /** Cancel pending generation too: Inspector must read original author styles. */
+    prepareForInspection() { bulk.clear(); revert(); },
     /** Composition root calls this before an Inspector scan, so it sees original styles. */
     hasActivePreview: () => previewManager.hasActivePreview(),
     clear() {
+      bulk.clear();
       previewManager.revert();
       element = undefined;
       if (!disposed) publish(EMPTY_STATE);
     },
     dispose() {
       if (disposed) return;
+      bulk.dispose();
       previewManager.dispose();
       element = undefined;
       publish(EMPTY_STATE);

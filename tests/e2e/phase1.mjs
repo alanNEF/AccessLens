@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { runCrossSite } from './cross-site.mjs';
 import { runUiRedesign } from './ui-redesign.mjs';
+import { runBulkCorrections } from './bulk-corrections.mjs';
 import { build } from 'esbuild';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -14,9 +15,11 @@ const work = await mkdtemp(join(tmpdir(), 'accesslens-simulator-'));
 const profile = join(work, 'profile');
 const html = await readFile('demo-site/index.html');
 const compatibility = await readFile('demo-site/compatibility.html');
+const bulkHtml = await readFile('demo-site/bulk-corrections.html');
 const server = createServer((req, res) => {
   res.setHeader('Content-Type', 'text/html');
   if (req.url === '/bare') return res.end('<!doctype html><body>Bare text<p>Wrapped content</p></body>');
+  if (req.url.startsWith('/bulk-corrections.html')) return res.end(bulkHtml);
   if (req.url.startsWith('/compatibility.html')) return res.end(compatibility);
   if (req.url === '/base') return res.end(html.toString().replace('<head>', '<head><base href="/">'));
   res.end(req.url === '/unsupported' ? '<!doctype html><style>body {filter:sepia(1)}</style><body><h1>Unsafe ancestor</h1></body>' : html);
@@ -122,6 +125,9 @@ try {
   }
   await call('Page.enable');
   await call('Runtime.enable');
+  if (process.env.ACCESSLENS_BULK_ONLY) {
+    await runBulkCorrections({call,evaluate,waitFor,select,shadow,triggerToolbar,work,url,deactivate:()=>cdp('Extensions.uninstall',{id:extension.id})});
+  } else {
   if (process.env.ACCESSLENS_CROSS_SITE) await runCrossSite({call,evaluate,waitFor,select,shadow,owned,work,extensionErrors});
   await call('Page.navigate', { url });
   await waitFor(`${shadow}?.querySelector('button')`);
@@ -532,6 +538,7 @@ try {
   await cdp('Extensions.uninstall', { id: extension.id });
   await waitFor(`${owned} === 0 && !document.querySelector('accesslens-panel')`);
   console.log('PASS narrow viewport panel bounds and actual extension disable/re-enable/uninstall cleanup');
+  }
   console.log('Chrome:', (await cdp('Browser.getVersion')).product);
   console.log('Screenshots:', work);
 } finally {
