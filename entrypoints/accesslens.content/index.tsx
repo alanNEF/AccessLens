@@ -7,6 +7,9 @@ import { createSimulatorController, type SimulatorController } from '../../src/f
 import { createSimulatorModeReader } from '../../src/shared/simulator-mode-reader';
 import { createInspectorStore, type InspectorStore } from '../../src/features/inspector/inspector-store';
 import { createIssueHandoffStore, type IssueHandoffStore } from '../../src/shared/issue-handoff';
+import { createFixerController, type FixerController } from '../../src/features/fixer/fixer-controller';
+import { createPreviewManager } from '../../src/features/fixer/preview-manager';
+import { connectInspectorToFixer } from '../../src/features/fixer/connect-inspector';
 import './style.css';
 
 export default defineContentScript({
@@ -19,6 +22,8 @@ export default defineContentScript({
     let controller: SimulatorController | undefined;
     let inspector: InspectorStore | undefined;
     let handoff: IssueHandoffStore | undefined;
+    let fixer: FixerController | undefined;
+    let disconnectFixer: (() => void) | undefined;
     // SPA navigation: re-apply simulation; drop Inspector results unless only the #hash changed.
     let lastPath = location.href.split('#')[0];
     const onPageChange = () => {
@@ -35,11 +40,16 @@ export default defineContentScript({
         controller = createSimulatorController(createSimulationEngine(document, host));
         inspector = createInspectorStore(host);
         handoff = createIssueHandoffStore();
+        fixer = createFixerController({ previewManager: createPreviewManager() });
+        disconnectFixer = connectInspectorToFixer(inspector, handoff, fixer);
         const root = createRoot(container);
-        root.render(<AccessLensPanel controller={controller} modeReader={createSimulatorModeReader(controller)} inspector={inspector} handoff={handoff} />);
+        root.render(<AccessLensPanel controller={controller} modeReader={createSimulatorModeReader(controller)} inspector={inspector} handoff={handoff} fixer={fixer} />);
         return root;
       },
       onRemove(root) {
+        // Disconnect first, then dispose: closing the panel reverts any Fixer preview.
+        disconnectFixer?.();
+        fixer?.dispose();
         controller?.dispose();
         inspector?.dispose();
         handoff?.clear();

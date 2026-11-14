@@ -17,7 +17,7 @@ npm run build
 ```
 
 WXT builds the browser extension into `.output/`. The Simulator has a Phase 4 cross-site support. The Inspector scans text
-contrast with axe-core (see below). Fixer remains a placeholder. See [the feasibility report](docs/simulator/phase-0-feasibility.md).
+contrast with axe-core (see below). The Fixer suggests and temporarily previews a passing text color for verified Inspector failures. See [the feasibility report](docs/simulator/phase-0-feasibility.md).
 
 ## Project layout
 
