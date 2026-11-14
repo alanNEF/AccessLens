@@ -9,6 +9,7 @@
     "build": "wxt build",
     "zip": "wxt zip",
     "typecheck": "tsc --noEmit",
+    "test:phase0": "node tests/e2e/phase0.mjs",
     "postinstall": "wxt prepare"
   },
   "dependencies": {
