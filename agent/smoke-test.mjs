@@ -66,7 +66,9 @@ try {
   assert.equal(find(aaa, 'fine-print')?.required, 7, 'AA-rule failures are judged against 7:1 at AAA');
   assert.equal(find(aaa, 'vendor-meta')?.status, 'fail', 'T8 (6.70:1) fails only at AAA');
   assert.equal(find(aa, 'vendor-meta'), undefined, 'T8 passes AA');
-  assert.equal(aaa.issues.filter(issue => issue.selector.includes('hero')).length, 1, 'no duplicate review items at AAA');
+  const keys = aaa.issues.map(issue => `${issue.kind}|${issue.selector}`);
+  assert.equal(new Set(keys).size, keys.length, 'each element is listed once at AAA, even though two axe rules run');
+  assert.equal(aaa.summary.review, aa.summary.review, 'AAA does not add duplicate review items');
   console.log(`PASS scan AAA: ${aaa.summary.fail} fail`);
 
   // Verify-a-fix loop: inject the suggested CSS and scan again.
