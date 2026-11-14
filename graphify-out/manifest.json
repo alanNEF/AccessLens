@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "src/components/AccessLensPanel.tsx": {
-    "mtime": 1794694457.656101,
-    "seen": 1794694523.9404824,
-    "ast_hash": "80c6ad4f2a241fad81312b64884af4db",
+    "mtime": 1794695220.8359342,
+    "seen": 1794695345.7867088,
+    "ast_hash": "24c7b4c566fa4b222f1f85ff964b7882",
     "semantic_hash": ""
   },
   "src/features/fixer/FixerTab.tsx": {
@@ -468,15 +468,27 @@
     "semantic_hash": ""
   },
   "src/components/shared/use-panel-position.ts": {
-    "mtime": 1794694457.6581004,
-    "seen": 1794694523.9404893,
-    "ast_hash": "a2dcac9aa90b1225fc0efd29664e5134",
+    "mtime": 1794695200.2899573,
+    "seen": 1794695345.7867186,
+    "ast_hash": "5e7315efa293ec23da2ba7502237a444",
     "semantic_hash": ""
   },
   "tests/unit/panel-position.test.mjs": {
     "mtime": 1794694457.6751063,
     "seen": 1794694523.9405868,
     "ast_hash": "ca1a7a98bf04e5902b4609f482380d0d",
+    "semantic_hash": ""
+  },
+  "src/components/shared/panel-size.ts": {
+    "mtime": 1794695160.1941702,
+    "seen": 1794695345.7867162,
+    "ast_hash": "b56da4d7555fcde10e6773a1b9c12b2c",
+    "semantic_hash": ""
+  },
+  "tests/unit/panel-size.test.mjs": {
+    "mtime": 1794695259.6728525,
+    "seen": 1794695345.786794,
+    "ast_hash": "02725f4dbe3b1193c1f092dc47b7f3e7",
     "semantic_hash": ""
   },
   "package-lock.json": {
