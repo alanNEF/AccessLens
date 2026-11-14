@@ -68,11 +68,17 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
         svg?.remove();
         svg = undefined;
       }
+      // Which filter to apply: Low Acuity blur, a CSS filter preset, or the SVG color matrix.
+      const effect = mode === 'blur' ? `blur(${intensity}px)`
+        : 'css' in preset ? preset.css
+        : `url("${doc.URL.split('#')[0]}#${owner}")`;
+      // Blurring effects bleed past the element's edges; clip that halo.
+      const clipHalo = mode === 'blur' || ('halo' in preset && preset.halo);
       style ??= doc.createElement('style');
       style.dataset.accesslensSimulatorOwned = owner;
       // Clip after filtering to contain the halo without changing layout or
       // scrolling. This also clips overflowing descendants and shadows.
-      style.textContent = targets.map(target => `${target.selector} { filter: ${target.filter === 'none' ? '' : target.filter + ' '}${mode === 'blur' ? `blur(${intensity}px)` : `url("${doc.URL.split('#')[0]}#${owner}")`} !important; ${mode === 'blur' && target.clipPath === 'none' ? 'clip-path: inset(0) !important;' : ''} }`).join('\n');
+      style.textContent = targets.map(target => `${target.selector} { filter: ${target.filter === 'none' ? '' : target.filter + ' '}${effect} !important; ${clipHalo && target.clipPath === 'none' ? 'clip-path: inset(0) !important;' : ''} }`).join('\n');
       doc.head.append(style);
       // Catch blocked styles / conflicting author rules; painting is browser-tested.
       if (targets.some(({node, filter}) => doc.defaultView!.getComputedStyle(node).filter === filter)) {

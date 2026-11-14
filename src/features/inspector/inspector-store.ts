@@ -1,4 +1,5 @@
 import { inspectElement, scanTextContrast, type InspectedIssue } from './axe-runner';
+import type { ContrastLevel } from '../../shared/types';
 
 export interface InspectorState {
   readonly status: 'idle' | 'scanning' | 'done' | 'error';
@@ -11,10 +12,12 @@ export interface InspectorState {
   /** Element under the pointer while picking, for the hover outline. */
   readonly hovered: Element | null;
   readonly message: string | null;
+  /** AA (WCAG 1.4.3) or enhanced AAA (1.4.6, for low vision). Kept across Clear. */
+  readonly level: ContrastLevel;
 }
 
 const INITIAL: InspectorState = Object.freeze({
-  status: 'idle', issues: [], picked: null, selectedId: null, picking: false, hovered: null, message: null,
+  status: 'idle', issues: [], picked: null, selectedId: null, picking: false, hovered: null, message: null, level: 'AA',
 });
 
 /**
@@ -59,7 +62,7 @@ export function createInspectorStore(panelHost: Element) {
     const id = ++runId;
     set({ status: 'scanning', message: null });
     try {
-      const issues = await withPanelHidden(() => scanTextContrast(panelHost));
+      const issues = await withPanelHidden(() => scanTextContrast(panelHost, state.level));
       if (id !== runId) return;
       set({ status: 'done', issues, selectedId: issues[0]?.issue.id ?? null, picked: null });
     } catch (cause) {
@@ -72,7 +75,7 @@ export function createInspectorStore(panelHost: Element) {
     const id = ++runId;
     set({ picking: false, hovered: null, message: null });
     try {
-      const result = await withPanelHidden(() => inspectElement(target, panelHost));
+      const result = await withPanelHidden(() => inspectElement(target, panelHost, state.level));
       if (id !== runId) return;
       if (!result) {
         set({ picked: null, message: 'No text was found in that element. Try clicking directly on some text.' });
@@ -134,6 +137,14 @@ export function createInspectorStore(panelHost: Element) {
     startPicking,
     cancelPicking,
     select(id: string | null) { set({ selectedId: id }); },
+    /** Switch standard. Existing results were measured against the old one, so they are re-scanned. */
+    setLevel(level: ContrastLevel) {
+      if (level === state.level) return;
+      const hadScan = state.status === 'done' || state.status === 'error';
+      runId++;
+      set({ level, issues: [], picked: null, selectedId: null, message: null, status: 'idle' });
+      if (hadScan) void scan();
+    },
     /** The issue currently shown in the detail view (from the scan list or the picked element). */
     getSelected(): InspectedIssue | null {
       if (state.picked?.issue.id === state.selectedId) return state.picked;
@@ -142,7 +153,7 @@ export function createInspectorStore(panelHost: Element) {
     clear() {
       runId++;
       cancelPicking();
-      set({ ...INITIAL });
+      set({ ...INITIAL, level: state.level });
     },
     dispose() {
       cancelPicking();

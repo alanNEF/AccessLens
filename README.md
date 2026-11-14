@@ -72,6 +72,24 @@ tooltip overlays stay within the extension's Shadow DOM.
 See [UI implementation and validation](docs/ui-redesign.md) for changed files,
 dependencies, accessibility details and browser checks.
 
+## From simulation to fix
+
+| Simulation | Inspector check | Fixer |
+|---|---|---|
+| Low Contrast, Cataracts | Enhanced contrast, WCAG 1.4.6 (AAA): 7:1, or 4.5:1 for large text. Auto-selected for these modes; switchable any time. | Text color reaching 7:1, or the background color when no text color can |
+| Achromatopsia (and other color modes) | Links that rely on color alone, WCAG 1.4.1 (axe `link-in-text-block`). Checked in every scan. | `text-decoration-line: underline` |
+| All | Text contrast, WCAG 1.4.3 (AA) | Text color reaching 4.5:1 / 3:1 |
+
+Not every simulated barrier is automatically detectable: for example, status badges whose words differ
+pass WCAG even if their colors look alike. Those remain review points rather than automated failures.
+
+## Simulator modes
+
+Protanopia, Deuteranopia and Tritanopia use the Machado et al. (2009) matrices. Achromatopsia maps every
+color to its luminance (grayscale) in linear RGB. Cataracts (hazy, faded, yellowed) and Low Contrast
+(washed-out light and dark) are illustrative CSS filter approximations, not calibrated clinical models.
+Low Acuity is an adjustable blur; Visionless blacks out the page and narrates keyboard focus.
+
 ## Inspector
 
 Open the Inspector tab and click **Scan text contrast**, or **Pick element** and click any text.

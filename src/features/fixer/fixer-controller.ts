@@ -2,7 +2,7 @@ import { isVerifiedFailure, type ContrastIssue } from '../../shared/types';
 import { contrastRatio, floorRatio, renderedColor, suggestFix } from './color-suggester';
 import type { PreviewFailure, PreviewManager, PreviewResult, StylableElement } from './preview-manager';
 import { EMPTY_STATE, snapshot, type FixerState } from './fixer-state';
-import { generateCorrection, DETACHED_MESSAGE } from './correction-generator';
+import { generateCorrection, DETACHED_MESSAGE, SUPPORTED_RATIOS, UNSUPPORTED_RATIO_MESSAGE, underlineFix } from './correction-generator';
 import { createBulkCorrections } from './bulk-corrections';
 
 const PREVIEW_MESSAGES: Record<PreviewFailure, string> = {
@@ -98,8 +98,15 @@ export function createFixerController({
   function measure() {
     const { issue, fix, opacity } = state;
     if (!element || !issue || !fix || !isVerifiedFailure(issue)) return;
-    const drawn = drawnTextColor(element, issue.backgroundColor);
-    const ratio = drawn ? contrastRatio(drawn, issue.backgroundColor) : Number.NaN;
+    if (fix.property === 'text-decoration-line') {
+      // Success for a color-only link is a visible underline; there is no ratio to measure.
+      publish({ phase: 'previewing', issue, fix, view: 'fixed', meetsTarget: readComputed(element, fix.property).includes('underline') });
+      return;
+    }
+    // A background fix changes what the text sits on, so measure against the rendered background.
+    const background = fix.property === 'background-color' ? readComputed(element, 'background-color') : issue.backgroundColor;
+    const drawn = drawnTextColor(element, background);
+    const ratio = drawn ? contrastRatio(drawn, background) : Number.NaN;
     const measuredRatio = Number.isFinite(ratio) ? floorRatio(ratio) : undefined;
     publish({ phase: 'previewing', issue, fix, opacity, view: 'fixed', measuredRatio, meetsTarget: measuredRatio !== undefined && ratio >= issue.requiredRatio });
   }
@@ -124,8 +131,15 @@ export function createFixerController({
       element = undefined;
       const reject = (message: string) => publish({ phase: 'unsupported', issue, view: 'original', message });
       if (!isVerifiedFailure(issue)) return reject('This issue needs manual review, so no automatic fix is suggested.');
-      if (issue.requiredRatio !== 4.5 && issue.requiredRatio !== 3) return reject('Only WCAG AA text thresholds (4.5:1 and 3:1) are supported.');
+      if (!SUPPORTED_RATIOS.has(issue.requiredRatio)) return reject(UNSUPPORTED_RATIO_MESSAGE);
       if (!target.isConnected || !isStylable(target)) return reject(PREVIEW_MESSAGES.detached);
+      if (issue.kind === 'link-color-only') {
+        const current = readComputed(target, 'text-decoration-line');
+        if (current.includes('underline')) return reject('This link is already underlined.');
+        element = target;
+        publish({ phase: 'ready', issue, fix: underlineFix(issue, current), view: 'original' });
+        return;
+      }
       // Inspector reports the color as drawn; the Fixer edits the CSS color, which opacity then fades.
       const opacity = readOpacity(target);
       if (opacity === undefined) return reject('The background behind this text is itself faded (CSS opacity), so the result can’t be measured reliably. Check it by eye.');

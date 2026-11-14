@@ -67,6 +67,10 @@ export function createBulkCorrections({ previewManager, readComputed, beforeRun,
       if (!result.ok) throw new Error(`The preview could not be applied (${result.reason}). Scan again before retrying.`);
       // Read back the rendered property, just as individual Fixer previews do (FIX-06).
       const rendered = readComputed(element, item.fix.property);
+      if (item.fix.property === 'text-decoration-line') {
+        if (!rendered.includes('underline')) throw new Error('The page did not show the underline. The preview was restored.');
+        return { ...item, enabled: true, measuredRatio: undefined, failure: undefined };
+      }
       const ratio = item.fix.property === 'color'
         ? contrastRatio(rendered, item.issue.backgroundColor)
         : contrastRatio(item.issue.textColor, rendered);

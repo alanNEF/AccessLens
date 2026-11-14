@@ -103,7 +103,7 @@ const MESSAGES: Record<UnsupportedReason, string> = {
   'invalid-color': 'The element’s colors could not be read reliably.',
   'transparent-color': 'Transparent or semi-transparent colors need manual review.',
   'already-passes': 'These colors already meet the required contrast ratio.',
-  'no-compliant-color': 'No compliant color could be proposed reliably for this element.',
+  'no-compliant-color': 'Changing only the text or only the background cannot reach this target. Both colors need to change; adjust them by hand.',
   'too-transparent': 'This text is drawn too transparent (CSS opacity) for any text color to reach the required contrast. Raise its opacity instead.',
 };
 
@@ -112,7 +112,7 @@ function unsupported(reason: UnsupportedReason): SuggestionResult {
 }
 
 /**
- * FIX-02: one replacement text color reaching the WCAG AA threshold.
+ * FIX-02: one replacement color reaching the required threshold (AA, or enhanced AAA 7:1).
  *
  * `textColor` is the CSS `color` to edit. With `opacity` below 1 the browser
  * fades it into the background, so every ratio here is measured on the color
@@ -120,8 +120,12 @@ function unsupported(reason: UnsupportedReason): SuggestionResult {
  *
  * Fully opaque text is always adjustable: the search ends at black or white,
  * and one of them reaches at least 4.58:1 against any opaque background. Faded
- * text may not be ('too-transparent'). 'background-color' stays in the shared
- * type for future fix types.
+ * text may not be ('too-transparent').
+ *
+ * The enhanced 7:1 target can be out of reach for the text alone on mid-tone
+ * backgrounds, so for opaque text the background color is tried next (FIX-02's
+ * "solid background color" option). Faded text is not given a background fix:
+ * its drawn color depends on the background too.
  */
 export function suggestFix(issue: SuggestionInput): SuggestionResult {
   const opacity = issue.opacity ?? 1;
@@ -135,7 +139,24 @@ export function suggestFix(issue: SuggestionInput): SuggestionResult {
   const original = drawnRatio(text);
   if (original >= issue.requiredRatio) return unsupported('already-passes');
 
-  const suggestedValue = closestReplacement(text, background, issue.requiredRatio + TARGET_MARGIN, opacity);
+  const target = issue.requiredRatio + TARGET_MARGIN;
+  const suggestedValue = closestReplacement(text, background, target, opacity);
+  if (!suggestedValue && opacity >= 1) {
+    const backgroundFix = closestReplacement(background, text, target, 1);
+    if (backgroundFix) {
+      return {
+        ok: true,
+        fix: {
+          issueId: issue.id,
+          property: 'background-color',
+          originalValue: toHex(background),
+          suggestedValue: backgroundFix,
+          originalContrastRatio: floorRatio(original),
+          expectedContrastRatio: floorRatio(contrastRatio(text, backgroundFix)),
+        },
+      };
+    }
+  }
   if (!suggestedValue) return unsupported(opacity < 1 ? 'too-transparent' : 'no-compliant-color');
   return {
     ok: true,
