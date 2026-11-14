@@ -20,6 +20,7 @@ import { Switch } from './ui/switch';
 import { OverlayContainerContext } from './shared/overlay-container';
 import { useTheme } from './shared/use-theme';
 import { usePanelPosition } from './shared/use-panel-position';
+import { RESIZE_EDGES } from './shared/panel-size';
 
 export function AccessLensPanel({ controller, modeReader, inspector, handoff, fixer }: {
   controller: SimulatorController;
@@ -56,7 +57,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
   if (!ready) return null;
 
   return (
-    <div ref={setRootEl} className={`accesslens-ui ${theme === 'dark' ? 'dark' : ''}`} data-theme={theme} data-dragging={position.dragging}>
+    <div ref={setRootEl} className={`accesslens-ui ${theme === 'dark' ? 'dark' : ''}`} data-theme={theme} data-dragging={position.dragging} data-resizing={position.resizing}>
       <OverlayContainerContext.Provider value={overlayContainer}>
         <TooltipProvider delayDuration={350}>
           <HighlightLayer store={inspector} />
@@ -113,6 +114,13 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
             {storageError && <p role="alert" className="px-5 pb-3 text-xs text-destructive">Theme storage is unavailable. Changes apply to this session.</p>}
             <Separator />
             <footer className="flex shrink-0 items-center gap-2 bg-secondary/50 px-5 py-3 text-xs text-muted-foreground"><ShieldCheck className="size-3.5" aria-hidden="true" />Temporary effects. Your source stays yours.</footer>
+            {/* Resize: drag any edge or corner. The top-left corner is also a keyboard control. */}
+            {RESIZE_EDGES.map(edge => edge === 'nw'
+              ? <button key={edge} type="button" className={`accesslens-resize accesslens-resize--${edge}`} {...position.resizeHandlers(edge)}
+                  onKeyDown={position.onResizeKeyDown} title="Drag to resize · arrow keys to resize"
+                  aria-label="Resize panel. Left and Up arrows grow it, Right and Down shrink it, Shift for bigger steps, Home for the default size."
+                  aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home" />
+              : <div key={edge} className={`accesslens-resize accesslens-resize--${edge}`} aria-hidden="true" {...position.resizeHandlers(edge)} />)}
           </section>
           {/* Every Radix portal stays inside this themed Shadow DOM subtree. */}
           <div ref={setOverlayContainer} />
