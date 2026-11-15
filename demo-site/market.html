@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hilltop Farmers Market — AccessLens demo</title>
+  <title>Hilltop Farmers Market — Perspective demo</title>
   <!--
-    AccessLens hackathon demo page. Fictional market, deliberately flawed.
+    Perspective hackathon demo page. Fictional market, deliberately flawed.
 
     TEST CASES (ratios checked with the WCAG formula; keep this table in sync):
       id   element                      colors                     ratio   expected
@@ -19,7 +19,15 @@
            but open/closed is shown by color only -> look alike under protanopia/deuteranopia
            (the Simulator catches what the contrast checker can't)
       T8   .vendor-meta (12px, dense)   #4b5563 on #f4f1ea         6.70    PASS, but unreadable under Low Acuity blur
+      T9   .policy-link inside .visit-note  link #1e40af, text #1f2937  1.68 between them  FAIL WCAG 1.4.1:
+           no underline, so the link is told apart by color only (vanishes under Achromatopsia).
+           The link itself passes contrast (8.72 on white) -> Fixer suggests text-decoration: underline
       PASS controls: body text #1f2937 on #fff (14.68), nav white on #1f5135 (9.18)
+
+    ENHANCED (AAA, WCAG 1.4.6) — Inspector "Enhanced" standard, auto-selected for Cataracts / Low Contrast:
+      7:1 normal text, 4.5:1 large. Everything failing AA above also fails here, plus:
+      T2   .section-title (large)       3.36 < 4.5   FAIL AAA (passes AA)
+      T8   .vendor-meta                 6.70 < 7     FAIL AAA (passes AA)
 
     Simulator constraints (from simulator-dom.ts): all content lives inside direct
     <body> children (header/main/footer), no bare text in <body>, no filter on html/body.
@@ -42,6 +50,9 @@
     /* T2 (pass as large text) and T3 (fail as normal text) share a color */
     .section-title { color: #8c8c8c; font-size: 28px; font-weight: 400; margin: 40px 0 4px; }
     .tagline { color: #8c8c8c; font-size: 16px; margin: 0 0 20px; }
+    /* T9: link distinguished from its sentence by color only (no underline) */
+    .visit-note { color: #1f2937; font-size: 16px; margin: 0 0 20px; }
+    .policy-link { color: #1e40af; text-decoration: none; }
 
     .vendors { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
     .card { background: #f4f1ea; border-radius: 12px; padding: 18px; }
@@ -83,6 +94,7 @@
     <section id="vendors" aria-labelledby="vendors-title">
       <h2 id="vendors-title" class="section-title">This week's vendors</h2>
       <p class="tagline">Status updates live from each stall — check before you head over.</p>
+      <p class="visit-note">Bring your own bags, and please read the <a class="policy-link" href="#newsletter">vendor safety policy</a> before your visit.</p>
 
       <div class="vendors">
         <article class="card">
@@ -119,11 +131,11 @@
       <button class="btn-subscribe" type="button">Subscribe</button>
     </section>
 
-    <p class="fine-print">Hilltop Farmers Market is a volunteer-run, fictional organization created for the AccessLens demo. Vendor status may change without notice. Rain or shine.</p>
+    <p class="fine-print">Hilltop Farmers Market is a volunteer-run, fictional organization created for the Perspective demo. Vendor status may change without notice. Rain or shine.</p>
   </main>
 
   <footer>
-    <span>© 2026 Hilltop Farmers Market (fictional) · Built to test AccessLens</span>
+    <span>© 2026 Hilltop Farmers Market (fictional) · Built to test Perspective</span>
   </footer>
 </body>
 </html>

@@ -1,14 +1,15 @@
-import { isVerifiedFailure, type ContrastIssue } from '../../shared/types';
+import { isVerifiedFailure, type ContrastIssue, type SuggestedFix } from '../../shared/types';
 import { contrastRatio, floorRatio, renderedColor, suggestFix } from './color-suggester';
 import type { PreviewFailure, PreviewManager, PreviewResult, StylableElement } from './preview-manager';
 import { EMPTY_STATE, snapshot, type FixerState } from './fixer-state';
-import { generateCorrection, DETACHED_MESSAGE } from './correction-generator';
+import { generateCorrection, DETACHED_MESSAGE, SUPPORTED_RATIOS, UNSUPPORTED_RATIO_MESSAGE, underlineFix } from './correction-generator';
 import { createBulkCorrections } from './bulk-corrections';
+import { collectSitePalette } from './site-palette';
 
 const PREVIEW_MESSAGES: Record<PreviewFailure, string> = {
   detached: DETACHED_MESSAGE,
   'not-applied': 'The browser did not accept the preview style.',
-  'page-changed': 'The page changed this element’s color itself, so AccessLens left the page’s value in place.',
+  'page-changed': 'The page changed this element’s color itself, so Perspective left the page’s value in place.',
   conflict: 'Another correction already owns this element’s CSS property.',
 };
 
@@ -18,6 +19,8 @@ interface FixerDependencies {
   readonly readComputed?: (element: Element, property: string) => string;
   /** Opacity the text is drawn with (see readDrawnOpacity); injectable for tests. */
   readonly readOpacity?: (element: Element) => number | undefined;
+  /** Colors the page already uses (site-palette.ts); injectable for tests. */
+  readonly readPalette?: () => readonly string[];
 }
 
 function isStylable(element: Element): element is StylableElement {
@@ -56,12 +59,15 @@ export function createFixerController({
   previewManager,
   readComputed = (el, prop) => getComputedStyle(el).getPropertyValue(prop),
   readOpacity = readDrawnOpacity,
+  readPalette = collectSitePalette,
 }: FixerDependencies) {
   let state = EMPTY_STATE;
   let element: StylableElement | undefined;
+  /** The other good suggestion for the current issue (site color vs. adjusted shade). */
+  let alternative: SuggestedFix | undefined;
   let disposed = false;
   const listeners = new Set<(state: FixerState) => void>();
-  const bulk = createBulkCorrections({ previewManager, readComputed,
+  const bulk = createBulkCorrections({ previewManager, readComputed, readPalette,
     beforeRun: revert,
     beforeEnable: (target, property) => {
       if (target === element && property === state.fix?.property) revert();
@@ -69,7 +75,8 @@ export function createFixerController({
   });
 
   function publish(next: FixerState) {
-    state = snapshot(next);
+    // Every state that shows a fix also offers its alternative, if there is one.
+    state = snapshot(next.fix && alternative ? { ...next, alternative } : next);
     for (const listener of [...listeners]) listener(state);
   }
 
@@ -98,8 +105,15 @@ export function createFixerController({
   function measure() {
     const { issue, fix, opacity } = state;
     if (!element || !issue || !fix || !isVerifiedFailure(issue)) return;
-    const drawn = drawnTextColor(element, issue.backgroundColor);
-    const ratio = drawn ? contrastRatio(drawn, issue.backgroundColor) : Number.NaN;
+    if (fix.property === 'text-decoration-line') {
+      // Success for a color-only link is a visible underline; there is no ratio to measure.
+      publish({ phase: 'previewing', issue, fix, view: 'fixed', meetsTarget: readComputed(element, fix.property).includes('underline') });
+      return;
+    }
+    // A background fix changes what the text sits on, so measure against the rendered background.
+    const background = fix.property === 'background-color' ? readComputed(element, 'background-color') : issue.backgroundColor;
+    const drawn = drawnTextColor(element, background);
+    const ratio = drawn ? contrastRatio(drawn, background) : Number.NaN;
     const measuredRatio = Number.isFinite(ratio) ? floorRatio(ratio) : undefined;
     publish({ phase: 'previewing', issue, fix, opacity, view: 'fixed', measuredRatio, meetsTarget: measuredRatio !== undefined && ratio >= issue.requiredRatio });
   }
@@ -122,24 +136,43 @@ export function createFixerController({
       if (disposed) return;
       previewManager.revert();
       element = undefined;
+      alternative = undefined;
       const reject = (message: string) => publish({ phase: 'unsupported', issue, view: 'original', message });
       if (!isVerifiedFailure(issue)) return reject('This issue needs manual review, so no automatic fix is suggested.');
-      if (issue.requiredRatio !== 4.5 && issue.requiredRatio !== 3) return reject('Only WCAG AA text thresholds (4.5:1 and 3:1) are supported.');
+      if (!SUPPORTED_RATIOS.has(issue.requiredRatio)) return reject(UNSUPPORTED_RATIO_MESSAGE);
       if (!target.isConnected || !isStylable(target)) return reject(PREVIEW_MESSAGES.detached);
-      // Validate the handoff against author colors when this target already has
-      // a bulk correction. Transfer its property before measuring the original.
+      if (issue.kind === 'link-color-only') {
+        const current = readComputed(target, 'text-decoration-line');
+        if (current.includes('underline')) return reject('This link is already underlined.');
+        element = target;
+        publish({ phase: 'ready', issue, fix: underlineFix(issue, current), view: 'original' });
+        return;
+      }
+      // A bulk correction on this element would make the measurement read its fixed colors,
+      // not the page's: hand the element over to the single Fixer first (as preview() would).
       bulk.release(target, 'color');
+      bulk.release(target, 'background-color');
       // Inspector reports the color as drawn; the Fixer edits the CSS color, which opacity then fades.
       const opacity = readOpacity(target);
       if (opacity === undefined) return reject('The background behind this text is itself faded (CSS opacity), so the result can’t be measured reliably. Check it by eye.');
       const drawn = drawnTextColor(target, issue.backgroundColor);
       if (!drawn || Math.abs(contrastRatio(drawn, issue.backgroundColor) - issue.contrastRatio) > MEASUREMENT_TOLERANCE) {
-        return reject('AccessLens could not confirm how this text is drawn, so no automatic fix is suggested. Check it by eye.');
+        return reject('Perspective could not confirm how this text is drawn, so no automatic fix is suggested. Check it by eye.');
       }
-      const result = suggestFix({ ...issue, textColor: readComputed(target, 'color'), opacity });
+      const result = suggestFix({ ...issue, textColor: readComputed(target, 'color'), opacity, palette: readPalette() });
       if (!result.ok) return reject(result.message);
       element = target;
+      alternative = result.alternative;
       publish({ phase: 'ready', issue, fix: result.fix, opacity, view: 'original' });
+    },
+    /** Swap to the other suggestion (site color ⇄ adjusted shade). Ends any preview first. */
+    useAlternative() {
+      if (disposed || !alternative || !state.fix || (state.phase !== 'ready' && state.phase !== 'previewing')) return;
+      if (state.phase === 'previewing') previewManager.revert();
+      const next = alternative;
+      alternative = state.fix;
+      const { issue, opacity } = state;
+      publish({ phase: 'ready', issue, fix: next, opacity, view: 'original' });
     },
     /** Preview fix: apply the temporary override and measure it. */
     preview() {
@@ -167,6 +200,7 @@ export function createFixerController({
       bulk.clear();
       previewManager.revert();
       element = undefined;
+      alternative = undefined;
       if (!disposed) publish(EMPTY_STATE);
     },
     dispose() {
@@ -174,6 +208,7 @@ export function createFixerController({
       bulk.dispose();
       previewManager.dispose();
       element = undefined;
+      alternative = undefined;
       publish(EMPTY_STATE);
       disposed = true;
       listeners.clear();

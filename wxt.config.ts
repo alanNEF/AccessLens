@@ -12,7 +12,7 @@ export default defineConfig({
   },
   manifest: {
     permissions: ['activeTab', 'scripting', 'storage', 'tts'],
-    name: 'AccessLens',
-    description: 'An accessibility simulator for developers.',
+    name: 'Perspective',
+    description: 'Perspective: simulate, inspect and fix accessibility barriers on any webpage.',
   },
 });

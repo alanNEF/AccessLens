@@ -60,3 +60,48 @@ test('explanations state the ratio, the rule and the result', () => {
   assert.match(text, /4\.5:1/);
   assert.match(text, /normal-size text/);
 });
+
+test('enhanced (AAA) standard: 7:1 normal, 4.5:1 large, criterion 1.4.6', () => {
+  assert.deepEqual(m.requiredRatioFor({ fontSize: '12.0pt (16px)', fontWeight: 'normal' }, 'AAA'), { requiredRatio: 7, isLargeText: false });
+  assert.deepEqual(m.requiredRatioFor({ fontSize: '21.0pt (28px)' }, 'AAA'), { requiredRatio: 4.5, isLargeText: true });
+  assert.deepEqual(m.requiredRatioFor({ expectedContrastRatio: '7:1' }, 'AAA'), { requiredRatio: 7, isLargeText: false });
+  const issue = m.toContrastIssue({ id: 'e', status: 'failed', selector: '.meta', elementLabel: '<p>', level: 'AAA',
+    data: { fgColor: '#4b5563', bgColor: '#f4f1ea', contrastRatio: 6.7, expectedContrastRatio: '7:1', fontSize: '9.0pt (12px)' } });
+  assert.equal(issue.wcagCriterion, '1.4.6');
+  assert.equal(issue.requiredRatio, 7);
+  assert.equal(issue.kind, 'text-contrast');
+  assert.match(m.explainIssue(issue), /AAA \(1\.4\.6\).*7:1/);
+});
+
+test('AA issues keep criterion 1.4.3 by default', () => {
+  assert.equal(failure({ fgColor: '#a3a3a3', bgColor: '#ffffff', contrastRatio: 2.52 }).wcagCriterion, '1.4.3');
+});
+
+test('color-only links map to WCAG 1.4.1 with link and surrounding text colors (market.html T9)', () => {
+  const link = m.toLinkIssue({ id: 'l', status: 'failed', selector: '.policy-link', elementLabel: '<a>',
+    data: { nodeColor: '#1e40af', parentColor: '#1f2937', contrastRatio: 1.68 } });
+  assert.equal(link.kind, 'link-color-only');
+  assert.equal(link.wcagCriterion, '1.4.1');
+  assert.equal(link.requiredRatio, 3);
+  assert.equal(link.textColor, '#1e40af');
+  assert.equal(link.backgroundColor, '#1f2937');
+  assert.equal(link.contrastRatio, 1.68);
+  assert.match(m.explainIssue(link), /no underline.*1\.68:1/);
+});
+
+test('link colors fall back to computed styles, and the ratio is computed when axe gives none', () => {
+  const link = m.toLinkIssue({ id: 'l', status: 'failed', selector: 'a', elementLabel: '<a>', data: {},
+    computedLinkColor: 'rgb(30, 64, 175)', computedTextColor: 'rgb(31, 41, 55)' });
+  assert.equal(link.status, 'failed');
+  assert.ok(Math.abs(link.contrastRatio - 1.68) < 0.01, String(link.contrastRatio));
+  const unknown = m.toLinkIssue({ id: 'l', status: 'failed', selector: 'a', elementLabel: '<a>', data: null, computedLinkColor: null });
+  assert.equal(unknown.status, 'needs-review', 'never claims a failure without colors');
+});
+
+test('cssContrastRatio reads hex and rgb(), and refuses transparent or unknown formats', () => {
+  assert.ok(Math.abs(m.cssContrastRatio('#000', '#ffffff') - 21) < 1e-9);
+  assert.ok(Math.abs(m.cssContrastRatio('rgb(119, 119, 119)', 'rgb(255 255 255)') - 4.48) < 0.01);
+  assert.equal(m.cssContrastRatio('rgba(0, 0, 0, 0.5)', '#fff'), null);
+  assert.equal(m.cssContrastRatio('oklch(0.5 0.1 200)', '#fff'), null);
+  assert.ok(m.cssContrastRatio('rgba(0, 0, 0, 1)', '#fff') > 20);
+});

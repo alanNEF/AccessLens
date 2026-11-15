@@ -65,7 +65,7 @@ export async function runCrossSite({call, evaluate, waitFor, select, shadow, own
       assert.equal(await evaluate(`${shadow}.querySelectorAll('[data-accesslens-visionless]').length`),0);
       // Focus and type into an existing search/text field, without submitting.
       const editable=await evaluate(`(() => {const input=[...document.querySelectorAll('input[type=search],input[type=text],input:not([type])')].find(n=>n.getBoundingClientRect().width>0&&!n.disabled);if(!input)return false;window.externalInput=input;window.originalInput=input.value;input.focus();return true;})()`);
-      if(editable){await call('Input.insertText',{text:'AccessLens'});assert.match(await evaluate('externalInput.value'),/AccessLens/);await evaluate('externalInput.value=originalInput');}
+      if(editable){await call('Input.insertText',{text:'Perspective'});assert.match(await evaluate('externalInput.value'),/Perspective/);await evaluate('externalInput.value=originalInput');}
       result.input = editable ? 'typed into existing field; no submission' : 'no visible field';
       // A real informational link navigation after Reset; no account actions.
       const link = await evaluate(`(() => {const a=[...document.querySelectorAll('a[href]')].find(a=>{try{const u=new URL(a.href);return u.origin===location.origin && u.pathname!==location.pathname && !u.search && !/login|logout|signin|signup|account|delete|edit|submit/i.test(u.pathname)&&a.getBoundingClientRect().width>0}catch{return false}});if(!a)return null;a.scrollIntoView({block:'center'});const r=a.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);

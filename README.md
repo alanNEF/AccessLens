@@ -1,4 +1,4 @@
-# AccessLens
+# Perspective
 
 An all inclusive accessibility simulator for developers.
 
@@ -34,7 +34,7 @@ contrast with axe-core (see below). The Fixer suggests and temporarily previews 
 
 Run `npm run build`, load `.output/chrome-mv3` as an unpacked extension in
 Chrome, then serve the demo with `npm run demo`.
-Pin AccessLens in Chrome’s Extensions menu, then click its toolbar icon in the
+Pin Perspective in Chrome’s Extensions menu, then click its toolbar icon in the
 active tab to show or hide the panel. Closing clears the simulation; reopening
 starts in Off. Already-open tabs initialize on the first icon click without a refresh.
 
@@ -59,7 +59,7 @@ focus the grip button and use the arrow keys (Shift for bigger steps, Home to re
 header also resets it. The position is kept on screen when the window resizes and is remembered in
 `browser.storage.local` as `accesslens.position`.
 
-Use the minus button in the panel header to collapse AccessLens to a small
+Use the minus button in the panel header to collapse Perspective to a small
 bottom-right launcher. Select the launcher to expand it again. Collapsing keeps
 the active simulation, selected tab and settings; the toolbar icon still closes
 the extension and clears simulation effects.
@@ -72,13 +72,31 @@ tooltip overlays stay within the extension's Shadow DOM.
 See [UI implementation and validation](docs/ui-redesign.md) for changed files,
 dependencies, accessibility details and browser checks.
 
+## From simulation to fix
+
+| Simulation | Inspector check | Fixer |
+|---|---|---|
+| Low Contrast, Cataracts | Enhanced contrast, WCAG 1.4.6 (AAA): 7:1, or 4.5:1 for large text. Auto-selected for these modes; switchable any time. | Text color reaching 7:1, or the background color when no text color can |
+| Achromatopsia (and other color modes) | Links that rely on color alone, WCAG 1.4.1 (axe `link-in-text-block`). Checked in every scan. | `text-decoration-line: underline` |
+| All | Text contrast, WCAG 1.4.3 (AA) | Text color reaching 4.5:1 / 3:1 |
+
+Not every simulated barrier is automatically detectable: for example, status badges whose words differ
+pass WCAG even if their colors look alike. Those remain review points rather than automated failures.
+
+## Simulator modes
+
+Protanopia, Deuteranopia and Tritanopia use the Machado et al. (2009) matrices. Achromatopsia maps every
+color to its luminance (grayscale) in linear RGB. Cataracts (hazy, faded, yellowed) and Low Contrast
+(washed-out light and dark) are illustrative CSS filter approximations, not calibrated clinical models.
+Low Acuity is an adjustable blur; Visionless blacks out the page and narrates keyboard focus.
+
 ## Inspector
 
 Open the Inspector tab and click **Scan text contrast**, or **Pick element** and click any text.
 Failures (measured below WCAG AA 4.5:1, or 3:1 for large text) and cases that need manual review
 (gradients, background images, overlaps) are outlined on the page and listed with colors, ratio,
 threshold and an explanation. **Preview fix** hands a verified failure to Fixer through
-`src/shared/issue-handoff.ts`. Outlines are drawn inside the AccessLens shadow root, so page styles are
+`src/shared/issue-handoff.ts`. Outlines are drawn inside the Perspective shadow root, so page styles are
 never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
 runs the contrast-mapping and simulator unit tests.
 

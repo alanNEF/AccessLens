@@ -31,9 +31,11 @@ const pause = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 const errorText = (cause: unknown) => cause instanceof Error ? cause.message : 'This correction could not be generated or applied.';
 
 /** Bulk state and orchestration; all page writes still go through the shared preview manager. */
-export function createBulkCorrections({ previewManager, readComputed, beforeRun, beforeEnable }: {
+export function createBulkCorrections({ previewManager, readComputed, readPalette, beforeRun, beforeEnable }: {
   previewManager: PreviewManager;
   readComputed: (element: Element, property: string) => string;
+  /** The site's own colors, read once per run (site-palette.ts). */
+  readPalette?: () => readonly string[];
   beforeRun: () => void;
   beforeEnable: (element: Element, property: SuggestedFix['property']) => void;
 }) {
@@ -73,6 +75,11 @@ export function createBulkCorrections({ previewManager, readComputed, beforeRun,
       // Read back the rendered property, just as individual Fixer previews do (FIX-06).
       const rendered = readComputed(element, item.fix.property);
       const ratio = state.owner === 'user' ? (readSolidContrast(element)?.ratio ?? Number.NaN) : item.fix.property === 'color'
+      if (item.fix.property === 'text-decoration-line') {
+        if (!rendered.includes('underline')) throw new Error('The page did not show the underline. The preview was restored.');
+        return { ...item, enabled: true, measuredRatio: undefined, failure: undefined };
+      }
+      const ratio = item.fix.property === 'color'
         ? contrastRatio(rendered, item.issue.backgroundColor)
         : contrastRatio(item.issue.textColor, rendered);
       if (!Number.isFinite(ratio) || ratio < item.issue.requiredRatio) throw new Error('The rendered color did not meet the required contrast. The preview was restored.');
@@ -150,12 +157,13 @@ export function createBulkCorrections({ previewManager, readComputed, beforeRun,
         }
         ids.add(item.id);
       }
+      const palette = readPalette?.();
       let skipped = 0;
       for (const [index, item] of items.entries()) {
         if (disposed || current !== version) return;
         if (item.issue.status !== 'failed') { skipped++; continue; }
         try {
-          const result = generateCorrection(item);
+          const result = generateCorrection(item, palette);
           if (!result.ok) { failures.push({ issue: item.issue, message: result.message }); continue; }
           if (owner === 'user' && !matchesOriginalContrast(result.element, result.issue)) { skipped++; continue; }
           let elementId = elementIds.get(item.element);

@@ -1,8 +1,21 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { browser } from 'wxt/browser';
-import { clampOffset, DEFAULT_OFFSET, dragOffset, isPanelOffset, nudgeOffset, passedThreshold, type PanelOffset } from './panel-position';
+import { clampOffset, DEFAULT_OFFSET, dragOffset, EDGE_MARGIN, isPanelOffset, nudgeOffset, passedThreshold, type PanelOffset, type Size } from './panel-position';
+import { isPanelSize, MIN_SIZE, resizeBox, resizeByKey, type PanelBox, type ResizeEdge } from './panel-size';
 
 const STORAGE_KEY = 'accesslens.position';
+const SIZE_STORAGE_KEY = 'accesslens.size';
+
+const viewportSize = (): Size => {
+  const doc = document.documentElement;
+  return { width: doc.clientWidth || innerWidth, height: doc.clientHeight || innerHeight };
+};
+
+/** A saved size can be too big for a smaller window: shrink it to fit, never below MIN_SIZE. */
+function fitSize(size: Size, viewport: Size): Size {
+  const fit = (value: number, min: number, room: number) => Math.round(Math.max(Math.min(min, room), Math.min(value, room)));
+  return { width: fit(size.width, MIN_SIZE.width, viewport.width - 2 * EDGE_MARGIN), height: fit(size.height, MIN_SIZE.height, viewport.height - 2 * EDGE_MARGIN) };
+}
 
 /**
  * Lets the user move the panel by dragging (pointer) or with arrow keys.
@@ -18,6 +31,10 @@ export function usePanelPosition(rootEl: HTMLElement | null) {
   const drag = useRef<{ id: number; x: number; y: number; start: PanelOffset; moved: boolean } | null>(null);
   /** Set when a drag just ended on the launcher, so the following click does not expand it. */
   const suppressClick = useRef(false);
+  /** User-chosen panel size; null means the default size from CSS. */
+  const [size, setSize] = useState<Size | null>(null);
+  const [resizing, setResizing] = useState(false);
+  const resize = useRef<{ id: number; x: number; y: number; edge: ResizeEdge; start: PanelBox; last?: PanelBox } | null>(null);
 
   const host = useCallback(() => {
     const root = rootEl?.getRootNode();
@@ -33,13 +50,20 @@ export function usePanelPosition(rootEl: HTMLElement | null) {
   }, [host]);
 
   const save = (next: PanelOffset) => { void browser.storage.local.set({ [STORAGE_KEY]: next }).catch(() => undefined); };
+  const saveSize = (next: Size | null) => {
+    const store = browser.storage.local;
+    void (next ? store.set({ [SIZE_STORAGE_KEY]: next }) : store.remove(SIZE_STORAGE_KEY)).catch(() => undefined);
+  };
 
-  // Restore the saved position once, clamped to this page's viewport.
+  // Restore the saved position and size once, fitted to this page's viewport.
   useEffect(() => {
     let mounted = true;
-    void browser.storage.local.get(STORAGE_KEY).then(result => {
+    void browser.storage.local.get([STORAGE_KEY, SIZE_STORAGE_KEY]).then(result => {
+      if (!mounted) return;
+      const savedSize = result[SIZE_STORAGE_KEY];
+      if (isPanelSize(savedSize)) setSize(fitSize(savedSize, viewportSize()));
       const saved = result[STORAGE_KEY];
-      if (mounted && isPanelOffset(saved)) setOffset(clamp(saved));
+      if (isPanelOffset(saved)) setOffset(clamp(saved));
     }).catch(() => undefined);
     return () => { mounted = false; };
   }, [clamp]);
@@ -51,6 +75,19 @@ export function usePanelPosition(rootEl: HTMLElement | null) {
     el.style.setProperty('--accesslens-right', `${offset.right}px`);
     el.style.setProperty('--accesslens-bottom', `${offset.bottom}px`);
   }, [offset, host]);
+
+  // Size variables are read by .accesslens-panel; removing them restores the CSS default.
+  useEffect(() => {
+    const el = host();
+    if (!el) return;
+    if (size) {
+      el.style.setProperty('--accesslens-width', `${size.width}px`);
+      el.style.setProperty('--accesslens-height', `${size.height}px`);
+    } else {
+      el.style.removeProperty('--accesslens-width');
+      el.style.removeProperty('--accesslens-height');
+    }
+  }, [size, host]);
 
   // Keep the panel on screen when the window shrinks or the panel grows.
   useEffect(() => {
@@ -71,7 +108,74 @@ export function usePanelPosition(rootEl: HTMLElement | null) {
     const el = host();
     el?.style.removeProperty('--accesslens-right');
     el?.style.removeProperty('--accesslens-bottom');
+    el?.style.removeProperty('--accesslens-width');
+    el?.style.removeProperty('--accesslens-height');
   }, [host]);
+
+  /** The panel's current box, measured from the expanded panel itself. */
+  function currentBox(): PanelBox | null {
+    const panel = rootEl?.querySelector('.accesslens-panel');
+    if (!panel) return null;
+    const rect = panel.getBoundingClientRect();
+    return { offset: offsetRef.current, size: { width: rect.width, height: rect.height } };
+  }
+
+  function applyBox(box: PanelBox) {
+    setSize(box.size);
+    setOffset(box.offset);
+  }
+
+  /** Pointer handlers for one invisible edge or corner grab zone. */
+  function resizeHandlers(edge: ResizeEdge) {
+    return {
+      onPointerDown(event: PointerEvent<HTMLElement>) {
+        if (event.button !== 0 || !event.isPrimary) return;
+        const start = currentBox();
+        if (!start) return;
+        event.preventDefault();
+        event.stopPropagation();
+        resize.current = { id: event.pointerId, x: event.clientX, y: event.clientY, edge, start };
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setResizing(true);
+      },
+      onPointerMove(event: PointerEvent<HTMLElement>) {
+        const r = resize.current;
+        if (!r || r.id !== event.pointerId) return;
+        event.preventDefault();
+        r.last = resizeBox(r.start, r.edge, event.clientX - r.x, event.clientY - r.y, viewportSize());
+        applyBox(r.last);
+      },
+      onPointerUp: endResize,
+      onPointerCancel: endResize,
+    };
+  }
+
+  function endResize(event: PointerEvent<HTMLElement>) {
+    const r = resize.current;
+    if (!r || r.id !== event.pointerId) return;
+    resize.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    setResizing(false);
+    // Save the last computed box, not a DOM measurement React may not have painted yet.
+    if (r.last) { saveSize(r.last.size); save(r.last.offset); }
+  }
+
+  /** Arrow keys on the resize handle: Left/Up grow, Right/Down shrink, Home restores the default size. */
+  function onResizeKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === 'Home') {
+      event.preventDefault();
+      setSize(null);
+      saveSize(null);
+      return;
+    }
+    const start = currentBox();
+    const next = start && resizeByKey(start, event.key, event.shiftKey, viewportSize());
+    if (!next) return;
+    event.preventDefault();
+    applyBox(next);
+    saveSize(next.size);
+    save(next.offset);
+  }
 
   function onPointerDown(event: PointerEvent<HTMLElement>) {
     if (event.button !== 0 || !event.isPrimary) return;
@@ -116,10 +220,13 @@ export function usePanelPosition(rootEl: HTMLElement | null) {
     save(clamped);
   }
 
+  /** Double-click on the header: default position and default size. */
   function reset() {
     const next = clamp(DEFAULT_OFFSET);
     setOffset(next);
     save(next);
+    setSize(null);
+    saveSize(null);
   }
 
   /** Wrap a click handler so it is skipped right after a drag. */
@@ -131,5 +238,5 @@ export function usePanelPosition(rootEl: HTMLElement | null) {
   }
 
   const dragHandlers = { onPointerDown, onPointerMove, onPointerUp: onPointerEnd, onPointerCancel: onPointerEnd };
-  return { offset, dragging, dragHandlers, onKeyDown, reset, guardClick };
+  return { offset, dragging, dragHandlers, onKeyDown, reset, guardClick, resizing, resizeHandlers, onResizeKeyDown };
 }

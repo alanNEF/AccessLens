@@ -139,3 +139,69 @@ test('opacity: random cases pass as drawn, or are honestly impossible', () => {
   }
   assert.ok(fixed > 50 && impossible > 5, `fixed ${fixed}, impossible ${impossible}`);
 });
+
+test('enhanced 7:1 on a mid-tone background falls back to changing the background', () => {
+  // White text on #777777 is 4.48:1; neither black (4.69:1) nor white text can reach 7:1.
+  const result = suggestFix(issue('#ffffff', '#777777', 7));
+  assert.equal(result.ok, true);
+  assert.equal(result.fix.property, 'background-color');
+  assert.equal(result.fix.originalValue, '#777777');
+  assert.ok(wcag('#ffffff', result.fix.suggestedValue) >= 7);
+  assert.ok(result.fix.expectedContrastRatio >= 7);
+});
+
+test('enhanced 7:1 prefers a text change when one exists', () => {
+  const result = suggestFix(issue('#4b5563', '#f4f1ea', 7));
+  assert.equal(result.ok, true);
+  assert.equal(result.fix.property, 'color');
+  assert.ok(wcag(result.fix.suggestedValue, '#f4f1ea') >= 7);
+});
+
+// ── Color-blind-safe suggestions and the site's own palette ──────────────────
+const vision = await import('data:text/javascript;base64,' + Buffer.from((await build({ entryPoints: ['src/features/fixer/color-vision.ts'], bundle: true, write: false, format: 'esm' })).outputFiles[0].text).toString('base64'));
+const simulatedOk = (text, bg, required) => vision.VISION_CHECKS.every(check => wcag(vision.simulateColor(text, check), vision.simulateColor(bg, check)) >= required);
+
+test('Health card: the fix now also passes with Deuteranopia (old fix reached only 4.46:1)', () => {
+  const { fix } = suggestFix({ ...issue('#07271c', '#43e8b0'), opacity: 0.6 });
+  assert.equal(fix.colorBlindSafe, true);
+  assert.ok(fix.simulatedRatios.deuteranopia >= 4.5);
+  assert.ok(simulatedOk(blend(fix.suggestedValue, '#43e8b0', 0.6), '#43e8b0', 4.5));
+});
+
+test('color-blind-safe claims hold for random colors; WCAG is always met', () => {
+  let seed = 23;
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const hex = () => '#' + Array.from({ length: 3 }, () => Math.floor(random() * 256).toString(16).padStart(2, '0')).join('');
+  let safe = 0;
+  for (let i = 0; i < 300; i++) {
+    const [text, bg, required] = [hex(), hex(), random() < 0.5 ? 4.5 : 3];
+    if (wcag(text, bg) >= required) continue;
+    const result = suggestFix(issue(text, bg, required));
+    if (!result.ok || result.fix.property !== 'color') continue;
+    assert.ok(wcag(result.fix.suggestedValue, bg) >= required);
+    assert.equal(result.fix.colorBlindSafe, simulatedOk(result.fix.suggestedValue, bg, required), `${result.fix.suggestedValue} on ${bg}`);
+    if (result.fix.colorBlindSafe) safe++;
+  }
+  assert.ok(safe > 100, `color-blind safe in ${safe} cases`);
+});
+
+test('a passing site color is preferred; the adjusted shade becomes the alternative (market Subscribe button)', () => {
+  const result = suggestFix({ ...issue('#ffffff', '#f59e0b'), palette: ['#1f2937', '#ffffff', '#1f5135'] });
+  assert.equal(result.fix.source, 'site-palette');
+  assert.equal(result.fix.suggestedValue, '#1f2937');
+  assert.ok(wcag('#1f2937', '#f59e0b') >= 4.5);
+  assert.equal(result.alternative.source, 'adjusted');
+});
+
+test('a much closer adjusted shade wins; the site color is offered as the alternative', () => {
+  const result = suggestFix({ ...issue('#999999', '#ffffff'), palette: ['#1f5135'] });
+  assert.equal(result.fix.source, 'adjusted');
+  assert.equal(result.alternative.suggestedValue, '#1f5135');
+  assert.equal(result.alternative.source, 'site-palette');
+});
+
+test('site colors that fail, are transparent or invalid are ignored', () => {
+  const result = suggestFix({ ...issue('#999999', '#ffffff'), palette: ['#aaaaaa', 'rgba(0, 0, 0, 0.5)', 'not-a-color'] });
+  assert.equal(result.fix.source, 'adjusted');
+  assert.equal(result.alternative, undefined);
+});

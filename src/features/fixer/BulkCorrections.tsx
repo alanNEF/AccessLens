@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Wrench } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import type { InspectorStore } from '../inspector/inspector-store';
 import type { FixerController } from './fixer-controller';
@@ -20,7 +20,7 @@ export function BulkCorrections({ controller, inspector }: { controller: FixerCo
       <Button type="button" className="w-full" disabled={busy} onClick={() => {
         const items = inspected.picked ? [inspected.picked, ...inspected.issues] : inspected.issues;
         void controller.bulk.run(items);
-      }}><Sparkles aria-hidden="true" />{generating ? 'Generating corrections…' : 'Run All Corrections'}</Button>
+      }}><Wrench aria-hidden="true" />{generating ? 'Generating corrections…' : 'Run All Corrections'}</Button>
 
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
         {generating ? 'Generating and validating supported corrections…'
@@ -41,15 +41,17 @@ export function BulkCorrections({ controller, inspector }: { controller: FixerCo
             <label className="flex cursor-pointer items-start gap-2 text-xs font-medium">
               <input type="checkbox" checked={item.enabled} disabled={busy} onChange={event => controller.bulk.setEnabled(item.id, event.currentTarget.checked)}
                 className="mt-0.5 size-4 shrink-0 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" />
-              <span className="min-w-0 break-words">Low contrast — {item.issue.elementLabel}</span>
+              <span className="min-w-0 break-words">{item.issue.kind === 'link-color-only' ? 'Color-only link' : 'Low contrast'} — {item.issue.elementLabel}</span>
             </label>
             <div className="mt-2 space-y-1 pl-6 text-xs text-muted-foreground">
               <code className="block break-all">{item.issue.selector}</code>
               <p>Original: <code>{item.fix.originalValue}</code></p>
               <p>Suggested {item.fix.property}: <code>{item.fix.suggestedValue}</code></p>
-              <p>{item.enabled && item.measuredRatio !== undefined
-                ? `Measured ${item.measuredRatio.toFixed(2)}:1 — meets ${item.issue.requiredRatio}:1`
-                : `Not applied · target ${item.issue.requiredRatio}:1`}</p>
+              <p>{item.fix.property === 'text-decoration-line'
+                ? (item.enabled ? 'Underline showing on the page' : 'Not applied · adds an underline')
+                : item.enabled && item.measuredRatio !== undefined
+                  ? `Measured ${item.measuredRatio.toFixed(2)}:1 — meets ${item.issue.requiredRatio}:1`
+                  : `Not applied · target ${item.issue.requiredRatio}:1`}</p>
               {item.failure && <p role="alert" className="text-destructive">{item.failure}</p>}
             </div>
           </li>)}

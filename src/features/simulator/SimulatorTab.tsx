@@ -1,5 +1,5 @@
 import { useId, useSyncExternalStore } from 'react';
-import { Check, CircleOff, Eye, Focus, Info, RotateCcw } from 'lucide-react';
+import { Check, CircleOff, CloudFog, Contrast, Eye, Focus, Info, Palette, RotateCcw } from 'lucide-react';
 import type { SimulationMode } from '../../shared/types';
 import type { SimulatorController } from './simulator-controller';
 import type { SimulatorModeReader } from '../../shared/simulator-mode-reader';
@@ -14,6 +14,9 @@ const modes = [
   { id: 'deuteranopia', description: 'Green sensitivity', icon: Eye },
   { id: 'tritanopia', description: 'Blue sensitivity', icon: Eye },
   { id: 'visionless', description: 'Keyboard and spoken focus', icon: Eye },
+  { id: 'achromatopsia', description: 'No color, grayscale only', icon: Palette },
+  { id: 'cataracts', description: 'Hazy, faded, yellowed', icon: CloudFog },
+  { id: 'low-contrast', description: 'Washed-out light and dark', icon: Contrast },
   { id: 'blur', description: 'Reduced visual clarity', icon: Focus },
 ] as const;
 

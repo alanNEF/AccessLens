@@ -1,9 +1,19 @@
 export type FeatureId = 'simulator' | 'inspector' | 'fixer';
 export type OperatingMode = 'developer' | 'user';
 
-export type SimulationMode = 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'blur' | 'visionless';
+export type SimulationMode =
+  | 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia'
+  | 'blur' | 'cataracts' | 'low-contrast' | 'visionless';
 
 /** failed = measured and below threshold; needs-review = could not be measured reliably. */
+export type ContrastLevel = 'AA' | 'AAA';
+/**
+ * text-contrast:    text vs its background (WCAG 1.4.3 AA, or 1.4.6 AAA "enhanced" for low vision).
+ * link-color-only:  a link inside a paragraph that differs from the surrounding text only by color (WCAG 1.4.1).
+ *                   For these, textColor = link color, backgroundColor = surrounding text color,
+ *                   contrastRatio = link vs surrounding text, requiredRatio = 3.
+ */
+export type IssueKind = 'text-contrast' | 'link-color-only';
 export type ContrastStatus = 'failed' | 'needs-review' | 'passed';
 
 /**
@@ -20,13 +30,15 @@ export interface ContrastIssue {
   textColor: string | null;
   backgroundColor: string | null;
   contrastRatio: number | null;
-  /** 4.5 for normal text, 3 for large text (WCAG AA). */
+  /** AA: 4.5 normal / 3 large. AAA (enhanced): 7 normal / 4.5 large. Color-only links: 3. */
   requiredRatio: number;
   isLargeText: boolean;
   status: ContrastStatus;
   /** Plain-language reason a needs-review case could not be measured. */
   reviewReason?: string;
-  wcagCriterion: '1.4.3';
+  wcagCriterion: '1.4.3' | '1.4.6' | '1.4.1';
+  /** Defaults to 'text-contrast' when absent. */
+  kind?: IssueKind;
 }
 
 /** A failure with every value Fixer needs (FIX-01). */
@@ -43,9 +55,15 @@ export function isVerifiedFailure(issue: ContrastIssue): issue is VerifiedContra
 
 export interface SuggestedFix {
   issueId: string;
-  property: 'color' | 'background-color';
+  property: 'color' | 'background-color' | 'text-decoration-line';
   originalValue: string;
   suggestedValue: string;
   originalContrastRatio: number;
   expectedContrastRatio: number;
+  /** 'adjusted': lightness-shifted original; 'site-palette': a color the page already uses. */
+  source?: 'adjusted' | 'site-palette';
+  /** True when it also meets the target under protanopia, deuteranopia and tritanopia simulation. */
+  colorBlindSafe?: boolean;
+  /** Contrast under each color-vision simulation, truncated to 2 decimals. */
+  simulatedRatios?: Readonly<Partial<Record<'protanopia' | 'deuteranopia' | 'tritanopia', number>>>;
 }
