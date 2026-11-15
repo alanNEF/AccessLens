@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { runCrossSite } from './cross-site.mjs';
 import { runUiRedesign } from './ui-redesign.mjs';
+import { runBulkCorrections } from './bulk-corrections.mjs';
 import { build } from 'esbuild';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -14,9 +15,11 @@ const work = await mkdtemp(join(tmpdir(), 'accesslens-simulator-'));
 const profile = join(work, 'profile');
 const html = await readFile('demo-site/index.html');
 const compatibility = await readFile('demo-site/compatibility.html');
+const bulkHtml = await readFile('demo-site/bulk-corrections.html');
 const server = createServer((req, res) => {
   res.setHeader('Content-Type', 'text/html');
   if (req.url === '/bare') return res.end('<!doctype html><body>Bare text<p>Wrapped content</p></body>');
+  if (req.url.startsWith('/bulk-corrections.html')) return res.end(bulkHtml);
   if (req.url.startsWith('/compatibility.html')) return res.end(compatibility);
   if (req.url === '/base') return res.end(html.toString().replace('<head>', '<head><base href="/">'));
   res.end(req.url === '/unsupported' ? '<!doctype html><style>body {filter:sepia(1)}</style><body><h1>Unsafe ancestor</h1></body>' : html);
@@ -122,6 +125,9 @@ try {
   }
   await call('Page.enable');
   await call('Runtime.enable');
+  if (process.env.ACCESSLENS_BULK_ONLY) {
+    await runBulkCorrections({call,evaluate,waitFor,select,shadow,triggerToolbar,work,url,deactivate:()=>cdp('Extensions.uninstall',{id:extension.id})});
+  } else {
   if (process.env.ACCESSLENS_CROSS_SITE) await runCrossSite({call,evaluate,waitFor,select,shadow,owned,work,extensionErrors});
   await call('Page.navigate', { url });
   await waitFor(`${shadow}?.querySelector('button')`);
@@ -189,23 +195,66 @@ try {
   await writeFile(join(work,'performance.json'), JSON.stringify(performanceReport,null,2));
   console.log('PASS action-to-paint proxy <300ms:', JSON.stringify(performanceReport));
   await select('Reset');
+  // Visionless uses native page focus/activation under a pointer-transparent blackout.
+  await evaluate(`const button=document.createElement('button');button.id='visionless-native-activation';button.textContent='Native action';window.nativeClicks=0;button.addEventListener('click',()=>window.nativeClicks++);document.querySelector('main').append(button)`);
+  await select('Visionless');
+  await select('Visionless');
+  await select('Collapse AccessLens');
+  const expandPoint=await evaluate(`(()=>{const b=${button('Expand AccessLens')};const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+  const expandShot=await call('Page.captureScreenshot',{clip:{...expandPoint,width:1,height:1,scale:1}});
+  const expandPixel=await evaluate(`(async()=>{const img=await createImageBitmap(await(await fetch('data:image/png;base64,${expandShot.data}')).blob());const c=document.createElement('canvas');c.width=1;c.height=1;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(0,0,1,1).data];})()`);
+  assert.ok(expandPixel.slice(0,3).some(v=>v>0),'Collapsed expand icon must paint above the blackout');
+  await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...expandPoint});
+  await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...expandPoint});
+  assert.equal(await evaluate(`${shadow}.querySelectorAll('[data-accesslens-visionless]').length`),1);
+
+  assert.equal(await evaluate(`${shadow}.querySelectorAll('[data-accesslens-visionless]').length`),1);
+  assert.equal(await evaluate(`${shadow}.querySelector('[data-accesslens-visionless]').style.pointerEvents`),'none');
+  const blackout = await call('Page.captureScreenshot');
+  await writeFile(join(work,'visionless.png'),Buffer.from(blackout.data,'base64'));
+  const blackPixel=await evaluate(`(async()=>{const blob=await(await fetch('data:image/png;base64,${blackout.data}')).blob();const img=await createImageBitmap(blob);const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(50,100,1,1).data];})()`);
+  assert.deepEqual(blackPixel,[0,0,0,255]);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('accesslens-panel')).filter`),'none');
+  await evaluate(`document.querySelector('input[name=name]').focus()`);
+  await call('Input.insertText',{text:'Visionless input'});
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
+  assert.equal(await evaluate('document.activeElement.localName'),'select');
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,modifiers:8});
+  await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9,modifiers:8});
+  assert.equal(await evaluate('document.activeElement.name'),'name');
+  await evaluate(`document.querySelector('#visionless-native-activation').focus()`);
+  for(const [key,code,virtual,text] of [['Enter','Enter',13,'\r'],[' ','Space',32,' ']]) {
+    await call('Input.dispatchKeyEvent',{type:'keyDown',key,code,windowsVirtualKeyCode:virtual,text});
+    await call('Input.dispatchKeyEvent',{type:'keyUp',key,code,windowsVirtualKeyCode:virtual});
+  }
+  assert.equal(await evaluate('nativeClicks'),2);
+  await evaluate('new Promise(r=>setTimeout(r,200))');
+  console.log('VISIONLESS Chrome TTS status:',await evaluate(`${shadow}.querySelector('p[aria-live=polite]:not([role])')?.textContent`));
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+  await select('Exit Visionless');
+  assert.equal(await evaluate(`${shadow}.querySelectorAll('[data-accesslens-visionless]').length`),0);
+  assert.equal(await evaluate(`document.querySelector('input[name=name]').value`),'Visionless input');
+  await evaluate(`document.querySelector('input[name=name]').value='';document.querySelector('#visionless-native-activation').remove();scrollTo(0,0)`);
+  console.log('PASS Visionless blackout pixels, panel exclusion, native Tab/Shift+Tab, Escape, Exit and preserved input');
   const panelBefore = await screenshot('panel-off', `${shadow}.querySelector('h1')`);
   const swatchBefore = await screenshot('swatch-off', `document.querySelector('.red')`);
   const baselineHeight = await evaluate('document.documentElement.scrollHeight');
   const painted = new Set();
-  for (const mode of ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Low Acuity']) {
+  const svgModes = ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Achromatopsia'];
+  for (const mode of ['Protanopia', 'Deuteranopia', 'Tritanopia', 'Achromatopsia', 'Cataracts', 'Low Contrast', 'Low Acuity']) {
     await select(mode);
-    assert.equal(await evaluate(owned), mode === 'Low Acuity' ? 1 : 2);
+    assert.equal(await evaluate(owned), svgModes.includes(mode) ? 2 : 1);
     assert.equal(await evaluate(`${shadow}.querySelector('[role=alert]')?.textContent || ''`), '');
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('accesslens-panel')).filter`), 'none');
     assert.equal(await screenshot(`panel-${mode === 'Low Acuity' ? 'blur' : 'color'}`, `${shadow}.querySelector('h1')`), panelBefore, 'Panel heading pixels must remain identical');
     assert.notEqual(await screenshot(`swatch-${mode === 'Low Acuity' ? 'blur' : 'color'}`, `document.querySelector('.red')`), swatchBefore, 'Page pixels must change');
-    if (mode !== 'Low Acuity') {
+    if (svgModes.includes(mode)) {
       const crop = await screenshot('reference-' + mode, `document.querySelector('.red')`);
       painted.add(crop);
       const pixel = await evaluate(`(async () => {const b=await (await fetch('data:image/png;base64,${crop}')).blob(); const img=await createImageBitmap(b); const c=document.createElement('canvas'); c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return [...ctx.getImageData(120,85,1,1).data];})()`);
       // Independent reference fixture: linear-light matrix output for #e00000.
-      const expected = { Protanopia: [94,82,0,255], Deuteranopia: [142,125,0,255], Tritanopia: [248,0,12,255] }[mode];
+      const expected = { Protanopia: [94,82,0,255], Deuteranopia: [142,125,0,255], Tritanopia: [248,0,12,255], Achromatopsia: [111,111,111,255] }[mode];
       assert.ok(pixel.every((v,i)=>Math.abs(v-expected[i])<=3), `${mode} reference ${pixel} vs ${expected}`);
     }
     assert.equal(await evaluate('document.documentElement.scrollHeight'), baselineHeight);
@@ -240,7 +289,7 @@ try {
     assert.equal(await screenshot('swatch-restored', `document.querySelector('.red')`), swatchBefore);
     console.log(`PASS ${mode}: painted page, identical panel pixels, forms, modal, anchors, fixed header, scrolling and Reset`);
   }
-  assert.equal(painted.size, 3, 'Three presets must paint distinctly');
+  assert.equal(painted.size, 4, 'Four color-matrix presets must paint distinctly');
   // Keyboard-operate simulator controls. Repeated selections do not add nodes.
   await call('Emulation.setFocusEmulationEnabled', { enabled: true });
   await evaluate(`${button('Protanopia')}.focus()`);
@@ -260,7 +309,7 @@ try {
   assert.equal(await evaluate(`${shadow}.querySelector('[role=tab]').getAttribute('aria-selected')`), 'true');
   assert.match(await evaluate(`${shadow}.textContent`), /approximations.*do not represent any individual.s lived visual experience/s);
   await evaluate(`${button('Off')}.focus()`);
-  for (const label of ['Protanopia','Deuteranopia','Tritanopia','Low Acuity']) {
+  for (const label of ['Protanopia','Deuteranopia','Tritanopia','Visionless','Achromatopsia','Cataracts','Low Contrast','Low Acuity']) {
     await call('Input.dispatchKeyEvent', {type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
     await call('Input.dispatchKeyEvent', {type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9});
     assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`), label);
@@ -395,6 +444,28 @@ try {
   await select('Reset');
   assert.equal(await evaluate(`document.querySelectorAll('*').length > 0 && [...document.querySelectorAll('*')].some(n=>n.getAttributeNames().some(a=>a.startsWith('data-accesslens-spike-')))`),false);
   console.log('PASS unmarked layout, SPA/root/body replacement, composed author filters, async Off/error and marker cleanup');
+  await select('Visionless');
+  await evaluate(`const a=document.createElement('a');a.href=${JSON.stringify(url.replace('127.0.0.1','localhost')+'/compatibility.html')};a.id='visionless-navigation-link';a.textContent='Next page';document.body.append(a);a.focus()`);
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',text:'\r',windowsVirtualKeyCode:13});
+  await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+  let carried=false;
+  for(let attempt=0;attempt<100;attempt++){
+    if(await evaluate(`location.pathname==='/compatibility.html' && Boolean(${shadow}?.querySelector('[data-accesslens-visionless]'))`)){carried=true;break;}
+    await new Promise(r=>setTimeout(r,50));
+  }
+  assert.ok(carried,'Enter navigation must restore Visionless automatically without a toolbar click');
+  const isolatedTab=await cdp('Target.createTarget',{url:url+'/base'});
+  const isolatedSession=await cdp('Target.attachToTarget',{targetId:isolatedTab.targetId,flatten:true});
+  await new Promise(r=>setTimeout(r,300));
+  const isolatedState=await cdp('Runtime.evaluate',{expression:`Boolean(document.querySelector('accesslens-panel'))`,returnByValue:true},isolatedSession.sessionId);
+  assert.equal(isolatedState.result.value,false,'Visionless continuation must not leak into another tab');
+  await cdp('Target.closeTarget',{targetId:isolatedTab.targetId});
+  await call('Page.bringToFront');
+  await select('Exit Visionless');
+  await call('Page.reload');
+  await evaluate('new Promise(r=>setTimeout(r,400))');
+  assert.equal(await evaluate(`Boolean(${shadow}?.querySelector('[data-accesslens-visionless]'))`),false);
+  console.log('PASS Visionless Enter navigation carry-over and explicit Exit clearing it');
   await call('Page.navigate', { url: url + '/compatibility.html' });
   await waitFor(`${shadow}?.querySelector('button')`);
   await select('Tritanopia');
@@ -468,6 +539,7 @@ try {
   await cdp('Extensions.uninstall', { id: extension.id });
   await waitFor(`${owned} === 0 && !document.querySelector('accesslens-panel')`);
   console.log('PASS narrow viewport panel bounds and actual extension disable/re-enable/uninstall cleanup');
+  }
   console.log('Chrome:', (await cdp('Browser.getVersion')).product);
   console.log('Screenshots:', work);
 } finally {

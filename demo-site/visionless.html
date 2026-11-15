@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Visionless Lite playground</title>
+<style>body{font:18px/1.6 system-ui;margin:32px;background:#f5f6fa;color:#172033}main{max-width:700px;padding-bottom:420px}label{display:block;margin:16px 0}input,button,select{font:inherit;padding:8px}button{margin:8px}.icon{width:50px}</style></head>
+<body><main>
+<h1>Visionless Lite playground</h1>
+<p>Open AccessLens with its toolbar icon, select Visionless, then use Tab and Shift+Tab to navigate. Escape stops speech; Exit Visionless restores the page.</p>
+<p>This simplified experience does not replace a real screen reader or reproduce blindness. Compare labeled and unlabeled controls below.</p>
+<a href="index.html">Original simulator demo</a>
+<form onsubmit="event.preventDefault()">
+<label>Email address <input type="email" required autocomplete="off"></label>
+<label>Password (values are never narrated) <input type="password" autocomplete="off"></label>
+<label><input type="checkbox"> Remember me</label>
+<label><input type="radio" name="delivery" checked> Standard shipping</label>
+<label><input type="radio" name="delivery"> Express shipping</label>
+<label>Country <select><option>United States</option><option>Canada</option></select></label>
+<button type="button" aria-label="Open settings" class="icon">⚙</button>
+<button type="button" class="icon"><svg width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="currentColor"/></svg></button>
+<p>The second icon button intentionally lacks a name. The next input intentionally lacks a label.</p>
+<input autocomplete="off">
+<button type="button" id="counter">Activate me</button><output id="count">Activated 0 times</output>
+<button type="button" disabled>Unavailable action</button>
+<button type="button" aria-expanded="false" id="disclosure">More options</button>
+</form>
+<p>Space and Enter should activate native buttons normally. Disabled controls are skipped by native tabbing, as expected.</p>
+</main>
+<script>let count=0;document.querySelector('#counter').addEventListener('click',()=>document.querySelector('#count').textContent=`Activated ${++count} times`);document.querySelector('#disclosure').addEventListener('click',event=>event.currentTarget.setAttribute('aria-expanded',String(event.currentTarget.getAttribute('aria-expanded')!=='true')));</script>
+</body></html>

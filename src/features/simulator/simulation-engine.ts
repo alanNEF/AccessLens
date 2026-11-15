@@ -1,3 +1,4 @@
+import { createVisionlessEngine } from './visionless/visionless-engine';
 import { PRESETS, BLUR, normalizeBlur } from './filters';
 import { createSimulatorDom } from './simulator-dom';
 import type { SimulationMode } from '../../shared/types';
@@ -12,9 +13,11 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
   let disposed = false;
   let active: { mode: SimulationMode; blurPx: number } | undefined;
   const errors = new Set<(error: Error) => void>();
+  const visionless = createVisionlessEngine(doc,panelHost);
   const dom = createSimulatorDom(doc, panelHost, owner);
 
   function reset() {
+    visionless.disable();
     active = undefined;
     dom.clear();
     style?.remove();
@@ -27,6 +30,11 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
     try {
       if (disposed) throw new Error('Simulator engine has been disposed.');
       if (!Object.hasOwn(PRESETS, mode)) throw new Error('Unknown simulation mode.');
+      if (mode === 'visionless') {
+        if (active?.mode !== 'visionless') { reset(); visionless.enable(); active={mode,blurPx}; }
+        return;
+      }
+      visionless.disable();
       if (mode === 'none') { reset(); return; }
       const intensity = normalizeBlur(blurPx);
       // Clear our rule synchronously before checking author filters. Reuse the
@@ -60,11 +68,17 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
         svg?.remove();
         svg = undefined;
       }
+      // Which filter to apply: Low Acuity blur, a CSS filter preset, or the SVG color matrix.
+      const effect = mode === 'blur' ? `blur(${intensity}px)`
+        : 'css' in preset ? preset.css
+        : `url("${doc.URL.split('#')[0]}#${owner}")`;
+      // Blurring effects bleed past the element's edges; clip that halo.
+      const clipHalo = mode === 'blur' || ('halo' in preset && preset.halo);
       style ??= doc.createElement('style');
       style.dataset.accesslensSimulatorOwned = owner;
       // Clip after filtering to contain the halo without changing layout or
       // scrolling. This also clips overflowing descendants and shadows.
-      style.textContent = targets.map(target => `${target.selector} { filter: ${target.filter === 'none' ? '' : target.filter + ' '}${mode === 'blur' ? `blur(${intensity}px)` : `url("${doc.URL.split('#')[0]}#${owner}")`} !important; ${mode === 'blur' && target.clipPath === 'none' ? 'clip-path: inset(0) !important;' : ''} }`).join('\n');
+      style.textContent = targets.map(target => `${target.selector} { filter: ${target.filter === 'none' ? '' : target.filter + ' '}${effect} !important; ${clipHalo && target.clipPath === 'none' ? 'clip-path: inset(0) !important;' : ''} }`).join('\n');
       doc.head.append(style);
       // Catch blocked styles / conflicting author rules; painting is browser-tested.
       if (targets.some(({node, filter}) => doc.defaultView!.getComputedStyle(node).filter === filter)) {
@@ -86,12 +100,15 @@ export function createSimulationEngine(doc: Document, panelHost: HTMLElement) {
   }
   return {
     apply,
+    stopSpeech: visionless.stopSpeech,
+    getSpeechStatus: visionless.getSpeechStatus,
+    subscribeSpeech: visionless.subscribeSpeech,
     subscribeErrors(listener: (error: Error) => void) {
       errors.add(listener);
       return () => { errors.delete(listener); };
     },
     reset,
-    dispose() { reset(); disposed = true; errors.clear(); },
+    dispose() { reset(); disposed = true; visionless.dispose(); errors.clear(); },
   };
 }
 export type SimulationEngine = ReturnType<typeof createSimulationEngine>;

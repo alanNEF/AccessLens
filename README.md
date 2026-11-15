@@ -54,6 +54,11 @@ root replacement and new content without demo-specific markers.
 
 ## Panel appearance
 
+Drag the panel by its header (or the collapsed launcher) to move it anywhere on the page. Keyboard users can
+focus the grip button and use the arrow keys (Shift for bigger steps, Home to reset); double-clicking the
+header also resets it. The position is kept on screen when the window resizes and is remembered in
+`browser.storage.local` as `accesslens.position`.
+
 Use the minus button in the panel header to collapse AccessLens to a small
 bottom-right launcher. Select the launcher to expand it again. Collapsing keeps
 the active simulation, selected tab and settings; the toolbar icon still closes
@@ -67,6 +72,24 @@ tooltip overlays stay within the extension's Shadow DOM.
 See [UI implementation and validation](docs/ui-redesign.md) for changed files,
 dependencies, accessibility details and browser checks.
 
+## From simulation to fix
+
+| Simulation | Inspector check | Fixer |
+|---|---|---|
+| Low Contrast, Cataracts | Enhanced contrast, WCAG 1.4.6 (AAA): 7:1, or 4.5:1 for large text. Auto-selected for these modes; switchable any time. | Text color reaching 7:1, or the background color when no text color can |
+| Achromatopsia (and other color modes) | Links that rely on color alone, WCAG 1.4.1 (axe `link-in-text-block`). Checked in every scan. | `text-decoration-line: underline` |
+| All | Text contrast, WCAG 1.4.3 (AA) | Text color reaching 4.5:1 / 3:1 |
+
+Not every simulated barrier is automatically detectable: for example, status badges whose words differ
+pass WCAG even if their colors look alike. Those remain review points rather than automated failures.
+
+## Simulator modes
+
+Protanopia, Deuteranopia and Tritanopia use the Machado et al. (2009) matrices. Achromatopsia maps every
+color to its luminance (grayscale) in linear RGB. Cataracts (hazy, faded, yellowed) and Low Contrast
+(washed-out light and dark) are illustrative CSS filter approximations, not calibrated clinical models.
+Low Acuity is an adjustable blur; Visionless blacks out the page and narrates keyboard focus.
+
 ## Inspector
 
 Open the Inspector tab and click **Scan text contrast**, or **Pick element** and click any text.
@@ -76,3 +99,26 @@ threshold and an explanation. **Preview fix** hands a verified failure to Fixer 
 `src/shared/issue-handoff.ts`. Outlines are drawn inside the AccessLens shadow root, so page styles are
 never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
 runs the contrast-mapping and simulator unit tests.
+
+## Bulk Fixer previews
+
+Use **Scan page** in Inspector, open Fixer and choose **Run All Corrections**.
+Supported text-contrast suggestions are validated and enabled immediately. Toggle individual
+checkboxes, **Select All**, **Deselect All**, or **Restore Original** to compare temporary changes.
+Unsupported results and failed corrections are reported separately. Existing single-issue previews
+remain available; the latest action owns a given element/property.
+
+Try `demo-site/bulk-corrections.html`. Run `npm run test:bulk` for DOM/state tests and
+`npm run test:bulk:e2e` for the production extension in an isolated Chrome profile.
+See [implementation, changed files and validation](docs/fixer/bulk-corrections.md).
+
+## Visionless Lite
+
+Reload the built extension for its new `tts` permission, then try
+[the Visionless playground](http://127.0.0.1:8081/visionless.html).
+Select Visionless from Simulator, use Tab/Shift+Tab and native Enter/Space,
+and press Escape to stop speech. Stop Speech and Exit Visionless remain in
+an unobscured panel. Local OS voices are required for narration.
+
+Run `npm run test:visionless` for Vitest coverage. See
+[implementation, files, validation and limitations](docs/simulator/visionless-lite.md).

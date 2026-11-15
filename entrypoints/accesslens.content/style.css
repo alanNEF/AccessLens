@@ -3,16 +3,19 @@
 :host {
   all: initial;
   position: fixed !important;
-  right: 16px !important;
-  bottom: 16px !important;
+  /* Set by usePanelPosition when the user moves the panel; defaults match the original corner. */
+  right: var(--accesslens-right, 16px) !important;
+  bottom: var(--accesslens-bottom, 16px) !important;
   z-index: 2147483647 !important;
 }
 
 .accesslens-panel {
   container: accesslens / inline-size;
-  width: 380px;
-  max-width: calc(100vw - 32px);
-  max-height: calc(100dvh - 32px);
+  /* Set by usePanelPosition when the user resizes the panel. Limits match its 8px edge margin. */
+  width: var(--accesslens-width, 380px);
+  height: var(--accesslens-height, auto);
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 16px);
 }
 
 @container accesslens (max-width: 340px) {
@@ -33,3 +36,26 @@
 .inspector-highlight--review .inspector-highlight-label { background: #7c3aed; }
 .inspector-highlight--pass .inspector-highlight-label { background: #15803d; }
 .accesslens-panel { position: relative; z-index: 1; }
+
+/* Movable panel: the header and launcher are drag handles. */
+.accesslens-drag-handle { touch-action: none; cursor: grab; user-select: none; }
+.accesslens-ui[data-dragging='true'] .accesslens-drag-handle,
+.accesslens-ui[data-dragging='true'] { cursor: grabbing; user-select: none; }
+
+/* Resizable panel: invisible grab zones on every edge and corner, above the panel content. */
+.accesslens-resize { position: absolute; z-index: 2; touch-action: none; margin: 0; padding: 0; border: 0; background: transparent; }
+.accesslens-resize--n, .accesslens-resize--s { left: 14px; right: 14px; height: 6px; cursor: ns-resize; }
+.accesslens-resize--e, .accesslens-resize--w { top: 14px; bottom: 14px; width: 6px; cursor: ew-resize; }
+.accesslens-resize--n { top: 0; }
+.accesslens-resize--s { bottom: 0; }
+.accesslens-resize--e { right: 0; }
+.accesslens-resize--w { left: 0; }
+.accesslens-resize--nw, .accesslens-resize--ne, .accesslens-resize--sw, .accesslens-resize--se { width: 14px; height: 14px; }
+/* .accesslens-ui prefix: outranks the global `.accesslens-ui button { cursor: pointer }`. */
+.accesslens-ui .accesslens-resize--nw { top: 0; left: 0; cursor: nwse-resize; border-top-left-radius: 14px; }
+.accesslens-resize--se { bottom: 0; right: 0; cursor: nwse-resize; }
+.accesslens-resize--ne { top: 0; right: 0; cursor: nesw-resize; }
+.accesslens-resize--sw { bottom: 0; left: 0; cursor: nesw-resize; }
+/* The keyboard corner shows a visible grip only when focused from the keyboard. */
+.accesslens-resize--nw:focus-visible { outline: 3px solid var(--ring); outline-offset: -3px; background: var(--accent); }
+.accesslens-ui[data-resizing='true'], .accesslens-ui[data-resizing='true'] * { user-select: none; }

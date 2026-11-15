@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { Eye, ScanLine, SlidersHorizontal, Sparkles, Sun, Moon, Monitor, ShieldCheck, Minus, ChevronUp } from 'lucide-react';
+import { Eye, ScanLine, SlidersHorizontal, Sparkles, Sun, Moon, Monitor, ShieldCheck, Minus, ChevronUp, GripVertical } from 'lucide-react';
 import { SimulatorTab } from '../features/simulator/SimulatorTab';
 import { InspectorTab } from '../features/inspector/InspectorTab';
 import { FixerTab } from '../features/fixer/FixerTab';
@@ -20,6 +20,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 import { Switch } from './ui/switch';
 import { OverlayContainerContext } from './shared/overlay-container';
 import { useTheme } from './shared/use-theme';
+import { usePanelPosition } from './shared/use-panel-position';
+import { RESIZE_EDGES } from './shared/panel-size';
 
 export function AccessLensPanel({ controller, modeReader, inspector, handoff, fixer }: {
   controller: SimulatorController;
@@ -30,6 +32,8 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
 }) {
   const { ready, theme, preference, changeTheme, storageError } = useTheme();
   const [overlayContainer, setOverlayContainer] = useState<HTMLDivElement | null>(null);
+  const [rootEl, setRootEl] = useState<HTMLDivElement | null>(null);
+  const position = usePanelPosition(rootEl);
 
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<FeatureId>('simulator');
@@ -59,17 +63,28 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
   if (!ready) return null;
 
   return (
-    <div className={`accesslens-ui ${theme === 'dark' ? 'dark' : ''}`} data-theme={theme}>
+    <div ref={setRootEl} className={`accesslens-ui ${theme === 'dark' ? 'dark' : ''}`} data-theme={theme} data-dragging={position.dragging} data-resizing={position.resizing}>
       <OverlayContainerContext.Provider value={overlayContainer}>
         <TooltipProvider delayDuration={350}>
           <HighlightLayer store={inspector} />
-          {collapsed && <Button ref={expandButton} onClick={toggleCollapsed} aria-label="Expand AccessLens" aria-expanded={false}
-            className="relative size-12 rounded-xl border border-border bg-primary text-primary-foreground shadow-xl hover:bg-primary/90">
+          {collapsed && <Button ref={expandButton} onClick={position.guardClick(toggleCollapsed)} {...position.dragHandlers} aria-label="Expand AccessLens" aria-expanded={false}
+            title="Click to expand · drag to move"
+            className="accesslens-drag-handle relative z-10 size-12 rounded-xl border border-border bg-primary text-primary-foreground shadow-xl hover:bg-primary/90">
             <Eye className="size-5" aria-hidden="true" /><ChevronUp className="absolute right-1 bottom-1 size-3" aria-hidden="true" />
           </Button>}
           <section hidden={collapsed} className="accesslens-panel flex flex-col overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-xl" aria-label={APP_NAME}>
-            <header className="flex shrink-0 items-center justify-between gap-2 px-4 py-4">
+            <header className="accesslens-drag-handle flex shrink-0 items-center justify-between gap-2 px-4 py-4" {...position.dragHandlers} onDoubleClick={event => { if (!(event.target as Element).closest('button, [role="switch"]')) position.reset(); }}>
               <div className="flex items-center gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button data-drag-handle variant="ghost" size="icon-xs" className="-ml-2 cursor-grab text-muted-foreground"
+                      aria-label="Move panel. Use arrow keys to move, Shift for bigger steps, Home to reset."
+                      aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home" onKeyDown={position.onKeyDown}>
+                      <GripVertical className="size-4" aria-hidden="true" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Drag to move · arrow keys to nudge · double-click header to reset</TooltipContent>
+                </Tooltip>
                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground"><Eye className="size-5" aria-hidden="true" /></div>
                 <div>
                   <h1 className="text-base leading-6 font-semibold tracking-tight">{APP_NAME}</h1>
@@ -118,6 +133,13 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
             {storageError && <p role="alert" className="px-5 pb-3 text-xs text-destructive">Theme storage is unavailable. Changes apply to this session.</p>}
             <Separator />
             <footer className="flex shrink-0 items-center gap-2 bg-secondary/50 px-5 py-3 text-xs text-muted-foreground"><ShieldCheck className="size-3.5" aria-hidden="true" />Temporary effects. Your source stays yours.</footer>
+            {/* Resize: drag any edge or corner. The top-left corner is also a keyboard control. */}
+            {RESIZE_EDGES.map(edge => edge === 'nw'
+              ? <button key={edge} type="button" className={`accesslens-resize accesslens-resize--${edge}`} {...position.resizeHandlers(edge)}
+                  onKeyDown={position.onResizeKeyDown} title="Drag to resize · arrow keys to resize"
+                  aria-label="Resize panel. Left and Up arrows grow it, Right and Down shrink it, Shift for bigger steps, Home for the default size."
+                  aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home" />
+              : <div key={edge} className={`accesslens-resize accesslens-resize--${edge}`} aria-hidden="true" {...position.resizeHandlers(edge)} />)}
           </section>
           {/* Every Radix portal stays inside this themed Shadow DOM subtree. */}
           <div ref={setOverlayContainer} />

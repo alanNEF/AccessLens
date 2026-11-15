@@ -5,7 +5,7 @@ type FixProperty = SuggestedFix['property'];
 /** Any element with an inline style (HTML or SVG). */
 export type StylableElement = Element & ElementCSSInlineStyle;
 
-export type PreviewFailure = 'detached' | 'not-applied' | 'page-changed';
+export type PreviewFailure = 'detached' | 'not-applied' | 'page-changed' | 'conflict';
 export type PreviewResult = { readonly ok: true } | { readonly ok: false; readonly reason: PreviewFailure };
 
 interface ActivePreview {
@@ -24,19 +24,21 @@ const OK: PreviewResult = Object.freeze({ ok: true });
 const fail = (reason: PreviewFailure): PreviewResult => ({ ok: false, reason });
 
 /**
- * Sole Fixer DOM writer. Changes one inline property on one element and
+ * Sole Fixer DOM writer. Changes individual inline properties and
  * restores that property's exact prior value and priority. It never reads or
  * replaces the whole `style` attribute, so other inline properties are untouched.
  */
 export function createPreviewManager() {
-  let active: ActivePreview | undefined;
+  const previews = new Map<string, ActivePreview>();
+  const SINGLE = 'individual';
 
   function write(preview: ActivePreview): PreviewResult {
     const { element, property, value } = preview;
     if (!element.isConnected) return fail('detached');
     const { style } = element;
     // getAttribute (not hasAttribute) also flushes Chrome's lazy CSSOM sync.
-    preview.hadStyleAttribute = element.getAttribute('style') !== null;
+    preview.hadStyleAttribute = [...previews.values()].find(item => item !== preview && item.element === element)?.hadStyleAttribute
+      ?? (element.getAttribute('style') !== null);
     preview.originalValue = style.getPropertyValue(property);
     preview.originalPriority = style.getPropertyPriority(property);
     // !important so the preview also wins over author !important rules.
@@ -77,35 +79,50 @@ export function createPreviewManager() {
   }
 
   /** End the preview and restore the prior inline state. */
-  function revert(): PreviewResult {
+  function revert(id = SINGLE): PreviewResult {
+    const active = previews.get(id);
     if (!active) return OK;
     const result = unwrite(active);
-    active = undefined;
+    previews.delete(id);
+    return result;
+  }
+
+  function revertAll(): PreviewResult {
+    let result = OK;
+    for (const id of [...previews.keys()].reverse()) {
+      const next = revert(id);
+      if (!next.ok) result = next;
+    }
     return result;
   }
 
   return {
-    /** Start a preview. Any other active preview is reverted first. */
-    apply(element: StylableElement, property: FixProperty, value: string): PreviewResult {
-      revert();
+    /** Start/replace one preview. A property can have only one owner. */
+    apply(element: StylableElement, property: FixProperty, value: string, id = SINGLE): PreviewResult {
+      if ([...previews.entries()].some(([key, item]) => key !== id && item.element === element && item.property === property)) return fail('conflict');
+      const previous = revert(id);
+      if (!previous.ok) return previous;
       const preview: ActivePreview = { element, property, value, originalValue: '', originalPriority: '', hadStyleAttribute: false };
       const result = write(preview);
-      if (result.ok) active = preview;
+      if (result.ok) previews.set(id, preview);
       return result;
     },
     /** Compare: show the page's own value without ending the preview. */
     showOriginal(): PreviewResult {
+      const active = previews.get(SINGLE);
       return active ? unwrite(active) : OK;
     },
     /** Compare: re-apply the suggestion. Re-captures the prior state first. */
     showFixed(): PreviewResult {
+      const active = previews.get(SINGLE);
       if (!active) return fail('not-applied');
       return active.written === undefined ? write(active) : OK;
     },
     revert,
-    isShowingFixed: () => active?.written !== undefined,
-    hasActivePreview: () => active !== undefined,
-    dispose(): void { revert(); },
+    revertAll,
+    isShowingFixed: () => previews.get(SINGLE)?.written !== undefined,
+    hasActivePreview: () => previews.size > 0,
+    dispose(): void { revertAll(); },
   };
 }
 export type PreviewManager = ReturnType<typeof createPreviewManager>;

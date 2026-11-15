@@ -1,6 +1,6 @@
 import axe from 'axe-core';
-import type { ContrastIssue, ContrastStatus } from '../../shared/types';
-import { describeElement, selectorFromTarget, toContrastIssue, type AxeContrastData } from './contrast-mapping';
+import type { ContrastIssue, ContrastLevel, ContrastStatus } from '../../shared/types';
+import { describeElement, selectorFromTarget, toContrastIssue, toLinkIssue, type AxeContrastData, type AxeLinkData } from './contrast-mapping';
 
 /** An issue plus a stable reference to the element it describes (INS-07). */
 export interface InspectedIssue {
@@ -8,7 +8,10 @@ export interface InspectedIssue {
   readonly element: Element;
 }
 
-const RULE = 'color-contrast';
+/** axe rule ids. color-contrast-enhanced is axe's WCAG 1.4.6 (AAA) rule; it is off unless asked for by id. */
+const TEXT_RULE: Record<ContrastLevel, string> = { AA: 'color-contrast', AAA: 'color-contrast-enhanced' };
+const LINK_RULE = 'link-in-text-block';
+
 let queue: Promise<unknown> = Promise.resolve();
 
 /** axe throws if two runs overlap, so every run waits for the previous one. */
@@ -18,23 +21,31 @@ function runAxe(context: axe.ElementContext, options: axe.RunOptions): Promise<a
   return next;
 }
 
-function toInspected(node: axe.NodeResult, status: ContrastStatus, id: string): InspectedIssue | null {
-  const element = node.element;
-  if (!element) return null;
-  const check = [...node.any, ...node.all, ...node.none].find(result => result.id === RULE);
-  return {
-    element,
-    issue: toContrastIssue({
-      id,
-      status,
-      selector: selectorFromTarget(node.target),
-      elementLabel: describeElement(element.tagName, element.textContent),
-      data: (check?.data ?? null) as AxeContrastData | null,
-    }),
-  };
+/** Color of the text a link sits in: the nearest ancestor that is not itself inline. */
+function surroundingTextColor(element: Element): string | null {
+  let parent = element.parentElement;
+  while (parent && getComputedStyle(parent).display.startsWith('inline')) parent = parent.parentElement;
+  return parent ? getComputedStyle(parent).color : null;
 }
 
-function collect(results: axe.AxeResults, includePasses: boolean): InspectedIssue[] {
+function toInspected(ruleId: string, node: axe.NodeResult, status: ContrastStatus, id: string, level: ContrastLevel): InspectedIssue | null {
+  const element = node.element;
+  if (!element) return null;
+  const checks = [...node.any, ...node.all, ...node.none];
+  const common = { id, status, selector: selectorFromTarget(node.target), elementLabel: describeElement(element.tagName, element.textContent) };
+  if (ruleId === LINK_RULE) {
+    const data = (checks.find(check => check.id === LINK_RULE)?.data ?? null) as AxeLinkData | null;
+    return {
+      element,
+      issue: toLinkIssue({ ...common, data, computedLinkColor: getComputedStyle(element).color, computedTextColor: surroundingTextColor(element) }),
+    };
+  }
+  const data = (checks.find(check => check.id === 'color-contrast' || check.id === 'color-contrast-enhanced')?.data ?? null) as AxeContrastData | null;
+  return { element, issue: toContrastIssue({ ...common, data, level }) };
+}
+
+function collect(results: axe.AxeResults, level: ContrastLevel, includePasses: boolean): InspectedIssue[] {
+  const wanted = new Set([TEXT_RULE[level], LINK_RULE]);
   const groups: Array<[axe.Result[], ContrastStatus]> = [
     [results.violations, 'failed'],
     [results.incomplete, 'needs-review'],
@@ -43,9 +54,9 @@ function collect(results: axe.AxeResults, includePasses: boolean): InspectedIssu
   const out: InspectedIssue[] = [];
   for (const [rules, status] of groups) {
     for (const rule of rules) {
-      if (rule.id !== RULE) continue;
+      if (!wanted.has(rule.id)) continue;
       rule.nodes.forEach((node, index) => {
-        const inspected = toInspected(node, status, `${status}-${index}`);
+        const inspected = toInspected(rule.id, node, status, `${rule.id}-${status}-${index}`, level);
         if (inspected) out.push(inspected);
       });
     }
@@ -53,29 +64,36 @@ function collect(results: axe.AxeResults, includePasses: boolean): InspectedIssu
   return out;
 }
 
+const optionsFor = (level: ContrastLevel): axe.RunOptions => ({
+  runOnly: { type: 'rule', values: [TEXT_RULE[level], LINK_RULE] },
+  elementRef: true,
+});
+
 /**
- * Scans the whole page for text-contrast failures and needs-review cases (INS-03, INS-05, INS-06).
+ * Scans the whole page (INS-03, INS-05, INS-06) for text contrast at the chosen level
+ * (AA 1.4.3 or enhanced AAA 1.4.6) and for links that rely on color alone (1.4.1).
  * `exclude` is the AccessLens panel host, so our own UI is never audited.
  * axe reads computed CSS colors, so an active simulation does not change results (INS-02).
  */
-export async function scanTextContrast(exclude: Element): Promise<InspectedIssue[]> {
+export async function scanTextContrast(exclude: Element, level: ContrastLevel = 'AA'): Promise<InspectedIssue[]> {
   const results = await runAxe(
     { include: [document.documentElement], exclude: [exclude] } as unknown as axe.ElementContext,
-    { runOnly: { type: 'rule', values: [RULE] }, elementRef: true, resultTypes: ['violations', 'incomplete'] },
+    { ...optionsFor(level), resultTypes: ['violations', 'incomplete'] },
   );
-  return collect(results, false);
+  return collect(results, level, false);
 }
 
 /**
  * Checks one element the developer clicked (INS-01). Returns the result for that element
  * (or, if it has no text of its own, its first text descendant), including passes.
  */
-export async function inspectElement(target: Element, exclude: Element): Promise<InspectedIssue | null> {
+export async function inspectElement(target: Element, exclude: Element, level: ContrastLevel = 'AA'): Promise<InspectedIssue | null> {
   const results = await runAxe(
     { include: [target], exclude: [exclude] } as unknown as axe.ElementContext,
-    { runOnly: { type: 'rule', values: [RULE] }, elementRef: true },
+    optionsFor(level),
   );
-  const found = collect(results, true);
+  const found = collect(results, level, true);
+  // Prefer a result about the clicked element itself; a failure beats a pass.
   const exact = found.find(item => item.element === target);
   const chosen = exact ?? found[0];
   if (!chosen) return null;
