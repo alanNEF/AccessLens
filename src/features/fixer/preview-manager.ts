@@ -21,16 +21,24 @@ interface ActivePreview {
   written?: string;
 }
 
+interface AltPreview {
+  readonly owner: OperatingMode;
+  readonly element: HTMLImageElement;
+  readonly originalValue: string | null;
+  readonly written: string;
+}
+
 const OK: PreviewResult = Object.freeze({ ok: true });
 const fail = (reason: PreviewFailure): PreviewResult => ({ ok: false, reason });
 
 /**
- * Sole Fixer DOM writer. Changes individual inline properties and
- * restores that property's exact prior value and priority. It never reads or
- * replaces the whole `style` attribute, so other inline properties are untouched.
+ * Sole Fixer DOM writer. Restores each CSS property's exact prior value/priority
+ * and each image's prior alt attribute (including absence). It never replaces
+ * the whole `style` attribute, so other inline properties are untouched.
  */
 export function createPreviewManager() {
   const previews = new Map<string, ActivePreview>();
+  const altPreviews = new Map<string, AltPreview>();
   let mode: OperatingMode = 'developer';
   const writers = new Set<(phase: 'before' | 'after') => void>();
   const SINGLE = 'individual';
@@ -91,8 +99,18 @@ export function createPreviewManager() {
     return OK;
   }
 
-  /** End the preview and restore the prior inline state. */
+  /** End a CSS or image preview and restore its prior state. */
   function revert(id = SINGLE): PreviewResult {
+    const alt = altPreviews.get(id);
+    if (alt) {
+      altPreviews.delete(id);
+      if (alt.element.getAttribute('alt') !== alt.written) return fail('page-changed');
+      mutate(() => {
+        if (alt.originalValue === null) alt.element.removeAttribute('alt');
+        else alt.element.setAttribute('alt', alt.originalValue);
+      });
+      return OK;
+    }
     const active = previews.get(id);
     if (!active) return OK;
     const result = unwrite(active);
@@ -102,7 +120,7 @@ export function createPreviewManager() {
 
   function revertAll(): PreviewResult {
     let result = OK;
-    for (const id of [...previews.keys()].reverse()) {
+    for (const id of [...previews.keys(), ...altPreviews.keys()].reverse()) {
       const next = revert(id);
       if (!next.ok) result = next;
     }
@@ -122,6 +140,8 @@ export function createPreviewManager() {
       return () => { writers.delete(listener); };
     },
     isApplied(id: string) {
+      const alt = altPreviews.get(id);
+      if (alt) return alt.element.isConnected && alt.element.getAttribute('alt') === alt.written;
       const item = previews.get(id);
       return Boolean(item?.element.isConnected && item.written !== undefined &&
         item.element.style.getPropertyValue(item.property) === item.written &&
@@ -129,10 +149,27 @@ export function createPreviewManager() {
     },
     revertOwner(owner: OperatingMode) {
       for (const [id, item] of previews) if (item.owner === owner) revert(id);
+      for (const [id, item] of altPreviews) if (item.owner === owner) revert(id);
+    },
+    /** Attribute previews share CSS previews' ownership, restoration and disposal lifecycle. */
+    applyAlt(element: HTMLImageElement, value: string, id: string, owner: OperatingMode = 'developer'): PreviewResult {
+      if (owner !== mode || previews.has(id)) return fail('conflict');
+      if (!element.isConnected) return fail('detached');
+      if ([...altPreviews.entries()].some(([key, item]) => key !== id && item.element === element)) return fail('conflict');
+      const previous = revert(id);
+      if (!previous.ok) return previous;
+      const originalValue = element.getAttribute('alt');
+      mutate(() => element.setAttribute('alt', value));
+      altPreviews.set(id, { owner, element, originalValue, written: value });
+      if (element.getAttribute('alt') !== value) {
+        altPreviews.delete(id);
+        return fail('not-applied');
+      }
+      return OK;
     },
     /** Start/replace one preview. A property can have only one owner. */
     apply(element: StylableElement, property: FixProperty, value: string, id = SINGLE, owner: OperatingMode = 'developer'): PreviewResult {
-      if (owner !== mode) return fail('conflict');
+      if (owner !== mode || altPreviews.has(id)) return fail('conflict');
       if ([...previews.entries()].some(([key, item]) => key !== id && item.element === element && item.property === property)) return fail('conflict');
       const previous = revert(id);
       if (!previous.ok) return previous;
@@ -155,7 +192,7 @@ export function createPreviewManager() {
     revert,
     revertAll,
     isShowingFixed: () => previews.get(SINGLE)?.written !== undefined,
-    hasActivePreview: () => previews.size > 0,
+    hasActivePreview: () => previews.size > 0 || altPreviews.size > 0,
     dispose(): void { revertAll(); writers.clear(); },
   };
 }

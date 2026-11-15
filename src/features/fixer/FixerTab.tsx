@@ -99,9 +99,6 @@ export function FixerTab({
       setCopyStatus('Copy blocked on this page. The declaration is selected: press Ctrl+C (⌘C on Mac).');
     }
   }
-  if (selectedImage) {
-    return <ImageAltFixer selectedImage={selectedImage} />;
-  }
   return (
     <div className="space-y-5">
       <div>
@@ -111,6 +108,9 @@ export function FixerTab({
 
       <BulkCorrections controller={controller} inspector={inspector} />
 
+      {selectedImage && <ImageAltFixer selectedImage={selectedImage} controller={controller} />}
+
+      {!selectedImage && <>
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
         Status: <strong className="font-medium text-foreground">{statusText(state)}</strong>
       </p>
@@ -226,6 +226,8 @@ export function FixerTab({
           </div>
         </>
       )}
+
+      </>}
 
       {mode !== 'none' && (
         <p className="rounded-lg border border-border bg-accent p-3 text-xs text-accent-foreground">

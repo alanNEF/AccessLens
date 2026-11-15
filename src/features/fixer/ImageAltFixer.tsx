@@ -1,122 +1,31 @@
-import { useEffect, useId, useState } from "react";
-import type { ImageIssue } from "../inspector/image-runner";
-import { Button } from "../../components/ui/button";
+import { useEffect, useId, useSyncExternalStore } from 'react';
+import type { ImageIssue } from '../inspector/image-runner';
+import type { FixerController } from './fixer-controller';
+import { Button } from '../../components/ui/button';
 
-export function ImageAltFixer({
-  selectedImage,
-}: {
-  selectedImage: ImageIssue;
-}) {
+/** Individual editing shares the bulk row's draft, enabled state and reversible preview. */
+export function ImageAltFixer({ selectedImage, controller }: { selectedImage: ImageIssue; controller: FixerController }) {
   const inputId = useId();
-  const [altText, setAltText] = useState("");
-  const [previewing, setPreviewing] = useState(false);
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const image = selectedImage.element;
-    if (!(image instanceof HTMLImageElement)) return;
-
-    // Remember the exact original attribute.
-    const originalAlt = image.getAttribute("alt");
-    let appliedAlt: string | null = null;
-
-    setAltText("");
-    setPreviewing(false);
-    setMessage("");
-
-    function restore() {
-      if (appliedAlt === null) return;
-
-      // Don't overwrite changes made by the webpage itself.
-      if (image.getAttribute("alt") !== appliedAlt) return;
-
-      if (originalAlt === null) {
-        image.removeAttribute("alt");
-      } else {
-        image.setAttribute("alt", originalAlt);
-      }
-
-      appliedAlt = null;
-    }
-
-    // Expose cleanup to the component's buttons.
-    restoreRef.current = restore;
-    applyRef.current = (text: string) => {
-      image.setAttribute("alt", text);
-      appliedAlt = text;
-    };
-
-    return () => {
-      restore();
-      restoreRef.current = null;
-      applyRef.current = null;
-    };
-  }, [selectedImage]);
-
-  const [restoreRef] = useState<{
-    current: (() => void) | null;
-  }>({ current: null });
-
-  const [applyRef] = useState<{
-    current: ((text: string) => void) | null;
-  }>({ current: null });
-
-  function preview() {
-    if (!selectedImage.element.isConnected) {
-      setMessage("This image is no longer on the page.");
-      return;
-    }
-
-    if (!altText.trim()) {
-      setMessage("Please enter an image description.");
-      return;
-    }
-
-    applyRef.current?.(altText.trim());
-    setPreviewing(true);
-    setMessage("Alt text temporarily applied.");
-  }
-
-  function revert() {
-    restoreRef.current?.();
-    setPreviewing(false);
-    setMessage("Original alt attribute restored.");
-  }
+  const state = useSyncExternalStore(controller.bulk.subscribe, controller.bulk.getState);
+  const item = state.imageCorrections.find(item => item.issue.element === selectedImage.element);
+  useEffect(() => { controller.bulk.ensureImage(selectedImage); }, [controller, selectedImage]);
+  const busy = state.phase === 'generating';
 
   return (
-    <section className="space-y-3 rounded-lg border p-3">
+    <section aria-label="Selected image correction" className="space-y-3 rounded-lg border border-border p-3">
       <h3 className="font-semibold">Fix image accessibility</h3>
-
-      <p className="text-xs text-muted-foreground">
-        Selected: {selectedImage.selector}
-      </p>
-
-      <label htmlFor={inputId} className="block text-sm font-medium">
-        Alternative text
-      </label>
-
-      <textarea
-        id={inputId}
-        value={altText}
-        onChange={(event) => setAltText(event.target.value)}
+      <p className="text-xs text-muted-foreground">Selected: {selectedImage.selector}</p>
+      <label htmlFor={inputId} className="block text-sm font-medium">Alternative text</label>
+      <textarea id={inputId} value={item?.text ?? ''} disabled={busy || !item} rows={3}
+        onChange={event => { if (item) controller.bulk.setImageText(item.id, event.currentTarget.value); }}
         placeholder="Describe what this image communicates"
-        className="w-full rounded-md border bg-background p-2 text-sm"
-        rows={3}
-      />
-
+        className="w-full rounded-md border border-border bg-background p-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" />
       <div className="flex gap-2">
-        <Button type="button" onClick={preview}>
-          Preview alt text
-        </Button>
-
-        {previewing && (
-          <Button type="button" variant="outline" onClick={revert}>
-            Revert
-          </Button>
-        )}
+        <Button type="button" disabled={busy || !item} onClick={() => { if (item) controller.bulk.setImageEnabled(item.id, true); }}>Preview alt text</Button>
+        {item?.enabled && <Button type="button" variant="outline" onClick={() => controller.bulk.setImageEnabled(item.id, false)}>Revert</Button>}
       </div>
-
-      {message && <p role="status" className="text-xs">{message}</p>}
+      {item?.failure && <p role="alert" className="text-xs text-destructive">{item.failure}</p>}
+      {item?.enabled && <p role="status" className="text-xs">Alt text temporarily applied.</p>}
     </section>
   );
 }

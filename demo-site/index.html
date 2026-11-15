@@ -50,6 +50,12 @@
         <img alt="Red, green and blue geometric landscape" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Crect width='320' height='160' fill='%230080ff'/%3E%3Ccircle cx='80' cy='60' r='40' fill='red'/%3E%3Cpath d='M0 160L160 40L320 160' fill='green'/%3E%3C/svg%3E" />
         <p class="existing-filter"><span style="color: red">Page-owned grayscale(1) remains applied here.</span></p>
       </section>
+      <section>
+        <h2>Unlabeled image</h2>
+        <p>This image intentionally has no alternative text for accessibility testing.</p>
+        <!-- Intentionally omit alt and ARIA labels to trigger image-label detection. -->
+        <img id="unlabeled-image" width="320" height="160" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='160'%3E%3Crect width='320' height='160' fill='%230080ff'/%3E%3Ccircle cx='80' cy='60' r='40' fill='red'/%3E%3Cpath d='M0 160L160 40L320 160' fill='green'/%3E%3C/svg%3E" />
+      </section>
       <section id="form">
         <h2>Form and modal</h2>
         <form id="demo-form">

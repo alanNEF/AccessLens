@@ -5,7 +5,7 @@
 // agent/src/server.ts
 import { createInterface } from "node:readline";
 
-// axe-source:/Users/aahanagarg/AccessLens/node_modules/axe-core/axe.min.js
+// axe-source:/Users/alanachilles/Documents/GitHub/AccessLens/node_modules/axe-core/axe.min.js
 var axe_min_default = `/*! axe v4.14.0
  * Copyright (c) 2015 - 2026 Deque Systems, Inc.
  *
@@ -285,7 +285,7 @@ var REVIEW_REASONS = {
   shadowOnText: "A text shadow changes how readable the text is.",
   colorParse: "One of the colors could not be read."
 };
-var DEFAULT_REVIEW_REASON = "AccessLens could not reliably determine this text\u2019s colors.";
+var DEFAULT_REVIEW_REASON = "Perspective could not reliably determine this text\u2019s colors.";
 function reviewReasonFor(messageKey) {
   return messageKey && REVIEW_REASONS[messageKey] || DEFAULT_REVIEW_REASON;
 }
@@ -2017,6 +2017,59 @@ function contrast(a, b) {
   return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
 }
 
+// src/features/simulator/filters.ts
+var PRESETS = {
+  none: { label: "Off" },
+  protanopia: { label: "Protanopia", matrix: "0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0" },
+  deuteranopia: { label: "Deuteranopia", matrix: "0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.011820 0.042940 0.968881 0 0  0 0 0 1 0" },
+  tritanopia: { label: "Tritanopia", matrix: "1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.303900 0 0  0 0 0 1 0" },
+  /** Rod monochromacy: every channel becomes relative luminance (Rec. 709 / sRGB weights).
+   * Applied in linear RGB like the matrices above, so perceived lightness is preserved. */
+  achromatopsia: { label: "Achromatopsia", matrix: "0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0" },
+  blur: { label: "Low Acuity" },
+  /** Cataracts: hazy blur, reduced contrast, slightly washed-out and yellowed color
+   * (symptoms per the U.S. National Eye Institute). An illustrative CSS approximation,
+   * not a calibrated clinical model. */
+  cataracts: { label: "Cataracts", css: "blur(1.5px) contrast(0.7) brightness(1.08) sepia(0.45) saturate(0.85)", halo: true },
+  /** Reduced contrast sensitivity (common with age, glaucoma, diabetic eye disease):
+   * light and dark areas move toward each other. Illustrative CSS approximation. */
+  "low-contrast": { label: "Low Contrast", css: "contrast(0.5) brightness(1.15)" },
+  visionless: { label: "Visionless" }
+};
+var BLUR = { default: 2, min: 0, max: 8, step: 0.5 };
+function normalizeBlur(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("Blur must be a finite number.");
+  return Math.round(Math.max(BLUR.min, Math.min(BLUR.max, value)) / BLUR.step) * BLUR.step;
+}
+
+// src/features/fixer/color-vision.ts
+var VISION_CHECKS = ["protanopia", "deuteranopia", "tritanopia"];
+function matrixOf(check) {
+  const values = PRESETS[check].matrix.trim().split(/\s+/).map(Number);
+  return [0, 1, 2].map((row) => values.slice(row * 5, row * 5 + 3));
+}
+var MATRICES = Object.freeze({
+  protanopia: matrixOf("protanopia"),
+  deuteranopia: matrixOf("deuteranopia"),
+  tritanopia: matrixOf("tritanopia")
+});
+var toLinear = (channel) => {
+  const c2 = channel / 255;
+  return c2 <= 0.04045 ? c2 / 12.92 : ((c2 + 0.055) / 1.055) ** 2.4;
+};
+var toSrgb = (linear) => {
+  const c2 = Math.min(1, Math.max(0, linear));
+  return Math.round((c2 <= 31308e-7 ? 12.92 * c2 : 1.055 * c2 ** (1 / 2.4) - 0.055) * 255);
+};
+function simulateColor(hex2, check) {
+  const rgb3 = [1, 3, 5].map((i) => toLinear(Number.parseInt(hex2.slice(i, i + 2), 16)));
+  return "#" + MATRICES[check].map((row) => toSrgb(row[0] * rgb3[0] + row[1] * rgb3[1] + row[2] * rgb3[2]).toString(16).padStart(2, "0")).join("");
+}
+function simulatedRatios(textHex, backgroundHex, ratio) {
+  const entry = (check) => [check, ratio(simulateColor(textHex, check), simulateColor(backgroundHex, check))];
+  return Object.freeze(Object.fromEntries(VISION_CHECKS.map(entry)));
+}
+
 // src/features/fixer/color-suggester.ts
 var toRgb = useMode(definition_default);
 useMode(definition_default5);
@@ -2052,10 +2105,9 @@ function renderedColor(color, background, opacity) {
 function floorRatio(ratio) {
   return Math.floor(ratio * 100) / 100;
 }
-function searchLightness(adjustable, fixed, target, opacity, toward) {
+function searchLightness(adjustable, passes, toward) {
   const start = toOklch(adjustable);
   const hexAt = (l) => toHex({ ...start, l });
-  const passes = (hex2) => contrastRatio(renderedColor(hex2, fixed, opacity), fixed) >= target;
   if (!passes(hexAt(toward))) return void 0;
   let failing = start.l;
   let passing = toward;
@@ -2066,16 +2118,29 @@ function searchLightness(adjustable, fixed, target, opacity, toward) {
   }
   return hexAt(passing);
 }
-function closestReplacement(adjustable, fixed, target, opacity) {
+function closestReplacement(adjustable, passes) {
   let best;
   for (const toward of [0, 1]) {
-    const hex2 = searchLightness(adjustable, fixed, target, opacity, toward);
+    const hex2 = searchLightness(adjustable, passes, toward);
     if (!hex2) continue;
     const difference = colorDifference(adjustable, hex2);
     if (!best || difference < best.difference) best = { hex: hex2, difference };
   }
-  return best?.hex;
+  return best;
 }
+function closestPaletteColor(original, palette, passes) {
+  let best;
+  for (const value of palette) {
+    const color = parseOpaque(value);
+    if (typeof color === "string") continue;
+    const hex2 = toHex(color);
+    if (!passes(hex2)) continue;
+    const difference = colorDifference(original, hex2);
+    if (!best || difference < best.difference) best = { hex: hex2, difference };
+  }
+  return best;
+}
+var PALETTE_PREFERENCE = 12;
 var MESSAGES = {
   "invalid-color": "The element\u2019s colors could not be read reliably.",
   "transparent-color": "Transparent or semi-transparent colors need manual review.",
@@ -2093,39 +2158,49 @@ function suggestFix(issue) {
   if (typeof text === "string") return unsupported(text);
   const background = parseOpaque(issue.backgroundColor);
   if (typeof background === "string") return unsupported(background);
-  const drawnRatio = (color) => contrastRatio(renderedColor(color, background, opacity), background);
-  const original = drawnRatio(text);
+  const backgroundHex = toHex(background);
+  const drawn = (color) => renderedColor(color, background, opacity);
+  const original = contrastRatio(drawn(text), background);
   if (original >= issue.requiredRatio) return unsupported("already-passes");
   const target = issue.requiredRatio + TARGET_MARGIN;
-  const suggestedValue = closestReplacement(text, background, target, opacity);
-  if (!suggestedValue && opacity >= 1) {
-    const backgroundFix = closestReplacement(background, text, target, 1);
-    if (backgroundFix) {
-      return {
-        ok: true,
-        fix: {
-          issueId: issue.id,
-          property: "background-color",
-          originalValue: toHex(background),
-          suggestedValue: backgroundFix,
-          originalContrastRatio: floorRatio(original),
-          expectedContrastRatio: floorRatio(contrastRatio(text, backgroundFix))
-        }
-      };
-    }
-  }
-  if (!suggestedValue) return unsupported(opacity < 1 ? "too-transparent" : "no-compliant-color");
-  return {
-    ok: true,
-    fix: {
+  const safeUnderSimulation = (textHex, backHex) => Object.values(simulatedRatios(textHex, backHex, contrastRatio)).every((ratio) => ratio >= target);
+  const describe = (property, originalValue, suggestedValue, textHex, backHex, source) => {
+    const simulated = simulatedRatios(textHex, backHex, contrastRatio);
+    return {
       issueId: issue.id,
-      property: "color",
-      originalValue: toHex(text),
+      property,
+      originalValue,
       suggestedValue,
       originalContrastRatio: floorRatio(original),
-      expectedContrastRatio: floorRatio(drawnRatio(suggestedValue))
-    }
+      expectedContrastRatio: floorRatio(contrastRatio(textHex, backHex)),
+      source,
+      colorBlindSafe: Object.values(simulated).every((ratio) => ratio >= issue.requiredRatio),
+      simulatedRatios: Object.fromEntries(Object.entries(simulated).map(([check, ratio]) => [check, floorRatio(ratio)]))
+    };
   };
+  const meets = (hex2) => contrastRatio(drawn(hex2), background) >= target;
+  const meetsSafely = (hex2) => meets(hex2) && safeUnderSimulation(drawn(hex2), backgroundHex);
+  const safeShade = closestReplacement(text, meetsSafely);
+  const accept = safeShade ? meetsSafely : meets;
+  const shade = safeShade ?? closestReplacement(text, meets);
+  const site = issue.palette?.length ? closestPaletteColor(text, issue.palette, accept) : void 0;
+  if (shade || site) {
+    const textFix = (candidate, source) => describe("color", toHex(text), candidate.hex, drawn(candidate.hex), backgroundHex, source);
+    const preferSite = site !== void 0 && (shade === void 0 || site.difference <= shade.difference + PALETTE_PREFERENCE);
+    const primary = preferSite ? textFix(site, "site-palette") : textFix(shade, "adjusted");
+    const other = preferSite ? shade : site;
+    const alternative = other && other.hex !== primary.suggestedValue ? textFix(other, preferSite ? "adjusted" : "site-palette") : void 0;
+    return { ok: true, fix: primary, ...alternative ? { alternative } : {} };
+  }
+  if (opacity >= 1) {
+    const textHex = toHex(text);
+    const backgroundMeets = (hex2) => contrastRatio(textHex, hex2) >= target;
+    const backgroundFix = closestReplacement(background, (hex2) => backgroundMeets(hex2) && safeUnderSimulation(textHex, hex2)) ?? closestReplacement(background, backgroundMeets);
+    if (backgroundFix) {
+      return { ok: true, fix: describe("background-color", backgroundHex, backgroundFix.hex, textHex, backgroundFix.hex, "adjusted") };
+    }
+  }
+  return unsupported(opacity < 1 ? "too-transparent" : "no-compliant-color");
 }
 
 // src/shared/types.ts
@@ -2207,31 +2282,6 @@ function toReport(url, level, raws, maxIssues) {
     ...issues.length > shown.length ? { truncated: issues.length - shown.length } : {},
     note: 'Automated checks cover text contrast (WCAG 1.4.3, or 1.4.6 at AAA) and color-only links (1.4.1). Zero failures does not mean the page is accessible. "review" items need a human.'
   };
-}
-
-// src/features/simulator/filters.ts
-var PRESETS = {
-  none: { label: "Off" },
-  protanopia: { label: "Protanopia", matrix: "0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0" },
-  deuteranopia: { label: "Deuteranopia", matrix: "0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.011820 0.042940 0.968881 0 0  0 0 0 1 0" },
-  tritanopia: { label: "Tritanopia", matrix: "1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.303900 0 0  0 0 0 1 0" },
-  /** Rod monochromacy: every channel becomes relative luminance (Rec. 709 / sRGB weights).
-   * Applied in linear RGB like the matrices above, so perceived lightness is preserved. */
-  achromatopsia: { label: "Achromatopsia", matrix: "0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0" },
-  blur: { label: "Low Acuity" },
-  /** Cataracts: hazy blur, reduced contrast, slightly washed-out and yellowed color
-   * (symptoms per the U.S. National Eye Institute). An illustrative CSS approximation,
-   * not a calibrated clinical model. */
-  cataracts: { label: "Cataracts", css: "blur(1.5px) contrast(0.7) brightness(1.08) sepia(0.45) saturate(0.85)", halo: true },
-  /** Reduced contrast sensitivity (common with age, glaucoma, diabetic eye disease):
-   * light and dark areas move toward each other. Illustrative CSS approximation. */
-  "low-contrast": { label: "Low Contrast", css: "contrast(0.5) brightness(1.15)" },
-  visionless: { label: "Visionless" }
-};
-var BLUR = { default: 2, min: 0, max: 8, step: 0.5 };
-function normalizeBlur(value) {
-  if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("Blur must be a finite number.");
-  return Math.round(Math.max(BLUR.min, Math.min(BLUR.max, value)) / BLUR.step) * BLUR.step;
 }
 
 // agent/src/simulate.ts

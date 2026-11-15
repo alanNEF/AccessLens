@@ -36,6 +36,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
   userMode: UserModeController;
 }) {
   const { mode } = useSyncExternalStore(userMode.subscribe, userMode.getState);
+  const inspected = useSyncExternalStore(inspector.subscribe, inspector.getState);
   const { ready, theme, preference, changeTheme, storageError } = useTheme();
   const [overlayContainer, setOverlayContainer] = useState<HTMLDivElement | null>(null);
   const [rootEl, setRootEl] = useState<HTMLDivElement | null>(null);
@@ -52,8 +53,8 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
     setActiveTab('fixer');
   }
   function previewImageFix(item: ImageIssue) {
-  setSelectedImage(item);
-  setActiveTab('fixer');
+    setSelectedImage(item);
+    setActiveTab('fixer');
   }
   const expandButton = useRef<HTMLButtonElement>(null);
   const collapseButton = useRef<HTMLButtonElement>(null);
@@ -136,7 +137,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
                   <FixerTab
                     controller={fixer}
                     modeReader={modeReader}
-                    selectedImage={selectedImage}
+                    selectedImage={selectedImage && inspected.status === 'done' && inspected.imageIssues.includes(selectedImage) ? selectedImage : null}
                     inspector={inspector}
                   />
                 </TabsContent>
