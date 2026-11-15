@@ -168,7 +168,7 @@ export function createInspectorStore(panelHost: Element) {
     scanSilently(roots?: readonly Element[]) {
       // Keep status and cancellation controls available in User Mode. axe excludes
       // our host and treats any covered page text as uncertain, hence never fixed.
-      return withPanelHidden(() => scanTextContrast(panelHost, roots), false);
+      return withPanelHidden(() => scanTextContrast(panelHost, state.level, roots), false);
     },
     startPicking,
     cancelPicking,

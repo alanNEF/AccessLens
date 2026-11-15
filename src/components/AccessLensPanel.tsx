@@ -1,5 +1,4 @@
 import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { Eye, ScanLine, SlidersHorizontal, Sparkles, Sun, Moon, Monitor, ShieldCheck, Minus, ChevronUp, GripVertical } from 'lucide-react';
 import { SimulatorTab } from '../features/simulator/SimulatorTab';
 import { InspectorTab } from '../features/inspector/InspectorTab';
 import { FixerTab } from '../features/fixer/FixerTab';
@@ -25,6 +24,8 @@ import { usePanelPosition } from './shared/use-panel-position';
 import { UserMode } from '../features/user-mode/UserMode';
 import type { UserModeController } from '../features/user-mode/user-mode-controller';
 import { RESIZE_EDGES } from './shared/panel-size';
+import { Eye, ScanLine, SlidersHorizontal, Sparkles, Sun, Moon, Monitor, ShieldCheck, Minus, ChevronUp, GripVertical, Wrench } from 'lucide-react';
+
 
 export function AccessLensPanel({ controller, modeReader, inspector, handoff, fixer, userMode }: {
   controller: SimulatorController;
@@ -46,6 +47,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
   // Inspector → Fixer handoff (INS-07): store the verified issue, then show the Fixer tab.
   function previewFix(item: InspectedIssue) {
     if (!isVerifiedFailure(item.issue)) return;
+    setSelectedImage(null);
     handoff.set({ issue: item.issue, element: item.element });
     setActiveTab('fixer');
   }
@@ -72,8 +74,6 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
       <OverlayContainerContext.Provider value={overlayContainer}>
         <TooltipProvider delayDuration={350}>
           {mode === 'developer' && <HighlightLayer store={inspector} />}
-          {collapsed && <Button ref={expandButton} onClick={position.guardClick(toggleCollapsed)} {...position.dragHandlers} aria-label="Expand AccessLens" aria-expanded={false}
-          <HighlightLayer store={inspector} />
           {collapsed && <Button ref={expandButton} onClick={position.guardClick(toggleCollapsed)} {...position.dragHandlers} aria-label={`Expand ${APP_NAME}`} aria-expanded={false}
             title="Click to expand · drag to move"
             className="accesslens-drag-handle relative z-10 size-12 rounded-xl border border-border bg-primary text-primary-foreground shadow-xl hover:bg-primary/90">
@@ -137,6 +137,7 @@ export function AccessLensPanel({ controller, modeReader, inspector, handoff, fi
                     controller={fixer}
                     modeReader={modeReader}
                     selectedImage={selectedImage}
+                    inspector={inspector}
                   />
                 </TabsContent>
               </div>
