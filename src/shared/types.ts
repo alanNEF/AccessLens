@@ -1,4 +1,5 @@
 export type FeatureId = 'simulator' | 'inspector' | 'fixer';
+export type OperatingMode = 'developer' | 'user';
 
 export type SimulationMode =
   | 'none' | 'protanopia' | 'deuteranopia' | 'tritanopia' | 'achromatopsia'
