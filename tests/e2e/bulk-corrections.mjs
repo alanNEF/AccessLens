@@ -15,13 +15,13 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
     await frame();
   }
   async function scan() {
-    await tab('Inspector');
+    await tab('Inspect');
     await select('Scan page');
     await waitFor(`[...${shadow}.querySelectorAll('button')].some(button => button.textContent === 'Scan page' && !button.disabled)`);
-    await tab('Fixer');
+    await tab('Fix');
   }
   async function run() {
-    await select('Run All Corrections');
+    await select('Fix All');
     await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${boxes}.length === 3`);
   }
   const styles = `['bulk-first','bulk-second','bulk-large','bulk-review','bulk-passing'].map(id => {const el=document.getElementById(id);return {id,hasStyle:el.hasAttribute('style'),properties:[...el.style].map(name=>[name,el.style.getPropertyValue(name),el.style.getPropertyPriority(name)])};})`;
@@ -30,11 +30,11 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   await waitFor(`${shadow}?.querySelector('button')`);
   const original = await evaluate(styles);
   const originalColors = await evaluate(colors);
-  await tab('Fixer');
-  await select('Run All Corrections');
+  await tab('Fix');
+  await select('Fix All');
   await waitFor(`${bulk}.getAttribute('aria-busy') === 'false'`);
   assert.match(await evaluate(`${bulk}.textContent`), /No supported corrections/);
-  await tab('Simulator');
+  await tab('Simulate');
   await select('Protanopia');
   await scan();
   await run();
@@ -80,7 +80,7 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   await scan();
   assert.deepEqual(await evaluate(styles), original);
   await run();
-  await tab('Inspector');
+  await tab('Inspect');
   await select('Preview fix');
   await select('Preview fix');
   assert.equal(await evaluate(checked), 2);
@@ -126,7 +126,7 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
     await waitFor(`${shadow}?.querySelector('button')`);
     await evaluate(`window.bulkOriginals = [...document.querySelectorAll('body *')].filter(el => el.style && el.localName !== 'accesslens-panel').map(el=>({el,value:el.style.getPropertyValue('color'),priority:el.style.getPropertyPriority('color'),hadStyle:el.hasAttribute('style')}))`);
     await scan();
-    await select('Run All Corrections');
+    await select('Fix All');
     await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${boxes}.length > 0`);
     const total = await evaluate(`${boxes}.length`);
     assert.equal(await evaluate(checked), total);
@@ -146,7 +146,7 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   const imagePageStyles = `[...document.querySelectorAll('main [id]')].map(element => [element.id, element.getAttribute('style')])`;
   const originalImagePageStyles = await evaluate(imagePageStyles);
   await scan();
-  await select('Run All Corrections');
+  await select('Fix All');
   await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
   const image = `document.getElementById('unlabeled-image')`;
   const imageRow = `[...${bulk}.querySelectorAll('li')].find(row => row.querySelector('textarea'))`;
@@ -161,19 +161,19 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   await evaluate(`${imageRow}.querySelector('input').click()`);
   await frame();
   assert.equal(await evaluate(`${image}.getAttribute('alt')`), description);
-  await tab('Inspector');
+  await tab('Inspect');
   await select('Fix image');
-  assert.ok(await evaluate(`[...${shadow}.querySelectorAll('button')].some(button => button.textContent === 'Run All Corrections')`));
+  assert.ok(await evaluate(`[...${shadow}.querySelectorAll('button')].some(button => button.getAttribute('aria-label') === 'Fix All')`));
   const selectedImage = `${shadow}.querySelector('section[aria-label="Selected image correction"]')`;
   assert.equal(await evaluate(`${selectedImage}.querySelector('textarea').value`), description);
   const edited = 'A red sun rising above green hills';
   await editText(`${selectedImage}.querySelector('textarea')`, edited);
   await select('Preview alt text');
   assert.equal(await evaluate(`${image}.getAttribute('alt')`), edited);
-  await tab('Simulator');
-  await tab('Fixer');
+  await tab('Simulate');
+  await tab('Fix');
   assert.equal(await evaluate(`${image}.getAttribute('alt')`), edited);
-  await select('Run All Corrections');
+  await select('Fix All');
   await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
   assert.equal(await evaluate(`${imageRow}.querySelector('textarea').value`), edited);
   assert.equal(await evaluate(`${imageRow}.querySelector('input').checked`), true);
@@ -187,7 +187,7 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   await scan();
   assert.equal(await evaluate(`${image}.getAttribute('alt')`), null);
   assert.equal(await evaluate(`${selectedImage}`), null);
-  await select('Run All Corrections');
+  await select('Fix All');
   await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
   await editText(`${imageRow}.querySelector('textarea')`, description);
   await select('Select All');
@@ -197,7 +197,7 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   await triggerToolbar();
   await waitFor(`${shadow}?.querySelector('button')`);
   await scan();
-  await select('Run All Corrections');
+  await select('Fix All');
   await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
   await editText(`${imageRow}.querySelector('textarea')`, description);
   await select('Select All');

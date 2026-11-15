@@ -1,7 +1,7 @@
 import type { ContrastIssue, OperatingMode, SuggestedFix, VerifiedContrastFailure } from '../../shared/types';
-import { contrastRatio, floorRatio } from './color-suggester';
+import { contrastRatio, floorRatio, renderedColor } from './color-suggester';
 import { matchesOriginalContrast, readSolidContrast } from './solid-contrast';
-import { generateCorrection, type CorrectionTarget } from './correction-generator';
+import { FADED_BACKGROUND_MESSAGE, generateCorrection, type CorrectionTarget, type DrawnText } from './correction-generator';
 import type { PreviewManager, StylableElement } from './preview-manager';
 import type { ImageIssue } from '../inspector/image-runner';
 
@@ -10,6 +10,8 @@ export interface BulkCorrection {
   readonly issue: VerifiedContrastFailure;
   readonly fix: SuggestedFix;
   readonly enabled: boolean;
+  /** Opacity the text is drawn with; the fix and its measurement account for it. */
+  readonly opacity: number;
   readonly measuredRatio?: number;
   readonly failure?: string;
 }
@@ -41,9 +43,11 @@ const pause = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 const errorText = (cause: unknown) => cause instanceof Error ? cause.message : 'This correction could not be generated or applied.';
 
 /** Bulk state and orchestration; all page writes still go through the shared preview manager. */
-export function createBulkCorrections({ previewManager, readComputed, readPalette, beforeRun, beforeEnable }: {
+export function createBulkCorrections({ previewManager, readComputed, readPalette, readOpacity, beforeRun, beforeEnable }: {
   previewManager: PreviewManager;
   readComputed: (element: Element, property: string) => string;
+  /** Opacity the text is drawn with, as for single fixes; undefined when the background fades too. */
+  readOpacity?: (element: Element) => number | undefined;
   /** The site's own colors, read once per run (site-palette.ts). */
   readPalette?: () => readonly string[];
   beforeRun: () => void;
@@ -124,11 +128,11 @@ export function createBulkCorrections({ previewManager, readComputed, readPalett
         if (!rendered.includes('underline')) throw new Error('The page did not show the underline. The preview was restored.');
         return { ...item, enabled: true, measuredRatio: undefined, failure: undefined };
       }
-      const ratio = state.owner === 'user'
-        ? (readSolidContrast(element)?.ratio ?? Number.NaN)
-        : item.fix.property === 'color'
-          ? contrastRatio(rendered, item.issue.backgroundColor)
-          : contrastRatio(item.issue.textColor, rendered);
+      // User Mode verifies the solid colors actually drawn; Developer Mode measures the edited
+      // property, with the text faded by its opacity exactly as the page draws it.
+      const ratio = state.owner === 'user' ? (readSolidContrast(element)?.ratio ?? Number.NaN) : item.fix.property === 'color'
+        ? contrastRatio(renderedColor(rendered, item.issue.backgroundColor, item.opacity), item.issue.backgroundColor)
+        : contrastRatio(item.opacity < 1 ? renderedColor(readComputed(element, 'color'), rendered, item.opacity) : item.issue.textColor, rendered);
       if (!Number.isFinite(ratio) || ratio < item.issue.requiredRatio) throw new Error('The rendered color did not meet the required contrast. The preview was restored.');
       return { ...item, enabled: true, measuredRatio: floorRatio(ratio), failure: undefined };
     } catch (cause) {
@@ -232,7 +236,14 @@ export function createBulkCorrections({ previewManager, readComputed, readPalett
         if (disposed || current !== version) return;
         if (item.issue.status !== 'failed') { skipped++; continue; }
         try {
-          const result = generateCorrection(item, palette);
+          // Faded text gets the same input as a single fix: its CSS color and the opacity that fades it.
+          let drawn: DrawnText | undefined;
+          if (readOpacity && item.issue.kind !== 'link-color-only' && item.element.isConnected) {
+            const opacity = readOpacity(item.element);
+            if (opacity === undefined) { failures.push({ issue: item.issue, message: FADED_BACKGROUND_MESSAGE }); continue; }
+            if (opacity < 1) drawn = { textColor: readComputed(item.element, 'color'), opacity };
+          }
+          const result = generateCorrection(item, palette, drawn);
           if (!result.ok) { failures.push({ issue: item.issue, message: result.message }); continue; }
           if (owner === 'user' && !matchesOriginalContrast(result.element, result.issue)) { skipped++; continue; }
           let elementId = elementIds.get(item.element);
@@ -248,7 +259,7 @@ export function createBulkCorrections({ previewManager, readComputed, readPalett
           claimed.set(item.element, properties);
           ids.add(id);
           targets.set(id, result.element);
-          corrections.push({ id, issue: result.issue, fix: result.fix, enabled: false });
+          corrections.push({ id, issue: result.issue, fix: result.fix, enabled: false, opacity: drawn?.opacity ?? 1 });
         } catch (cause) {
           failures.push({ issue: item.issue, message: errorText(cause) });
         }

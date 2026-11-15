@@ -20,14 +20,14 @@ export async function runUserMode({ call, evaluate, waitFor, select, shadow, tri
   async function enabled(count) {
     await waitFor(`${status}?.textContent.includes('${count} ${count === 1 ? 'improvement' : 'improvements'} applied')`);
     assert.equal(await evaluate(`${toggle}.getAttribute('aria-checked')`), 'true');
-    assert.equal(await evaluate(`${shadow}.querySelectorAll('.inspector-highlight, [aria-label="Bulk corrections"], [aria-label="AccessLens features"]').length`), 0);
+    assert.equal(await evaluate(`${shadow}.querySelectorAll('.inspector-highlight, [aria-label="Bulk corrections"], [aria-label="Perspective features"]').length`), 0);
   }
   async function scanAndBulk() {
-    await tab('Inspector');
+    await tab('Inspect');
     await select('Scan page');
     await waitFor(`[...${shadow}.querySelectorAll('button')].some(button => button.textContent === 'Scan page' && !button.disabled)`);
-    await tab('Fixer');
-    await select('Run All Corrections');
+    await tab('Fix');
+    await select('Fix All');
     await waitFor(`${bulk}.getAttribute('aria-busy')==='false' && ${bulk}.querySelectorAll('input:checked').length===3`);
   }
   await call('Page.navigate', { url: url + '/user-mode.html' });
@@ -55,7 +55,7 @@ export async function runUserMode({ call, evaluate, waitFor, select, shadow, tri
     return ['bulk-first','bulk-second','bulk-large'].map(id=>{const s=getComputedStyle(document.getElementById(id)),a=luminance(s.color),b=luminance(s.backgroundColor);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05)});
   })()`);
   ratios.forEach((ratio, i) => assert.ok(ratio >= (i === 2 ? 3 : 4.5)));
-  await select('Restore Original Page');
+  await select('Restore original page');
   assert.deepEqual(await evaluate(styles), original);
   for (let i = 0; i < 2; i++) {
     await select('Enable Accessibility Improvements');
@@ -97,14 +97,14 @@ export async function runUserMode({ call, evaluate, waitFor, select, shadow, tri
   await select('Developer');
   assert.deepEqual(await evaluate(styles), original);
   assert.equal(await evaluate(`document.getElementById('dynamic-1').hasAttribute('style')`), false);
-  await tab('Simulator');
+  await tab('Simulate');
   await select('Low Acuity');
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`), 'blur(2px)');
   await select('User');
   await select('Enable Accessibility Improvements');
   await enabled(4);
   await evaluate(`document.getElementById('bulk-first').style.setProperty('color','blue');document.getElementById('bulk-first').style.setProperty('padding','9px')`);
-  await select('Restore Original Page');
+  await select('Restore original page');
   assert.equal(await evaluate(`document.getElementById('bulk-first').style.color`), 'blue');
   assert.equal(await evaluate(`document.getElementById('bulk-first').style.padding`), '9px');
   console.log('PASS dynamic additions/replacements, normal typing/actions, no rescan loop, Developer simulator return and author style preservation');
@@ -115,7 +115,7 @@ export async function runUserMode({ call, evaluate, waitFor, select, shadow, tri
   await evaluate(`document.querySelectorAll('.low-contrast,.gradient').forEach(el=>el.remove())`);
   await select('Enable Accessibility Improvements');
   await waitFor(`${status}.textContent.includes('No supported improvements were found')`);
-  await select('Restore Original Page');
+  await select('Restore original page');
   await call('Page.navigate', { url: url + '/user-mode.html' });
   await waitFor(`${shadow}?.querySelector('button')`);
   await select('User');
@@ -146,7 +146,7 @@ export async function runUserMode({ call, evaluate, waitFor, select, shadow, tri
     assert.equal(await evaluate('siteCheckingStates'), 0, 'Live site updates must not restart the loading state');
     const message = await evaluate(`${status}.textContent`);
     assert.equal(await evaluate(`${shadow}.querySelectorAll('.inspector-highlight').length`), 0);
-    await select('Restore Original Page');
+    await select('Restore original page');
     assert.ok(await evaluate(`userOriginals.every(({el,value,priority,hadStyle})=>!el.isConnected||(el.style.getPropertyValue('color')===value&&el.style.getPropertyPriority('color')===priority&&el.hasAttribute('style')===hadStyle))`));
     console.log(`PASS real-site User Mode and exact restoration: ${site}: ${message}`);
     await call('Page.navigate', { url: url + '/user-mode.html' });

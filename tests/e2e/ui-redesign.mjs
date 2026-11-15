@@ -16,8 +16,7 @@ export async function runUiRedesign({ call, evaluate, waitFor, select, shadow, t
     await call('Emulation.setEmulatedMedia', { features:[{ name:'prefers-color-scheme', value:scheme }, { name:'prefers-reduced-motion', value:'reduce' }] });
   }
   async function setTheme(label) {
-    if (label === 'System') await evaluate(`${shadow}.querySelector('button[aria-label="Use system theme"]').click()`);
-    else if (await evaluate(`${themeButton}.getAttribute('aria-checked')`) !== String(label === 'Dark')) await evaluate(`${themeButton}.click()`);
+    if (await evaluate(`${themeButton}.getAttribute('aria-checked')`) !== String(label === 'Dark')) await evaluate(`${themeButton}.click()`);
     await evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');
   }
   async function capture(name) {
@@ -26,7 +25,7 @@ export async function runUiRedesign({ call, evaluate, waitFor, select, shadow, t
   }
   // Collapsing preserves active effects, selected tab, and settings; focus follows.
   await select('Low Acuity');
-  await evaluate(`[...${shadow}.querySelectorAll('[role=tab]')].find(n=>n.textContent==='Inspector').focus()`);
+  await evaluate(`[...${shadow}.querySelectorAll('[role=tab]')].find(n=>n.textContent==='Inspect').focus()`);
   await evaluate(`${shadow}.querySelector('button[aria-label="Collapse Perspective"]').focus()`);
   await key('Enter');
   await waitFor(`${shadow}.querySelector('button[aria-label="Expand Perspective"]')`);
@@ -37,8 +36,8 @@ export async function runUiRedesign({ call, evaluate, waitFor, select, shadow, t
   await key('Enter');
   await waitFor(`!${shadow}.querySelector('section').hidden`);
   assert.equal(await evaluate(`${shadow}.activeElement.getAttribute('aria-label')`),'Collapse Perspective');
-  assert.equal(await evaluate(`${shadow}.querySelector('[role=tab][aria-selected=true]').textContent`),'Inspector');
-  await evaluate(`[...${shadow}.querySelectorAll('[role=tab]')].find(n=>n.textContent==='Simulator').focus()`);
+  assert.equal(await evaluate(`${shadow}.querySelector('[role=tab][aria-selected=true]').textContent`),'Inspect');
+  await evaluate(`[...${shadow}.querySelectorAll('[role=tab]')].find(n=>n.textContent==='Simulate').focus()`);
   await select('Reset');
   console.log('PASS collapse/expand keyboard focus, compact host bounds and preserved simulation');
   // Switch keyboard operation, preference persistence, and local tooltips.
@@ -54,15 +53,11 @@ export async function runUiRedesign({ call, evaluate, waitFor, select, shadow, t
   await waitFor(`${theme}?.dataset.theme === 'dark'`);
   await call('Page.reload');
   await waitFor(`${theme}?.dataset.theme === 'dark'`);
-  await evaluate(`${shadow}.querySelector('button[aria-label="Use system theme"]').focus()`);
+  await evaluate(`${themeButton}.focus()`);
   await waitFor(`${shadow}.querySelector('[role=tooltip]')`);
   assert.equal(await evaluate(`Boolean(document.querySelector('[role=tooltip]'))`), false);
   assert.ok(await evaluate(`${shadow}.querySelector('[role=tooltip]').closest('[data-theme]') !== null`));
   await key('Escape');
-  await setTheme('System');
-  await waitFor(`${theme}.dataset.theme === 'light'`);
-  await media('dark');
-  await waitFor(`${theme}.dataset.theme === 'dark'`);
   await setTheme('Light');
   await waitFor(`${theme}.dataset.theme === 'light'`);
   await media('dark');
@@ -100,11 +95,11 @@ export async function runUiRedesign({ call, evaluate, waitFor, select, shadow, t
   // Roving keyboard tabs must keep the controller state alive across content unmounts.
   await evaluate(`${shadow}.querySelector('[role=tab][data-state=active]').focus()`);
   await key('ArrowRight');
-  assert.equal(await evaluate(`${shadow}.querySelector('[role=tab][data-state=active]').textContent`),'Inspector');
+  assert.equal(await evaluate(`${shadow}.querySelector('[role=tab][data-state=active]').textContent`),'Inspect');
   assert.equal(await evaluate(`getComputedStyle(document.querySelector('main')).filter`),'blur(0.5px)');
   await capture('ui-inspector');
   await key('ArrowRight');
-  assert.equal(await evaluate(`${shadow}.querySelector('[role=tab][data-state=active]').textContent`),'Fixer');
+  assert.equal(await evaluate(`${shadow}.querySelector('[role=tab][data-state=active]').textContent`),'Fix');
   await capture('ui-fixer');
   await key('Home');
   assert.equal(await evaluate(`${slider}.getAttribute('aria-valuenow')`),'0.5');

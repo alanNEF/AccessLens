@@ -1,28 +1,20 @@
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
-import { CircleAlert, CircleCheck, Copy, Info, Palette, RotateCcw, Wrench } from 'lucide-react';
-import { isVerifiedFailure, type ContrastIssue, type SimulationMode, type SuggestedFix } from '../../shared/types';
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
+import { ArrowLeftRight, ArrowRight, Check, ChevronLeft, ChevronRight, CircleAlert, CircleCheck, Copy, Info, ListChecks, Palette, RotateCcw, Wrench } from 'lucide-react';
+import { isVerifiedFailure, type ContrastIssue, type SuggestedFix, type VerifiedContrastFailure } from '../../shared/types';
 import type { SimulatorModeReader } from '../../shared/simulator-mode-reader';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent } from '../../components/ui/card';
 import { cn } from '../../components/shared/utils';
 import type { FixerController } from './fixer-controller';
-import type { FixerState } from './fixer-state';
-import type { ImageIssue } from '../inspector/image-runner';
-import { ImageAltFixer } from './ImageAltFixer';
 import { BulkCorrections } from './BulkCorrections';
+import { ImageAltFixer } from './ImageAltFixer';
+import type { ImageIssue } from '../inspector/image-runner';
+import { modeName } from '../simulator/SimulatorTab';
 import type { InspectorStore } from '../inspector/inspector-store';
 
-// Local labels keep the Fixer independent of simulator internals.
-const MODE_LABELS: Record<SimulationMode, string> = {
-  none: 'Off', protanopia: 'Protanopia', deuteranopia: 'Deuteranopia', tritanopia: 'Tritanopia', achromatopsia: 'Achromatopsia', blur: 'Low Acuity', cataracts: 'Cataracts', 'low-contrast': 'Low Contrast', visionless: 'Visionless',
-};
+const VISION_LABELS = { protanopia: 'Protanopia', deuteranopia: 'Deuteranopia', tritanopia: 'Tritanopia' } as const;
 
-function statusText({ phase, view }: FixerState): string {
-  if (phase === 'empty') return 'No issue selected';
-  if (phase === 'unsupported') return 'No automatic fix for this issue';
-  if (phase === 'ready') return 'Suggestion ready — not applied';
-  return view === 'fixed' ? 'Previewing the fix' : 'Showing the original';
-}
+/** The primary action color: blue on navy (dark) and on white (light). */
+const PRIMARY = 'bg-ring text-background hover:bg-ring/90';
 
 function requirementText(issue: ContrastIssue): string {
   if (issue.kind === 'link-color-only') return `Links in text need an underline, or ${issue.requiredRatio}:1 against the surrounding text (WCAG 1.4.1)`;
@@ -30,215 +22,271 @@ function requirementText(issue: ContrastIssue): string {
   return `${issue.isLargeText ? 'Large' : 'Normal'} text needs ${issue.requiredRatio}:1 (WCAG ${issue.wcagCriterion} ${level})`;
 }
 
-/** `opacity` fades only the sample text, matching how the page draws it. */
-function Swatch({ label, color, background, ratio, opacity = 1, code = color }: { label: string; color: string; background: string; ratio: number; opacity?: number; code?: string }) {
+/** One half of the big before/after preview. The ratio sits on a readable chip, never in the sample's own colors. */
+function PreviewHalf({ label, ratio, sample, style }: { label: string; ratio?: number; sample: ReactNode; style: CSSProperties }) {
   return (
-    <figure className="m-0 space-y-2 rounded-lg border border-border p-2.5">
-      <div className="flex h-12 items-center justify-center rounded-md border border-border text-xl font-semibold" style={{ background }} aria-hidden="true"><span style={{ color, opacity }}>Aa</span></div>
-      <figcaption className="space-y-0.5 text-xs">
-        <span className="block font-medium text-foreground">{label}</span>
-        <code className="block font-mono text-muted-foreground">{code}</code>
-        <span className="block tabular-nums text-muted-foreground">{ratio.toFixed(2)}:1</span>
-      </figcaption>
-    </figure>
-  );
-}
-const VISION_LABELS = { protanopia: 'Protanopia', deuteranopia: 'Deuteranopia', tritanopia: 'Tritanopia' } as const;
-
-/** Contrast of the suggestion under each color-vision simulation; pass/fail shown in words, not only color. */
-function ColorVisionCheck({ fix, required }: { fix: SuggestedFix; required: number }) {
-  const ratios = (Object.keys(VISION_LABELS) as (keyof typeof VISION_LABELS)[])
-    .flatMap(check => (fix.simulatedRatios?.[check] === undefined ? [] : [[check, fix.simulatedRatios[check]!] as const]));
-  return (
-    <div className={cn('rounded-lg border p-3 text-xs', fix.colorBlindSafe ? 'border-border' : 'border-destructive')}>
-      <p className={cn('flex items-center gap-1.5 font-medium', fix.colorBlindSafe ? 'text-foreground' : 'text-destructive')}>
-        {fix.colorBlindSafe ? <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" /> : <CircleAlert className="size-3.5 shrink-0" aria-hidden="true" />}
-        {fix.colorBlindSafe ? 'Color-blind safe: also passes for every color-vision type' : 'Meets WCAG, but not for every color-vision type'}
-      </p>
-      <ul className="mt-2 grid grid-cols-3 gap-1.5">
-        {ratios.map(([check, ratio]) => (
-          <li key={check} className="flex flex-col">
-            <span className="text-muted-foreground">{VISION_LABELS[check]}</span>
-            <span className="font-semibold tabular-nums">{ratio.toFixed(2)}:1 {ratio >= required ? '✓' : '(below)'}</span>
-          </li>
-        ))}
-      </ul>
-      {!fix.colorBlindSafe && <p className="mt-2 text-muted-foreground">No single color reaches {required}:1 for every type here. This one meets WCAG with the page’s real colors.</p>}
+    <div className="flex min-h-[92px] flex-col justify-between p-3" style={style}>
+      <div className="text-2xl leading-none font-bold">{sample}</div>
+      <span className="mt-3 self-start rounded-md bg-background/90 px-1.5 py-0.5 text-[11px] font-medium text-foreground tabular-nums">
+        {label}{ratio !== undefined ? ` · ${ratio.toFixed(2)} : 1` : ''}
+      </span>
     </div>
   );
 }
-export function FixerTab({
-  controller,
-  modeReader,
-  selectedImage,
-  inspector,
-}: {
+
+function BeforeAfter({ issue, fix, opacity = 1 }: { issue: VerifiedContrastFailure; fix: SuggestedFix; opacity?: number }) {
+  const halves = fix.property === 'text-decoration-line'
+    ? (['Now', 'Fixed'] as const).map(label => ({ label, ratio: undefined, style: { background: '#ffffff' },
+      sample: <span className="text-lg font-medium" style={{ color: issue.textColor, textDecorationLine: label === 'Now' ? 'none' : 'underline' }}>link</span> }))
+    : fix.property === 'background-color'
+      ? [{ label: 'Now', ratio: fix.originalContrastRatio, style: { background: fix.originalValue, color: issue.textColor }, sample: 'Aa' },
+        { label: 'Fixed', ratio: fix.expectedContrastRatio, style: { background: fix.suggestedValue, color: issue.textColor }, sample: 'Aa' }]
+      : [{ label: 'Now', ratio: fix.originalContrastRatio, style: { background: issue.backgroundColor }, sample: <span style={{ color: fix.originalValue, opacity }}>Aa</span> },
+        { label: 'Fixed', ratio: fix.expectedContrastRatio, style: { background: issue.backgroundColor }, sample: <span style={{ color: fix.suggestedValue, opacity }}>Aa</span> }];
+  return (
+    <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-border" aria-hidden="true">
+      {halves.map((half, index) => (
+        <div key={half.label} className={cn(index === 1 && 'border-l-2 border-background')}><PreviewHalf {...half} /></div>
+      ))}
+    </div>
+  );
+}
+
+export function FixerTab({ controller, modeReader, selectedImage, inspector }: {
   controller: FixerController;
   modeReader: SimulatorModeReader;
+  /** An image picked with Fix image in Inspect: edited here instead of a contrast issue. */
   selectedImage: ImageIssue | null;
   inspector: InspectorStore;
 }) {
-
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
+  const bulk = useSyncExternalStore(controller.bulk.subscribe, controller.bulk.getState);
+  const inspected = useSyncExternalStore(inspector.subscribe, inspector.getState);
   const mode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
+  const { phase, issue, fix, view } = state;
+  // The CSS rule to copy: this element's selector and the suggested declaration. Editable before copying.
+  const rule = issue && fix ? `${issue.selector} {
+  ${fix.property}: ${fix.suggestedValue};
+}` : '';
+  const [cssText, setCssText] = useState(rule);
+  const [copied, setCopied] = useState(false);
   const [copyStatus, setCopyStatus] = useState('');
   const cssId = useId();
-  const cssField = useRef<HTMLInputElement>(null);
-  const { phase, issue, fix, view } = state;
-  const declaration = fix ? `${fix.property}: ${fix.suggestedValue};` : '';
-  // A copy message belongs to one declaration; clear it when the suggestion changes.
-  useEffect(() => setCopyStatus(''), [declaration]);
+  const cssField = useRef<HTMLTextAreaElement>(null);
+  const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // A new suggestion starts from its own rule, with no leftover copy message.
+  useEffect(() => { setCssText(rule); setCopied(false); setCopyStatus(''); }, [rule]);
+  useEffect(() => () => clearTimeout(copiedTimer.current), []);
+
+  // Step through the Inspector's verified failures (‹ 1 of 7 ›).
+  const failures = inspected.issues.filter(item => isVerifiedFailure(item.issue));
+  const index = issue ? failures.findIndex(item => item.issue.id === issue.id) : -1;
+  const go = (step: number) => {
+    const next = failures[(index + step + failures.length) % failures.length];
+    if (next) controller.selectIssue(next.issue, next.element);
+  };
 
   async function copyCss() {
-    cssField.current?.select();
+    clearTimeout(copiedTimer.current);
     try {
-      await navigator.clipboard.writeText(declaration);
-      setCopyStatus('Copied to clipboard.');
+      await navigator.clipboard.writeText(cssText);
+      setCopied(true);
+      setCopyStatus('Fix copied to the clipboard');
+      // The tick shows for 2 seconds, then the copy icon returns.
+      copiedTimer.current = setTimeout(() => { setCopied(false); setCopyStatus(''); }, 2000);
     } catch {
-      // Clipboard API needs a secure, focused page; fall back to the selected field.
-      setCopyStatus('Copy blocked on this page. The declaration is selected: press Ctrl+C (⌘C on Mac).');
+      // Clipboard API needs a secure, focused page; fall back to selecting the field.
+      setCopied(false);
+      setCopyStatus('Copy blocked on this page. The fix is selected: press Ctrl+C (⌘C on Mac).');
+      cssField.current?.focus();
+      cssField.current?.select();
     }
   }
-  return (
-    <div className="space-y-5">
-      <div>
-        <h2 className="mb-1 text-lg font-semibold tracking-tight">Preview a fix</h2>
-        <p className="text-sm text-muted-foreground">Try a fix on the page, then copy the CSS.</p>
-      </div>
 
-      <BulkCorrections controller={controller} inspector={inspector} />
+  return (
+    <div className="space-y-3">
+      {bulk.phase !== 'idle' && <BulkCorrections controller={controller} inspector={inspector} />}
+      <FixAll controller={controller} inspector={inspector} />
 
       {selectedImage && <ImageAltFixer selectedImage={selectedImage} controller={controller} />}
 
       {!selectedImage && <>
-      <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
-        Status: <strong className="font-medium text-foreground">{statusText(state)}</strong>
+
+      <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {phase === 'empty' ? 'No issue selected' : phase === 'unsupported' ? 'No automatic fix for this issue' : phase === 'ready' ? 'Suggestion ready, not applied' : view === 'fixed' ? 'Previewing the fix' : 'Showing the original'}
       </p>
 
-      {phase === 'empty' && (
-        <Card className="rounded-lg border-dashed bg-secondary/30 py-0 shadow-none"><CardContent className="flex flex-col items-center px-5 py-8 text-center">
-          <span className="mb-4 flex size-11 items-center justify-center rounded-xl border border-border bg-background"><Wrench className="size-5 text-muted-foreground" aria-hidden="true" /></span>
-          <h3 className="mb-2 text-sm font-medium">No issue selected</h3>
-          <p className="text-sm text-muted-foreground">Select a failure in Inspector to see a suggested fix.</p>
-        </CardContent></Card>
+      {phase === 'empty' && bulk.phase === 'idle' && (
+        <div className="flex flex-col items-center rounded-xl border border-dashed border-border px-5 py-8 text-center">
+          <span className="mb-3 flex size-11 items-center justify-center rounded-xl bg-secondary"><Wrench className="size-5 text-muted-foreground" aria-hidden="true" /></span>
+          <h3 className="mb-1 text-sm font-medium">No issue selected</h3>
+          <p className="text-sm text-muted-foreground">Pick a failure in Inspect, or fix everything at once with Fix all.</p>
+        </div>
       )}
 
       {issue && (
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-          <dt className="font-medium">Element</dt>
-          <dd className="m-0 min-w-0"><code className="font-mono text-xs break-all text-muted-foreground">{issue.selector}</code></dd>
-          <dt className="font-medium">Requirement</dt>
-          <dd className="m-0 text-muted-foreground">{requirementText(issue)}</dd>
-        </dl>
+        <div>
+          <div className="flex items-center gap-2">
+            <span className={cn('shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium', isVerifiedFailure(issue) ? 'bg-destructive/15 text-destructive' : 'bg-secondary text-muted-foreground')}>
+              {isVerifiedFailure(issue) ? 'Fail' : 'Review'}
+            </span>
+            <h3 className="min-w-0 flex-1 truncate text-sm font-semibold" title={issue.selector}>{issue.elementLabel || issue.selector}</h3>
+            {index >= 0 && failures.length > 1 && <>
+              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{index + 1} of {failures.length}</span>
+              <Button type="button" variant="ghost" size="icon-xs" aria-label="Previous issue" onClick={() => go(-1)}><ChevronLeft aria-hidden="true" /></Button>
+              <Button type="button" variant="ghost" size="icon-xs" aria-label="Next issue" onClick={() => go(1)}><ChevronRight aria-hidden="true" /></Button>
+            </>}
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">{requirementText(issue)}</p>
+        </div>
       )}
 
       {state.message && <p role="alert" className="rounded-lg border border-destructive p-3 text-sm text-destructive">{state.message}</p>}
 
       {issue && fix && isVerifiedFailure(issue) && (
         <>
-          <div className="space-y-2">
-            {fix.property === 'color' && (
-              <div className="grid grid-cols-2 gap-2">
-                <Swatch label="Current" color={fix.originalValue} background={issue.backgroundColor} ratio={fix.originalContrastRatio} opacity={state.opacity} />
-                <Swatch label="Suggested" color={fix.suggestedValue} background={issue.backgroundColor} ratio={fix.expectedContrastRatio} opacity={state.opacity} />
-              </div>
-            )}
-            {fix.property === 'background-color' && (
-              <div className="grid grid-cols-2 gap-2">
-                <Swatch label="Current background" color={issue.textColor} background={fix.originalValue} code={fix.originalValue} ratio={fix.originalContrastRatio} />
-                <Swatch label="Suggested background" color={issue.textColor} background={fix.suggestedValue} code={fix.suggestedValue} ratio={fix.expectedContrastRatio} />
-              </div>
-            )}
-            {fix.property === 'text-decoration-line' && (
-              <div className="grid grid-cols-2 gap-2" aria-hidden="true">
-                {(['Current', 'Suggested'] as const).map(label => (
-                  <figure key={label} className="m-0 space-y-2 rounded-lg border border-border p-2.5">
-                    <div className="flex h-12 items-center justify-center rounded-md border border-border bg-white px-2 text-sm">
-                      <span style={{ color: issue.backgroundColor }}>a&nbsp;</span>
-                      <span style={{ color: issue.textColor, textDecorationLine: label === 'Current' ? 'none' : 'underline' }}>link</span>
-                      <span style={{ color: issue.backgroundColor }}>&nbsp;here</span>
-                    </div>
-                    <figcaption className="text-xs font-medium text-foreground">{label}: {label === 'Current' ? 'color only' : 'underlined'}</figcaption>
-                  </figure>
-                ))}
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground">Changes the <code className="font-mono">{fix.property}</code> property only.</p>
-            {state.opacity !== undefined && state.opacity < 1 && (
-              <p className="text-xs text-muted-foreground">
-                This text is drawn at {Math.round(state.opacity * 100)}% opacity, so the suggested color is darker or lighter than it looks: ratios are measured as drawn. Raising the opacity is another way to fix it.
-              </p>
-            )}
-            {fix.simulatedRatios && <ColorVisionCheck fix={fix} required={issue.requiredRatio} />}
-            {fix.source === 'site-palette' && (
-              <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Palette className="size-3.5 shrink-0" aria-hidden="true" />Uses a color this site already uses, so it stays on-brand.</p>
-            )}
-            {state.alternative && (
-              <Button type="button" variant="outline" size="sm" className="h-auto w-full justify-start py-1.5 whitespace-normal text-left" onClick={() => controller.useAlternative()}>
-                <span className="size-3.5 shrink-0 rounded-sm border border-border" style={{ background: state.alternative.suggestedValue }} aria-hidden="true" />
-                <span>Use {state.alternative.source === 'site-palette' ? 'this site’s color' : 'an adjusted shade'} <code className="font-mono">{state.alternative.suggestedValue}</code> instead ({state.alternative.expectedContrastRatio.toFixed(2)}:1{state.alternative.colorBlindSafe ? ', color-blind safe' : ''})</span>
-              </Button>
-            )}
-          </div>
+          <BeforeAfter issue={issue} fix={fix} opacity={state.opacity} />
 
-          {phase === 'ready' && (
-            <Button type="button" className="w-full" onClick={() => controller.preview()}><Wrench aria-hidden="true" />Preview fix</Button>
+          {fix.property !== 'text-decoration-line' && (
+            <p className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
+              <span>{fix.originalValue}</span>
+              <ArrowRight className="size-3.5" aria-label="changes to" />
+              <span className="size-3.5 rounded-sm border border-border" style={{ background: fix.suggestedValue }} aria-hidden="true" />
+              <span className="text-foreground">{fix.suggestedValue}</span>
+              <span className="ml-auto font-sans">{fix.property}</span>
+            </p>
           )}
 
-          {phase === 'previewing' && (
-            <div className="space-y-3">
-              <fieldset className="min-w-0">
-                <legend className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Compare</legend>
-                <div className="grid grid-cols-2 gap-2">
+          {(fix.simulatedRatios || fix.source === 'site-palette' || state.alternative || (state.opacity ?? 1) < 1) && (
+            <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border text-sm">
+              {fix.simulatedRatios && (
+                <li className="flex items-center gap-2.5 px-3 py-2.5">
+                  {fix.colorBlindSafe
+                    ? <CircleCheck className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+                    : <CircleAlert className="size-4 shrink-0 text-destructive" aria-hidden="true" />}
+                  <span className="flex-1">{fix.colorBlindSafe ? 'Color-blind safe' : 'Not safe for every color-vision type'}</span>
+                  <span className="text-xs text-muted-foreground tabular-nums">
+                    {(Object.keys(VISION_LABELS) as (keyof typeof VISION_LABELS)[]).map((check, i) => {
+                      const ratio = fix.simulatedRatios?.[check];
+                      return ratio === undefined ? null : <span key={check}>{i > 0 && ' · '}<span className="sr-only">{VISION_LABELS[check]} </span><span className={ratio < issue.requiredRatio ? 'text-destructive' : undefined}>{ratio.toFixed(2)}</span></span>;
+                    })}
+                  </span>
+                </li>
+              )}
+              {(fix.source === 'site-palette' || state.alternative?.source === 'site-palette') && (
+                <li className="flex items-center gap-2.5 px-3 py-2.5">
+                  <Palette className="size-4 shrink-0 text-violet-600 dark:text-violet-300" aria-hidden="true" />
+                  <span className="flex-1">{fix.source === 'site-palette' ? 'This site’s own color' : 'A site color also works'}</span>
+                  {state.alternative && (
+                    <button type="button" className="text-xs font-medium text-ring hover:underline" onClick={() => controller.useAlternative()}>
+                      Use {state.alternative.suggestedValue}
+                    </button>
+                  )}
+                </li>
+              )}
+              {fix.source !== 'site-palette' && state.alternative && state.alternative.source !== 'site-palette' && (
+                <li className="flex items-center gap-2.5 px-3 py-2.5">
+                  <Palette className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  <span className="flex-1">Another option</span>
+                  <button type="button" className="text-xs font-medium text-ring hover:underline" onClick={() => controller.useAlternative()}>Use {state.alternative.suggestedValue}</button>
+                </li>
+              )}
+              {(state.opacity ?? 1) < 1 && (
+                <li className="flex items-start gap-2.5 px-3 py-2.5 text-xs text-muted-foreground">
+                  <Info className="mt-px size-4 shrink-0" aria-hidden="true" />
+                  <span>Drawn at {Math.round((state.opacity ?? 1) * 100)}% opacity, so ratios are measured as drawn. Raising the opacity also works.</span>
+                </li>
+              )}
+            </ul>
+          )}
+
+          {phase === 'previewing' && (state.measuredRatio !== undefined || (fix.property === 'text-decoration-line' && state.meetsTarget !== undefined && view === 'fixed')) && (
+            <p className={cn('flex items-start gap-2 rounded-lg border p-2.5 text-sm', state.meetsTarget ? 'border-border' : 'border-destructive text-destructive')}>
+              {state.meetsTarget ? <CircleCheck className="mt-0.5 size-4 shrink-0 text-emerald-600 dark:text-emerald-400" aria-hidden="true" /> : <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
+              {state.measuredRatio !== undefined
+                ? <span>Measured on the page: <strong className="font-semibold tabular-nums">{state.measuredRatio.toFixed(2)}:1</strong> — {state.meetsTarget ? 'meets' : 'does not meet'} {issue.requiredRatio}:1</span>
+                : <span>{state.meetsTarget ? 'The link is now underlined, so it no longer relies on color.' : 'The page did not show the underline.'}</span>}
+            </p>
+          )}
+
+          <div className="flex gap-2">
+            {phase === 'previewing' ? (
+              <>
+                <div role="group" aria-label="Compare" className="flex flex-1 rounded-lg bg-secondary p-0.5">
                   {(['original', 'fixed'] as const).map(option => (
-                    <Button key={option} type="button" variant="outline" aria-pressed={view === option}
+                    <button key={option} type="button" aria-pressed={view === option}
                       onClick={() => (option === 'original' ? controller.showOriginal() : controller.showFixed())}
-                      className={cn(view === option ? 'border-ring bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground' : 'bg-background hover:bg-secondary')}>
+                      className={cn('flex-1 rounded-md py-1.5 text-sm font-medium transition-colors', view === option ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground')}>
                       {option === 'original' ? 'Original' : 'Fixed'}
-                    </Button>
+                    </button>
                   ))}
                 </div>
-              </fieldset>
-              {fix.property === 'text-decoration-line' && state.meetsTarget !== undefined && view === 'fixed' && (
-                <p className={cn('flex items-start gap-2 rounded-lg border p-3 text-sm', state.meetsTarget ? 'border-border' : 'border-destructive text-destructive')}>
-                  {state.meetsTarget ? <CircleCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" /> : <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
-                  <span>{state.meetsTarget ? 'The link is now underlined on the page, so it no longer relies on color.' : 'The page did not show the underline.'}</span>
-                </p>
-              )}
-              {state.measuredRatio !== undefined && (
-                <p className={cn('flex items-start gap-2 rounded-lg border p-3 text-sm', state.meetsTarget ? 'border-border' : 'border-destructive text-destructive')}>
-                  {state.meetsTarget ? <CircleCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" /> : <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
-                  <span>Measured on the page: <strong className="font-semibold tabular-nums">{state.measuredRatio.toFixed(2)}:1</strong> — {state.meetsTarget ? 'meets' : 'does not meet'} {issue.requiredRatio}:1</span>
-                </p>
-              )}
-              <Button type="button" variant="outline" size="sm" onClick={() => controller.revert()}><RotateCcw className="size-3.5" aria-hidden="true" />Revert</Button>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <label htmlFor={cssId} className="block text-xs font-semibold tracking-wide text-muted-foreground uppercase">CSS declaration</label>
-            <div className="flex gap-2">
-              <input id={cssId} ref={cssField} readOnly value={declaration} onFocus={event => event.currentTarget.select()}
-                className="h-8 min-w-0 flex-1 rounded-md border border-border bg-background px-2.5 font-mono text-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50" />
-              <Button type="button" variant="outline" size="sm" onClick={copyCss}><Copy className="size-3.5" aria-hidden="true" />Copy CSS</Button>
-            </div>
-            {copyStatus && <p role="status" className="text-xs text-muted-foreground">{copyStatus}</p>}
+                <Button type="button" variant="outline" className="h-auto" onClick={() => controller.revert()}><RotateCcw className="size-3.5" aria-hidden="true" />Revert</Button>
+              </>
+            ) : (
+              <>
+                <Button type="button" className={cn('h-10 flex-1', PRIMARY)} onClick={() => controller.preview()}><Wrench aria-hidden="true" />Preview fix</Button>
+                <Button type="button" variant="outline" className="size-10" aria-label="Compare original and fixed" onClick={() => { controller.preview(); controller.showOriginal(); }}><ArrowLeftRight aria-hidden="true" /></Button>
+              </>
+            )}
           </div>
+
+          <div className="space-y-2 rounded-xl border border-border p-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <label htmlFor={cssId} className="text-sm font-medium">Copy fix</label>
+              <span className="text-xs text-muted-foreground">Paste it into your stylesheet</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <textarea id={cssId} ref={cssField} value={cssText} onChange={event => setCssText(event.currentTarget.value)} rows={3} spellCheck={false}
+                className="min-w-0 flex-1 resize-y rounded-md border border-border bg-background px-2.5 py-2 font-mono text-xs leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50" />
+              <Button type="button" variant="outline" className="relative size-10 shrink-0" aria-label={copied ? 'Copied' : 'Copy fix'} onClick={copyCss}>
+                <Copy aria-hidden="true" className={cn('absolute transition-all duration-200 motion-reduce:transition-none', copied ? 'scale-50 opacity-0' : 'scale-100 opacity-100')} />
+                <Check aria-hidden="true" className={cn('absolute text-emerald-600 transition-all duration-200 motion-reduce:transition-none dark:text-emerald-400', copied ? 'scale-100 opacity-100' : 'scale-50 opacity-0')} />
+              </Button>
+            </div>
+            <p role="status" aria-live="polite" className={cn('text-xs', copyStatus ? 'text-muted-foreground' : 'sr-only')}>{copyStatus}</p>
+          </div>
+          <p className="text-xs text-muted-foreground">Preview only — your source code isn’t changed. Copy the fix into your stylesheet to keep it.</p>
         </>
       )}
 
       </>}
 
-      {mode !== 'none' && (
-        <p className="rounded-lg border border-border bg-accent p-3 text-xs text-accent-foreground">
-          Simulation active: <strong className="font-semibold">{MODE_LABELS[mode]}</strong>. Comparing keeps it on.
-        </p>
-      )}
-
-      <div className="flex items-start gap-2.5 rounded-lg bg-secondary p-3.5 text-xs leading-relaxed text-muted-foreground">
-        <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-        <p><strong className="font-semibold text-foreground">Preview only — source code has not been changed.</strong> Add the declaration to your own stylesheet to make the fix permanent.</p>
-      </div>
+      {mode !== 'none' && issue && !selectedImage && <p className="text-xs text-muted-foreground">Simulation on: <strong className="font-medium text-foreground">{modeName(mode)}</strong>. Comparing keeps it on.</p>}
     </div>
+  );
+}
+
+/** Fixes every verified failure at once, scanning the page first if Inspect hasn't yet. */
+function FixAll({ controller, inspector }: { controller: FixerController; inspector: InspectorStore }) {
+  const bulk = useSyncExternalStore(controller.bulk.subscribe, controller.bulk.getState);
+  const inspected = useSyncExternalStore(inspector.subscribe, inspector.getState);
+  const generating = bulk.phase === 'generating';
+  const scanning = inspected.status === 'scanning';
+  const scanned = inspected.status === 'done';
+  const count = inspected.issues.filter(item => isVerifiedFailure(item.issue)).length;
+  const images = inspected.imageIssues.length;
+  // Same count as the list above: contrast fixes plus image descriptions.
+  const items = [...bulk.corrections, ...bulk.imageCorrections];
+  const enabled = items.filter(item => item.enabled).length;
+  const allFixed = bulk.phase === 'ready' && items.length > 0 && enabled === items.length;
+
+  async function fixAll() {
+    if (!scanned) await inspector.scan();
+    const latest = inspector.getState();
+    if (latest.status !== 'done') return; // scan failed: Inspect shows the error
+    // Images can't be described automatically: they join the list for you to write their alt text.
+    await controller.bulk.run(latest.picked ? [latest.picked, ...latest.issues] : latest.issues, 'developer', { imageIssues: latest.imageIssues });
+  }
+
+  return (
+    <Button type="button" className={cn('h-10 w-full', PRIMARY)} aria-label="Fix All" disabled={generating || scanning || inspected.picking || (scanned && count === 0 && images === 0)}
+      onClick={() => { void fixAll(); }}>
+      <ListChecks aria-hidden="true" />
+      {scanning ? 'Scanning the page…' : generating ? 'Fixing…'
+        : allFixed ? `All ${enabled} fixed · Fix all again`
+          : scanned && count === 0 ? (images ? 'Add image descriptions' : 'No contrast failures to fix')
+            : `Fix all${scanned ? ` ${count} ${count === 1 ? 'issue' : 'issues'}` : ''}`}
+    </Button>
   );
 }
