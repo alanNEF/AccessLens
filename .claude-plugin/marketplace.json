@@ -1,0 +1,14 @@
+{
+  "name": "accesslens",
+  "description": "AccessLens accessibility tools for coding agents (HackUMass).",
+  "owner": {
+    "name": "AccessLens team (HackUMass)"
+  },
+  "plugins": [
+    {
+      "name": "accesslens",
+      "source": "./agent-plugin",
+      "description": "Accessibility scans for coding agents: WCAG contrast and color-only-link failures as JSON, with CSS fixes."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "accesslens",
+  "displayName": "AccessLens",
+  "version": "0.1.0",
+  "description": "Accessibility checks for coding agents: scan any URL for WCAG text-contrast and color-only-link failures and get compact JSON with ready-to-apply CSS fixes, instead of screenshots.",
+  "author": { "name": "AccessLens team (HackUMass)" },
+  "repository": "https://github.com/alanNEF/AccessLens",
+  "license": "MIT",
+  "keywords": ["accessibility", "a11y", "wcag", "contrast", "mcp"]
+}
