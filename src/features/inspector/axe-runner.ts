@@ -8,8 +8,12 @@ export interface InspectedIssue {
   readonly element: Element;
 }
 
-/** axe rule ids. color-contrast-enhanced is axe's WCAG 1.4.6 (AAA) rule; it is off unless asked for by id. */
-const TEXT_RULE: Record<ContrastLevel, string> = { AA: 'color-contrast', AAA: 'color-contrast-enhanced' };
+/**
+ * axe rule ids. color-contrast-enhanced is axe's WCAG 1.4.6 (AAA) rule. It only reports ratios from
+ * 4.5:1 (3:1 large) up to 7:1 (4.5:1 large) and passes anything lower, so AAA also runs color-contrast
+ * to catch the worst text, judged against the AAA target.
+ */
+const TEXT_RULES: Record<ContrastLevel, readonly string[]> = { AA: ['color-contrast'], AAA: ['color-contrast', 'color-contrast-enhanced'] };
 const LINK_RULE = 'link-in-text-block';
 
 let queue: Promise<unknown> = Promise.resolve();
@@ -41,11 +45,13 @@ function toInspected(ruleId: string, node: axe.NodeResult, status: ContrastStatu
     };
   }
   const data = (checks.find(check => check.id === 'color-contrast' || check.id === 'color-contrast-enhanced')?.data ?? null) as AxeContrastData | null;
-  return { element, issue: toContrastIssue({ ...common, data, level }) };
+  return { element, issue: toContrastIssue({ ...common, data, level, fromMinimumRule: ruleId === 'color-contrast' }) };
 }
 
 function collect(results: axe.AxeResults, level: ContrastLevel, includePasses: boolean): InspectedIssue[] {
-  const wanted = new Set([TEXT_RULE[level], LINK_RULE]);
+  const wanted = new Set([...TEXT_RULES[level], LINK_RULE]);
+  // At AAA both text rules can report the same element (e.g. as needs-review); keep its first, most severe result.
+  const seenElements = new Map<Element, Set<string>>();
   const groups: Array<[axe.Result[], ContrastStatus]> = [
     [results.violations, 'failed'],
     [results.incomplete, 'needs-review'],
@@ -57,7 +63,11 @@ function collect(results: axe.AxeResults, level: ContrastLevel, includePasses: b
       if (!wanted.has(rule.id)) continue;
       rule.nodes.forEach((node, index) => {
         const inspected = toInspected(rule.id, node, status, `${rule.id}-${status}-${index}`, level);
-        if (inspected) out.push(inspected);
+        if (!inspected) return;
+        const key = `${inspected.issue.kind}`;
+        if (seenElements.get(inspected.element)?.has(key)) return;
+        seenElements.set(inspected.element, (seenElements.get(inspected.element) ?? new Set()).add(key));
+        out.push(inspected);
       });
     }
   }
@@ -65,7 +75,7 @@ function collect(results: axe.AxeResults, level: ContrastLevel, includePasses: b
 }
 
 const optionsFor = (level: ContrastLevel): axe.RunOptions => ({
-  runOnly: { type: 'rule', values: [TEXT_RULE[level], LINK_RULE] },
+  runOnly: { type: 'rule', values: [...TEXT_RULES[level], LINK_RULE] },
   elementRef: true,
 });
 
@@ -75,10 +85,10 @@ const optionsFor = (level: ContrastLevel): axe.RunOptions => ({
  * `exclude` is the AccessLens panel host, so our own UI is never audited.
  * axe reads computed CSS colors, so an active simulation does not change results (INS-02).
  */
-export async function scanTextContrast(exclude: Element, level: ContrastLevel = 'AA'): Promise<InspectedIssue[]> {
+export async function scanTextContrast(exclude: Element, roots: readonly Element[] = [document.documentElement]): Promise<InspectedIssue[]> {
   const results = await runAxe(
-    { include: [document.documentElement], exclude: [exclude] } as unknown as axe.ElementContext,
-    { ...optionsFor(level), resultTypes: ['violations', 'incomplete'] },
+    { include: [...roots], exclude: [exclude] } as unknown as axe.ElementContext,
+    { runOnly: { type: 'rule', values: [RULE] }, elementRef: true, resultTypes: ['violations', 'incomplete'] },
   );
   return collect(results, level, false);
 }

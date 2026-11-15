@@ -45,7 +45,7 @@ const REVIEW_REASONS: Record<string, string> = {
   shadowOnText: 'A text shadow changes how readable the text is.',
   colorParse: 'One of the colors could not be read.',
 };
-const DEFAULT_REVIEW_REASON = 'AccessLens could not reliably determine this text’s colors.';
+const DEFAULT_REVIEW_REASON = 'Perspective could not reliably determine this text’s colors.';
 
 export function reviewReasonFor(messageKey: string | null | undefined): string {
   return (messageKey && REVIEW_REASONS[messageKey]) || DEFAULT_REVIEW_REASON;
@@ -98,9 +98,16 @@ export function toContrastIssue(input: {
   elementLabel: string;
   data: AxeContrastData | null | undefined;
   level?: ContrastLevel;
+  /**
+   * True when the data came from axe's AA rule (color-contrast). At the AAA level that rule is run
+   * alongside color-contrast-enhanced, because the enhanced rule only reports ratios from 4.5:1
+   * (3:1 for large text) up to its target and passes anything lower. Its "expected" ratio is then
+   * the AA one, so it is ignored and the AAA target is worked out from the font instead.
+   */
+  fromMinimumRule?: boolean;
 }): ContrastIssue {
-  const data = input.data ?? {};
   const level = input.level ?? 'AA';
+  const data = level === 'AAA' && input.fromMinimumRule ? { ...input.data, expectedContrastRatio: null } : (input.data ?? {});
   const { requiredRatio, isLargeText: large } = requiredRatioFor(data, level);
   let status = input.status;
   const textColor = usableColor(data.fgColor);

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
-import { CircleAlert, CircleCheck, Copy, Info, RotateCcw, Sparkles } from 'lucide-react';
-import { isVerifiedFailure, type ContrastIssue, type SimulationMode } from '../../shared/types';
+import { CircleAlert, CircleCheck, Copy, Info, Palette, RotateCcw, Wrench } from 'lucide-react';
+import { isVerifiedFailure, type ContrastIssue, type SimulationMode, type SuggestedFix } from '../../shared/types';
 import type { SimulatorModeReader } from '../../shared/simulator-mode-reader';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
@@ -9,6 +9,8 @@ import type { FixerController } from './fixer-controller';
 import type { FixerState } from './fixer-state';
 import type { ImageIssue } from '../inspector/image-runner';
 import { ImageAltFixer } from './ImageAltFixer';
+import { BulkCorrections } from './BulkCorrections';
+import type { InspectorStore } from '../inspector/inspector-store';
 
 // Local labels keep the Fixer independent of simulator internals.
 const MODE_LABELS: Record<SimulationMode, string> = {
@@ -41,7 +43,30 @@ function Swatch({ label, color, background, ratio, opacity = 1, code = color }: 
     </figure>
   );
 }
+const VISION_LABELS = { protanopia: 'Protanopia', deuteranopia: 'Deuteranopia', tritanopia: 'Tritanopia' } as const;
 
+/** Contrast of the suggestion under each color-vision simulation; pass/fail shown in words, not only color. */
+function ColorVisionCheck({ fix, required }: { fix: SuggestedFix; required: number }) {
+  const ratios = (Object.keys(VISION_LABELS) as (keyof typeof VISION_LABELS)[])
+    .flatMap(check => (fix.simulatedRatios?.[check] === undefined ? [] : [[check, fix.simulatedRatios[check]!] as const]));
+  return (
+    <div className={cn('rounded-lg border p-3 text-xs', fix.colorBlindSafe ? 'border-border' : 'border-destructive')}>
+      <p className={cn('flex items-center gap-1.5 font-medium', fix.colorBlindSafe ? 'text-foreground' : 'text-destructive')}>
+        {fix.colorBlindSafe ? <CircleCheck className="size-3.5 shrink-0" aria-hidden="true" /> : <CircleAlert className="size-3.5 shrink-0" aria-hidden="true" />}
+        {fix.colorBlindSafe ? 'Color-blind safe: also passes for every color-vision type' : 'Meets WCAG, but not for every color-vision type'}
+      </p>
+      <ul className="mt-2 grid grid-cols-3 gap-1.5">
+        {ratios.map(([check, ratio]) => (
+          <li key={check} className="flex flex-col">
+            <span className="text-muted-foreground">{VISION_LABELS[check]}</span>
+            <span className="font-semibold tabular-nums">{ratio.toFixed(2)}:1 {ratio >= required ? '✓' : '(below)'}</span>
+          </li>
+        ))}
+      </ul>
+      {!fix.colorBlindSafe && <p className="mt-2 text-muted-foreground">No single color reaches {required}:1 for every type here. This one meets WCAG with the page’s real colors.</p>}
+    </div>
+  );
+}
 export function FixerTab({
   controller,
   modeReader,
@@ -53,7 +78,7 @@ export function FixerTab({
   selectedImage: ImageIssue | null;
   inspector: InspectorStore;
 }) {
-  
+
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const mode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const [copyStatus, setCopyStatus] = useState('');
@@ -75,7 +100,7 @@ export function FixerTab({
     }
   }
   if (selectedImage) {
-  return <ImageAltFixer selectedImage={selectedImage} />;
+    return <ImageAltFixer selectedImage={selectedImage} />;
   }
   return (
     <div className="space-y-5">
@@ -92,7 +117,7 @@ export function FixerTab({
 
       {phase === 'empty' && (
         <Card className="rounded-lg border-dashed bg-secondary/30 py-0 shadow-none"><CardContent className="flex flex-col items-center px-5 py-8 text-center">
-          <span className="mb-4 flex size-11 items-center justify-center rounded-xl border border-border bg-background"><Sparkles className="size-5 text-muted-foreground" aria-hidden="true" /></span>
+          <span className="mb-4 flex size-11 items-center justify-center rounded-xl border border-border bg-background"><Wrench className="size-5 text-muted-foreground" aria-hidden="true" /></span>
           <h3 className="mb-2 text-sm font-medium">No issue selected</h3>
           <p className="text-sm text-muted-foreground">Select a failure in Inspector to see a suggested fix.</p>
         </CardContent></Card>
@@ -144,10 +169,20 @@ export function FixerTab({
                 This text is drawn at {Math.round(state.opacity * 100)}% opacity, so the suggested color is darker or lighter than it looks: ratios are measured as drawn. Raising the opacity is another way to fix it.
               </p>
             )}
+            {fix.simulatedRatios && <ColorVisionCheck fix={fix} required={issue.requiredRatio} />}
+            {fix.source === 'site-palette' && (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Palette className="size-3.5 shrink-0" aria-hidden="true" />Uses a color this site already uses, so it stays on-brand.</p>
+            )}
+            {state.alternative && (
+              <Button type="button" variant="outline" size="sm" className="h-auto w-full justify-start py-1.5 whitespace-normal text-left" onClick={() => controller.useAlternative()}>
+                <span className="size-3.5 shrink-0 rounded-sm border border-border" style={{ background: state.alternative.suggestedValue }} aria-hidden="true" />
+                <span>Use {state.alternative.source === 'site-palette' ? 'this site’s color' : 'an adjusted shade'} <code className="font-mono">{state.alternative.suggestedValue}</code> instead ({state.alternative.expectedContrastRatio.toFixed(2)}:1{state.alternative.colorBlindSafe ? ', color-blind safe' : ''})</span>
+              </Button>
+            )}
           </div>
 
           {phase === 'ready' && (
-            <Button type="button" className="w-full" onClick={() => controller.preview()}><Sparkles aria-hidden="true" />Preview fix</Button>
+            <Button type="button" className="w-full" onClick={() => controller.preview()}><Wrench aria-hidden="true" />Preview fix</Button>
           )}
 
           {phase === 'previewing' && (

@@ -1,4 +1,4 @@
-# AccessLens
+# Perspective
 
 An all inclusive accessibility simulator for developers.
 
@@ -34,7 +34,7 @@ contrast with axe-core (see below). The Fixer suggests and temporarily previews 
 
 Run `npm run build`, load `.output/chrome-mv3` as an unpacked extension in
 Chrome, then serve the demo with `npm run demo`.
-Pin AccessLens in Chrome’s Extensions menu, then click its toolbar icon in the
+Pin Perspective in Chrome’s Extensions menu, then click its toolbar icon in the
 active tab to show or hide the panel. Closing clears the simulation; reopening
 starts in Off. Already-open tabs initialize on the first icon click without a refresh.
 
@@ -59,7 +59,7 @@ focus the grip button and use the arrow keys (Shift for bigger steps, Home to re
 header also resets it. The position is kept on screen when the window resizes and is remembered in
 `browser.storage.local` as `accesslens.position`.
 
-Use the minus button in the panel header to collapse AccessLens to a small
+Use the minus button in the panel header to collapse Perspective to a small
 bottom-right launcher. Select the launcher to expand it again. Collapsing keeps
 the active simulation, selected tab and settings; the toolbar icon still closes
 the extension and clears simulation effects.
@@ -71,6 +71,16 @@ tooltip overlays stay within the extension's Shadow DOM.
 
 See [UI implementation and validation](docs/ui-redesign.md) for changed files,
 dependencies, accessibility details and browser checks.
+
+## For coding agents
+
+`agent/` builds an MCP server and Claude Code plugin (`agent-plugin/`) that runs the same checks headlessly and
+returns compact JSON with CSS fixes, so agents can test accessibility without screenshots. See
+[agent/README.md](agent/README.md). Install in Claude Code (2.1.275+) with:
+
+```
+/plugin install accesslens --marketplace alanNEF/accesslens
+```
 
 ## From simulation to fix
 
@@ -96,7 +106,7 @@ Open the Inspector tab and click **Scan text contrast**, or **Pick element** and
 Failures (measured below WCAG AA 4.5:1, or 3:1 for large text) and cases that need manual review
 (gradients, background images, overlaps) are outlined on the page and listed with colors, ratio,
 threshold and an explanation. **Preview fix** hands a verified failure to Fixer through
-`src/shared/issue-handoff.ts`. Outlines are drawn inside the AccessLens shadow root, so page styles are
+`src/shared/issue-handoff.ts`. Outlines are drawn inside the Perspective shadow root, so page styles are
 never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
 runs the contrast-mapping and simulator unit tests.
 
@@ -111,6 +121,22 @@ remain available; the latest action owns a given element/property.
 Try `demo-site/bulk-corrections.html`. Run `npm run test:bulk` for DOM/state tests and
 `npm run test:bulk:e2e` for the production extension in an isolated Chrome profile.
 See [implementation, changed files and validation](docs/fixer/bulk-corrections.md).
+
+## User Mode
+
+Open the panel, choose **User**, and turn on **Enable Accessibility Improvements**.
+AccessLens runs the existing Inspector and bulk Fixer automatically, shows the number of
+verified text improvements, and watches for new content without Inspector highlights or a checklist.
+Turn the switch off or choose **Restore Original Page** to undo the changes.
+
+Mode changes restore the departing workflow's corrections and stop simulation/picking.
+Returning to Developer keeps its tabs and controls available. Improvements require activation
+for the current page; closing the panel, changing SPA routes, or navigating restores and disables them.
+Nothing is activated automatically on other websites.
+
+Try `demo-site/user-mode.html`. Run `npm run test:user`, `npm run test:user:e2e`, and
+`npm run test:bulk:e2e`. Browser tests use the repository's isolated real-Chrome/CDP harness.
+See [ownership, dynamic behavior, changed files, verification, and limitations](docs/user-mode.md).
 
 ## Visionless Lite
 

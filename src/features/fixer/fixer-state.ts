@@ -16,6 +16,8 @@ export interface FixerState {
   readonly view: FixerView;
   /** Combined CSS opacity the text is drawn with; below 1, the suggestion compensates for it. */
   readonly opacity?: number;
+  /** The other good suggestion (site color ⇄ adjusted shade), offered as a one-click switch. */
+  readonly alternative?: SuggestedFix;
   /** FIX-06: ratio measured from the page after applying, truncated to 2 decimals. */
   readonly measuredRatio?: number;
   readonly meetsTarget?: boolean;

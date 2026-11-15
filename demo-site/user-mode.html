@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>User Mode playground</title>
+  <style>
+    body { margin: 32px; background: white; color: #222; font: 16px/1.5 Arial, sans-serif; }
+    main { max-width: 650px; }
+    .low-contrast { color: #aaa; background: white; }
+    .large { font-size: 24px; }
+    .gradient { color: #aaa; background: linear-gradient(white, #ddd); }
+    button, input { font: inherit; color: #222; background: white; padding: 8px; border: 1px solid #555; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #1648b8; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>User Mode playground</h1>
+    <p>Open AccessLens, choose User, and enable improvements. Three text improvements are supported; the gradient needs manual review.</p>
+    <p id="bulk-first" class="low-contrast" style="color: #aaa !important; margin-left: 7px;">Navigation text needs a stronger foreground.</p>
+    <p id="bulk-second" class="low-contrast">Submit button instructions need more contrast.</p>
+    <p id="bulk-large" class="low-contrast large">Large footer text needs at least 3:1.</p>
+    <p id="bulk-review" class="gradient">Gradient backgrounds need manual review.</p>
+    <p id="bulk-passing">This text already meets the contrast requirement.</p>
+    <p>Live quote: <output id="live-quote">$100.00</output></p>
+    <button id="toggle-live" type="button">Start live updates</button>
+    <label>Your note <input id="note" type="text"></label>
+    <button id="add-text" type="button">Add more text</button>
+    <button id="page-action" type="button">Try a normal page action</button>
+    <p id="action-result" role="status">Ready for interaction.</p>
+    <div id="dynamic-content"></div>
+  </main>
+  <script>
+    let additions = 0;
+    let liveTimer;
+    let tick = 0;
+    document.getElementById('toggle-live').addEventListener('click', event => {
+      if (liveTimer) { clearInterval(liveTimer); liveTimer = undefined; event.target.textContent = 'Start live updates'; return; }
+      event.target.textContent = 'Stop live updates';
+      liveTimer = setInterval(() => {
+        const quote = document.getElementById('live-quote');
+        quote.textContent = `$${(100 + ++tick / 100).toFixed(2)}`;
+        quote.style.transform = `translateX(${tick % 2}px)`;
+        const script = document.createElement('script');
+        document.body.append(script);
+        script.remove();
+      }, 100);
+    });
+    document.getElementById('add-text').addEventListener('click', () => {
+      const p = document.createElement('p');
+      p.id = `dynamic-${++additions}`;
+      p.className = 'low-contrast';
+      p.textContent = 'Newly introduced text also needs stronger contrast.';
+      document.getElementById('dynamic-content').append(p);
+    });
+    document.getElementById('page-action').addEventListener('click', () => {
+      document.getElementById('action-result').textContent = 'The page action worked.';
+    });
+  </script>
+</body>
+</html>
