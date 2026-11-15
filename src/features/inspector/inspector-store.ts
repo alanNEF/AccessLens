@@ -1,4 +1,8 @@
 import { inspectElement, scanTextContrast, type InspectedIssue } from './axe-runner';
+import {
+  scanImageAccessibility,
+  type ImageIssue,
+} from "./image-runner";
 import type { ContrastLevel } from '../../shared/types';
 
 export interface InspectorState {
@@ -12,12 +16,21 @@ export interface InspectorState {
   /** Element under the pointer while picking, for the hover outline. */
   readonly hovered: Element | null;
   readonly message: string | null;
+  readonly imageIssues: readonly ImageIssue[];
   /** AA (WCAG 1.4.3) or enhanced AAA (1.4.6, for low vision). Kept across Clear. */
   readonly level: ContrastLevel;
 }
 
 const INITIAL: InspectorState = Object.freeze({
-  status: 'idle', issues: [], picked: null, selectedId: null, picking: false, hovered: null, message: null, level: 'AA',
+  status: 'idle',
+  issues: [],
+  picked: null,
+  selectedId: null,
+  picking: false,
+  hovered: null,
+  message: null,
+  imageIssues: [],
+  level: 'AA',
 });
 
 /**
@@ -68,9 +81,20 @@ export function createInspectorStore(panelHost: Element) {
     const id = ++runId;
     set({ status: 'scanning', message: null });
     try {
-      const issues = await withPanelHidden(() => scanTextContrast(panelHost, state.level));
+      const { issues, imageIssues } = await withPanelHidden(async () => {
+        const issues = await scanTextContrast(panelHost, state.level);
+        const imageIssues = await scanImageAccessibility(panelHost);
+
+        return { issues, imageIssues };
+      });
       if (id !== runId) return;
-      set({ status: 'done', issues, selectedId: issues[0]?.issue.id ?? null, picked: null });
+      set({
+        status: 'done',
+        issues,
+        imageIssues,
+        selectedId: issues[0]?.issue.id ?? null,
+        picked: null,
+      });
     } catch (cause) {
       if (id !== runId) return;
       set({ status: 'error', message: errorText(cause) });
@@ -144,7 +168,7 @@ export function createInspectorStore(panelHost: Element) {
     scanSilently(roots?: readonly Element[]) {
       // Keep status and cancellation controls available in User Mode. axe excludes
       // our host and treats any covered page text as uncertain, hence never fixed.
-      return withPanelHidden(() => scanTextContrast(panelHost, roots), false);
+      return withPanelHidden(() => scanTextContrast(panelHost, state.level, roots), false);
     },
     startPicking,
     cancelPicking,

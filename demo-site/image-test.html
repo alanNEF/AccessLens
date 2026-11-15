@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AccessLens Image Accessibility Test</title>
+</head>
+<body>
+  <h1>Image Accessibility Test</h1>
+
+  <h2>Test 1: Missing alt text (should FAIL)</h2>
+  <img src="https://placehold.co/300x200/png">
+
+  <h2>Test 2: Descriptive alt text (should PASS)</h2>
+  <img
+    src="https://placehold.co/300x200/png"
+    alt="Gray placeholder image displaying its dimensions"
+  >
+
+  <h2>Test 3: Decorative image (should PASS)</h2>
+  <img
+    src="https://placehold.co/300x200/png"
+    alt=""
+  >
+</body>
+</html>

@@ -7,6 +7,8 @@ import { Card, CardContent } from '../../components/ui/card';
 import { cn } from '../../components/shared/utils';
 import type { FixerController } from './fixer-controller';
 import type { FixerState } from './fixer-state';
+import type { ImageIssue } from '../inspector/image-runner';
+import { ImageAltFixer } from './ImageAltFixer';
 import { BulkCorrections } from './BulkCorrections';
 import type { InspectorStore } from '../inspector/inspector-store';
 
@@ -41,7 +43,6 @@ function Swatch({ label, color, background, ratio, opacity = 1, code = color }: 
     </figure>
   );
 }
-
 const VISION_LABELS = { protanopia: 'Protanopia', deuteranopia: 'Deuteranopia', tritanopia: 'Tritanopia' } as const;
 
 /** Contrast of the suggestion under each color-vision simulation; pass/fail shown in words, not only color. */
@@ -66,8 +67,18 @@ function ColorVisionCheck({ fix, required }: { fix: SuggestedFix; required: numb
     </div>
   );
 }
+export function FixerTab({
+  controller,
+  modeReader,
+  selectedImage,
+  inspector,
+}: {
+  controller: FixerController;
+  modeReader: SimulatorModeReader;
+  selectedImage: ImageIssue | null;
+  inspector: InspectorStore;
+}) {
 
-export function FixerTab({ controller, modeReader, inspector }: { controller: FixerController; modeReader: SimulatorModeReader; inspector: InspectorStore }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
   const mode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const [copyStatus, setCopyStatus] = useState('');
@@ -88,7 +99,9 @@ export function FixerTab({ controller, modeReader, inspector }: { controller: Fi
       setCopyStatus('Copy blocked on this page. The declaration is selected: press Ctrl+C (⌘C on Mac).');
     }
   }
-
+  if (selectedImage) {
+    return <ImageAltFixer selectedImage={selectedImage} />;
+  }
   return (
     <div className="space-y-5">
       <div>

@@ -9,6 +9,7 @@ import { isVerifiedFailure, type ContrastIssue, type ContrastLevel, type Contras
 import { Button } from '../../components/ui/button';
 import { Card, CardContent } from '../../components/ui/card';
 import { cn } from '../../components/shared/utils';
+import type { ImageIssue } from './image-runner';
 
 const WCAG_LINKS: Record<ContrastIssue['wcagCriterion'], { href: string; label: string }> = {
   '1.4.3': { href: 'https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html', label: 'WCAG 1.4.3' },
@@ -155,12 +156,14 @@ function IssueDetail({ item, onPreviewFix }: { item: InspectedIssue; onPreviewFi
   );
 }
 
-export function InspectorTab({ store, modeReader, onPreviewFix }: {
+export function InspectorTab({ store, modeReader, onPreviewFix, onPreviewImageFix }: {
   store: InspectorStore;
   modeReader: SimulatorModeReader;
   onPreviewFix: (item: InspectedIssue) => void;
+  onPreviewImageFix: (item: ImageIssue) => void;
 }) {
   const state = useSyncExternalStore(store.subscribe, store.getState);
+  const imageIssues = state.imageIssues;
   const simulationMode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const failures = state.issues.filter(item => item.issue.status === 'failed' && !isLink(item.issue));
   const linkFailures = state.issues.filter(item => item.issue.status === 'failed' && isLink(item.issue));
@@ -249,9 +252,63 @@ export function InspectorTab({ store, modeReader, onPreviewFix }: {
 
       {selected && <IssueDetail item={selected} onPreviewFix={onPreviewFix} />}
 
-      <IssueList title={state.level === 'AAA' ? 'Enhanced contrast failures' : 'Contrast failures'} items={failures} selectedId={state.selectedId} onSelect={select} />
-      <IssueList title="Links that rely on color" items={linkFailures} selectedId={state.selectedId} onSelect={select} />
-      <IssueList title="Needs manual review" items={reviews} selectedId={state.selectedId} onSelect={select} />
+      <IssueList
+        title={state.level === 'AAA' ? 'Enhanced contrast failures' : 'Contrast failures'}
+        items={failures}
+        selectedId={state.selectedId}
+        onSelect={select}
+      />
+
+      <IssueList
+        title="Links that rely on color"
+        items={linkFailures}
+        selectedId={state.selectedId}
+        onSelect={select}
+      />
+
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase">
+          Images missing alt text ({imageIssues.length})
+        </h3>
+      {imageIssues.map((item) => (
+        <div key={item.id} className="rounded-lg border p-3 space-y-2">
+          <p className="text-sm font-medium break-all">
+            {item.selector}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {item.description}
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => revealElement(item.element)}
+            >
+              Show image on page
+            </Button>
+
+            {item.element instanceof HTMLImageElement && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => onPreviewImageFix(item)}
+              >
+                Fix image
+              </Button>
+            )}
+          </div>
+        </div>
+      ))}
+      </section>
+
+      <IssueList
+        title="Needs manual review"
+        items={reviews}
+        selectedId={state.selectedId}
+        onSelect={select}
+      />
 
       {state.status === 'idle' && !state.picked && !state.picking && (
         <Card className="rounded-lg border-dashed bg-secondary/30 py-0 shadow-none"><CardContent className="flex flex-col items-center px-5 py-6 text-center">
