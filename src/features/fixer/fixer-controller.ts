@@ -2,9 +2,10 @@ import { isVerifiedFailure, type ContrastIssue, type SuggestedFix } from '../../
 import { contrastRatio, floorRatio, renderedColor, suggestFix } from './color-suggester';
 import type { PreviewFailure, PreviewManager, PreviewResult, StylableElement } from './preview-manager';
 import { EMPTY_STATE, snapshot, type FixerState } from './fixer-state';
-import { generateCorrection, DETACHED_MESSAGE, SUPPORTED_RATIOS, UNSUPPORTED_RATIO_MESSAGE, underlineFix } from './correction-generator';
+import { isStylable, DETACHED_MESSAGE, FADED_BACKGROUND_MESSAGE, SUPPORTED_RATIOS, UNSUPPORTED_RATIO_MESSAGE, underlineFix } from './correction-generator';
 import { createBulkCorrections } from './bulk-corrections';
 import { collectSitePalette } from './site-palette';
+import { readDrawnOpacity } from './solid-contrast';
 
 const PREVIEW_MESSAGES: Record<PreviewFailure, string> = {
   detached: DETACHED_MESSAGE,
@@ -21,31 +22,6 @@ interface FixerDependencies {
   readonly readOpacity?: (element: Element) => number | undefined;
   /** Colors the page already uses (site-palette.ts); injectable for tests. */
   readonly readPalette?: () => readonly string[];
-}
-
-function isStylable(element: Element): element is StylableElement {
-  return 'style' in element;
-}
-
-const isClear = (color: string) => color === 'transparent' || /^rgba\(.*,\s*0\)$/.test(color);
-
-/**
- * Combined CSS opacity of the element and its ancestors up to the one that
- * paints its background. Undefined when that background layer (or anything
- * above it) is faded too: text and background then fade together, which the
- * Fixer does not model.
- */
-function readDrawnOpacity(element: Element): number | undefined {
-  let opacity = 1;
-  let reachedBackground = false;
-  for (let node: Element | null = element; node; node = node.parentElement) {
-    const style = getComputedStyle(node);
-    const own = Number.parseFloat(style.opacity);
-    reachedBackground ||= style.backgroundImage !== 'none' || !isClear(style.backgroundColor);
-    if (!reachedBackground) opacity *= own;
-    else if (own < 1) return undefined;
-  }
-  return opacity;
 }
 
 /** A difference above this between the drawn color and Inspector's measurement means something else affects the text. */
@@ -67,7 +43,7 @@ export function createFixerController({
   let alternative: SuggestedFix | undefined;
   let disposed = false;
   const listeners = new Set<(state: FixerState) => void>();
-  const bulk = createBulkCorrections({ previewManager, readComputed, readPalette,
+  const bulk = createBulkCorrections({ previewManager, readComputed, readPalette, readOpacity,
     beforeRun: revert,
     beforeEnable: (target, property) => {
       if (target === element && property === state.fix?.property) revert();
@@ -154,7 +130,7 @@ export function createFixerController({
       bulk.release(target, 'background-color');
       // Inspector reports the color as drawn; the Fixer edits the CSS color, which opacity then fades.
       const opacity = readOpacity(target);
-      if (opacity === undefined) return reject('The background behind this text is itself faded (CSS opacity), so the result can’t be measured reliably. Check it by eye.');
+      if (opacity === undefined) return reject(FADED_BACKGROUND_MESSAGE);
       const drawn = drawnTextColor(target, issue.backgroundColor);
       if (!drawn || Math.abs(contrastRatio(drawn, issue.backgroundColor) - issue.contrastRatio) > MEASUREMENT_TOLERANCE) {
         return reject('Perspective could not confirm how this text is drawn, so no automatic fix is suggested. Check it by eye.');

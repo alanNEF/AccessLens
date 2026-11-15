@@ -60,7 +60,7 @@ function mountFixer(selectedImage: (ImageIssue & { element: HTMLImageElement }) 
   const render = (selectedImage: ImageIssue | null) => act(() => root.render(createElement(FixerTab, { controller: c, inspector, selectedImage,
     modeReader: { getActiveMode: () => 'none' as const, subscribeActiveMode: () => () => {} } })));
   render(selectedImage);
-  const button = (label: string) => [...host.querySelectorAll('button')].find(button => button.textContent === label);
+  const button = (label: string) => [...host.querySelectorAll('button')].find(button => button.textContent === label || button.getAttribute('aria-label') === label);
   return { c, host, image, item, button, render };
 }
 
@@ -75,7 +75,7 @@ describe('image and contrast Fixer UI', () => {
   it('includes an image checkbox and label textbox when running all corrections', async () => {
     const f = mountFixer();
     await act(async () => {
-      f.button('Run All Corrections')!.click();
+      f.button('Fix All')!.click();
       await new Promise(resolve => setTimeout(resolve, 10));
     });
     expect(f.host.querySelectorAll('input[type=checkbox]')).toHaveLength(2);
@@ -95,18 +95,18 @@ describe('image and contrast Fixer UI', () => {
   it('keeps bulk controls and image edits available after an individual preview and switching views', async () => {
     const f = mountFixer(imageTarget('selected-image'));
     expect(f.button('Preview alt text')).toBeDefined();
-    expect(f.button('Run All Corrections')).toBeDefined();
+    expect(f.button('Fix All')).toBeDefined();
     const selected = f.host.querySelector('section[aria-label="Selected image correction"]')!;
     enterText(selected.querySelector('textarea')!, 'The selected landscape');
     act(() => f.button('Preview alt text')!.click());
     expect(f.image.element.alt).toBe('The selected landscape');
     await act(async () => {
-      f.button('Run All Corrections')!.click();
+      f.button('Fix All')!.click();
       await new Promise(resolve => setTimeout(resolve, 10));
     });
     expect(f.host.querySelectorAll('input[type=checkbox]')).toHaveLength(2);
     expect(f.host.textContent).toContain('2 of 2 corrections enabled');
-    expect(f.button('Run All Corrections')).toBeDefined();
+    expect(f.button('Fix All')).toBeDefined();
     f.render(null);
     expect(f.image.element.alt).toBe('The selected landscape');
     expect(f.host.querySelector('textarea')!.value).toBe('The selected landscape');
@@ -257,6 +257,28 @@ describe('bulk correction workflow', () => {
       expect(item.measuredRatio).toBeGreaterThanOrEqual(4.5);
       expect(contrastRatio(getComputedStyle(items[index].element).color, '#fff')).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  it('compensates for opacity like a single fix, so faded text really meets the target', async () => {
+    const c = controller();
+    const card = document.createElement('div');
+    card.style.setProperty('background-color', 'white');
+    const element = document.createElement('em');
+    element.textContent = 'sleep last night';
+    element.style.setProperty('color', 'rgb(85, 85, 85)');
+    element.style.setProperty('opacity', '0.6');
+    card.append(element);
+    document.body.append(card);
+    // Inspector reports the color as drawn: #555 at 60% over white is #999.
+    await c.bulk.run([{ element, issue: { id: 'faded', selector: 'em', elementLabel: '<em> sleep last night', textColor: '#999999', backgroundColor: '#ffffff',
+      contrastRatio: contrastRatio('#999999', '#ffffff'), requiredRatio: 4.5, isLargeText: false, status: 'failed', wcagCriterion: '1.4.3' } }]);
+    const [item] = c.bulk.getState().corrections;
+    expect(item.enabled).toBe(true);
+    expect(item.opacity).toBeCloseTo(0.6);
+    expect(item.measuredRatio).toBeGreaterThanOrEqual(4.5);
+    const [r] = getComputedStyle(element).color.match(/\d+/g)!.map(Number);
+    const drawn = Math.round(r * 0.6 + 255 * 0.4);
+    expect(contrastRatio(`rgb(${drawn}, ${drawn}, ${drawn})`, '#ffffff')).toBeGreaterThanOrEqual(4.5);
   });
 
   it('toggles just one correction repeatedly and restores exact properties and priorities', async () => {

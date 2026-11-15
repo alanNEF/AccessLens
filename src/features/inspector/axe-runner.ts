@@ -85,17 +85,10 @@ const optionsFor = (level: ContrastLevel): axe.RunOptions => ({
  * `exclude` is the AccessLens panel host, so our own UI is never audited.
  * axe reads computed CSS colors, so an active simulation does not change results (INS-02).
  */
-export async function scanTextContrast(
-  exclude: Element,
-  level: ContrastLevel = 'AA',
-  roots: readonly Element[] = [document.documentElement],
-): Promise<InspectedIssue[]> {
+export async function scanTextContrast(exclude: Element, roots: readonly Element[] = [document.documentElement], level: ContrastLevel = 'AA'): Promise<InspectedIssue[]> {
   const results = await runAxe(
     { include: [...roots], exclude: [exclude] } as unknown as axe.ElementContext,
-    {
-      ...optionsFor(level),
-      resultTypes: ['violations', 'incomplete'],
-    },
+    { ...optionsFor(level), resultTypes: ['violations', 'incomplete'] },
   );
 
   return collect(results, level, false);

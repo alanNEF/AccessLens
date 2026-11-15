@@ -112,7 +112,7 @@ runs the contrast-mapping and simulator unit tests.
 
 ## Bulk Fixer previews
 
-Use **Scan page** in Inspector, open Fixer and choose **Run All Corrections**.
+Open the Fix tab and choose **Fix all**. It scans the page first if Inspect has not.
 Supported text-contrast suggestions are validated and enabled immediately. Toggle individual
 checkboxes, **Select All**, **Deselect All**, or **Restore Original** to compare temporary changes.
 Unsupported results and failed corrections are reported separately. Existing single-issue previews

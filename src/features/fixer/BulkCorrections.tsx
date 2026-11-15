@@ -1,5 +1,4 @@
 import { useId, useSyncExternalStore } from 'react';
-import { Wrench } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import type { InspectorStore } from '../inspector/inspector-store';
 import type { FixerController } from './fixer-controller';
@@ -35,25 +34,17 @@ export function BulkCorrections({ controller, inspector }: { controller: FixerCo
   const busy = generating || inspected.status === 'scanning' || inspected.picking;
 
   return (
-    <section aria-label="Bulk corrections" aria-busy={generating} className="space-y-3 rounded-lg border border-border p-3">
-      <div>
-        <h3 className="text-sm font-semibold">Correct detected issues</h3>
-        <p className="mt-1 text-xs text-muted-foreground">Preview contrast fixes and image descriptions from Inspector’s current results. Image descriptions need your input.</p>
-      </div>
-      <Button type="button" className="w-full" disabled={busy} onClick={() => {
-        const items = inspected.picked ? [inspected.picked, ...inspected.issues] : inspected.issues;
-        void controller.bulk.run(items, 'developer', { imageIssues: inspected.imageIssues });
-      }}><Wrench aria-hidden="true" />{generating ? 'Generating corrections…' : 'Run All Corrections'}</Button>
-
+    <section aria-label="Bulk corrections" aria-busy={generating} className="space-y-3 rounded-xl border border-border p-3">
+      <h3 className="text-sm font-semibold">All corrections</h3>
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
         {generating ? 'Generating and validating supported corrections…'
-          : state.phase === 'idle' ? 'Use Scan page in Inspector, then run all corrections.'
+          : state.phase === 'idle' ? 'Use Fix all to correct every failure at once.'
             : total === 0 ? 'No supported corrections are available. Use Scan page in Inspector for current results.'
               : `${enabled} of ${total} corrections enabled`}
       </p>
+      {state.imageCorrections.length > 0 && <p className="text-xs text-muted-foreground">Image descriptions need your input: type one, then tick the image to preview it.</p>}
 
       {total > 0 && <>
-        <h4 className="text-xs font-semibold">Generated Corrections</h4>
         <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => controller.bulk.setAllEnabled(true)}>Select All</Button>
           <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => controller.bulk.setAllEnabled(false)}>Deselect All</Button>

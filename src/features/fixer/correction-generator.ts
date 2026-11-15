@@ -8,8 +8,15 @@ export interface CorrectionTarget {
 }
 
 export const DETACHED_MESSAGE = 'The element is no longer on the page, so no preview was applied.';
+export const FADED_BACKGROUND_MESSAGE = 'The background behind this text is itself faded (CSS opacity), so the result can’t be measured reliably. Check it by eye.';
 
-function isStylable(element: Element): element is StylableElement {
+/** How the text is actually drawn: its CSS color, faded by this opacity. */
+export interface DrawnText {
+  readonly textColor: string;
+  readonly opacity: number;
+}
+
+export function isStylable(element: Element): element is StylableElement {
   return 'style' in element;
 }
 
@@ -31,11 +38,11 @@ export function underlineFix(issue: ContrastIssue, current = 'none'): SuggestedF
 }
 
 /** The same eligibility checks and color engine for individual and bulk fixes. `palette`: the site's colors. */
-export function generateCorrection({ issue, element }: CorrectionTarget, palette?: readonly string[]) {
+export function generateCorrection({ issue, element }: CorrectionTarget, palette?: readonly string[], drawn?: DrawnText) {
   if (!isVerifiedFailure(issue)) return { ok: false, message: 'This issue needs manual review, so no automatic fix is suggested.' } as const;
   if (!SUPPORTED_RATIOS.has(issue.requiredRatio)) return { ok: false, message: UNSUPPORTED_RATIO_MESSAGE } as const;
   if (!element.isConnected || !isStylable(element)) return { ok: false, message: DETACHED_MESSAGE } as const;
   if (issue.kind === 'link-color-only') return { ok: true, fix: underlineFix(issue), element, issue } as const;
-  const result = suggestFix({ ...issue, palette });
+  const result = suggestFix({ ...issue, ...drawn, palette });
   return result.ok ? { ...result, element, issue } : result;
 }

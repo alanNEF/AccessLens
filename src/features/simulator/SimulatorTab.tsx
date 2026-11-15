@@ -1,85 +1,101 @@
 import { useId, useSyncExternalStore } from 'react';
-import { Check, CircleOff, CloudFog, Contrast, Eye, Focus, Info, Palette, RotateCcw } from 'lucide-react';
+import { Blend, CloudFog, Contrast, Droplets, Eye, EyeOff, Info, RotateCcw } from 'lucide-react';
 import type { SimulationMode } from '../../shared/types';
 import type { SimulatorController } from './simulator-controller';
 import type { SimulatorModeReader } from '../../shared/simulator-mode-reader';
 import { Button } from '../../components/ui/button';
 import { Slider } from '../../components/ui/slider';
+import { PanelFooter } from '../../components/shared/panel-footer';
 import { cn } from '../../components/shared/utils';
 import { PRESETS, BLUR } from './filters';
 
+/** Display order and wording for the 3×3 grid; `PRESETS` keeps the technical labels. */
 const modes = [
-  { id: 'none', description: 'Original page appearance', icon: CircleOff },
-  { id: 'protanopia', description: 'Red sensitivity', icon: Eye },
-  { id: 'deuteranopia', description: 'Green sensitivity', icon: Eye },
-  { id: 'tritanopia', description: 'Blue sensitivity', icon: Eye },
-  { id: 'visionless', description: 'Keyboard and spoken focus', icon: Eye },
-  { id: 'achromatopsia', description: 'No color, grayscale only', icon: Palette },
-  { id: 'cataracts', description: 'Hazy, faded, yellowed', icon: CloudFog },
-  { id: 'low-contrast', description: 'Washed-out light and dark', icon: Contrast },
-  { id: 'blur', description: 'Reduced visual clarity', icon: Focus },
-] as const;
+  { id: 'none', name: 'Off', description: 'Original page appearance', icon: Eye },
+  { id: 'protanopia', name: 'Protanopia', description: 'Red sensitivity', icon: Eye },
+  { id: 'deuteranopia', name: 'Deuteranopia', description: 'Green sensitivity', icon: Eye },
+  { id: 'tritanopia', name: 'Tritanopia', description: 'Blue sensitivity', icon: Eye },
+  { id: 'achromatopsia', name: 'Grayscale', description: 'No color, grayscale only', icon: Droplets },
+  { id: 'low-contrast', name: 'Low contrast', description: 'Washed-out light and dark', icon: Contrast },
+  { id: 'blur', name: 'Low acuity', description: 'Reduced visual clarity', icon: Blend },
+  { id: 'cataracts', name: 'Cataracts', description: 'Hazy, faded, yellowed', icon: CloudFog },
+  { id: 'visionless', name: 'Visionless', description: 'Keyboard and spoken focus', icon: EyeOff },
+] as const satisfies readonly { id: SimulationMode; name: string; description: string; icon: unknown }[];
 
-export function SimulatorTab({ controller, modeReader }: { controller: SimulatorController; modeReader: SimulatorModeReader }) {
+const modeInfo = (id: SimulationMode) => modes.find(mode => mode.id === id) ?? modes[0];
+/** The short name shown for a mode anywhere in the panel. */
+export const modeName = (id: SimulationMode) => modeInfo(id).name;
+
+export function SimulatorTab({ controller }: { controller: SimulatorController; modeReader: SimulatorModeReader }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState);
-  const activeMode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
   const { mode, blurPx } = state.settings;
-  const speechStatus = useSyncExternalStore(controller.subscribeSpeech,controller.getSpeechStatus);
+  const speechStatus = useSyncExternalStore(controller.subscribeSpeech, controller.getSpeechStatus);
   const intensityId = useId();
   return (
-    <div className="space-y-5">
-      <div>
-        <div className="mb-1 flex items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold tracking-tight">Simulate vision</h2>
-          <span className="rounded-md border border-border px-2 py-0.5 text-xs text-muted-foreground">Live preview</span>
-        </div>
-        <p className="text-sm text-muted-foreground">Explore visual barriers on this page.</p>
-      </div>
-      {mode === 'visionless' && <div className="space-y-3 rounded-lg border border-border bg-secondary/40 p-3.5">
-        <h3 className="text-sm font-semibold">Active mode: Visionless</h3>
-        <p className="text-sm">Use Tab / Shift+Tab to navigate the page, Enter or Space to activate controls, and Escape to stop speech. Panel controls are not narrated.</p>
-        <p aria-live="polite" className="text-xs text-muted-foreground">{speechStatus}</p>
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" onClick={()=>controller.stopSpeech()}>Stop Speech</Button>
-          <Button type="button" onClick={()=>controller.reset()}>Exit Visionless</Button>
-        </div>
-        <p className="text-xs text-muted-foreground">Visionless Mode is a simplified educational approximation. It does not reproduce the experience of blindness or replace testing with a real screen reader.</p>
-        <p className="text-xs text-muted-foreground">Native top-layer dialogs and unusual stacking contexts may remain visible. Exit Visionless if blackout is incomplete.</p>
-      </div>}
-      <fieldset className="min-w-0 space-y-2.5">
-        <legend className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Vision mode</legend>
-        <div className="grid grid-cols-2 gap-2">
-          {modes.map(({ id, description, icon: Icon }) => (
-            <Button key={id} type="button" variant="outline" aria-label={PRESETS[id].label} aria-pressed={mode === id}
-              onClick={() => controller.setMode(id satisfies SimulationMode)}
-              className={cn('relative h-auto min-h-20 flex-col items-start justify-center gap-1 rounded-lg px-3 py-3 text-left whitespace-normal transition-colors duration-150',
-                id === 'none' && 'col-span-2 min-h-14 flex-row items-center justify-start gap-3',
-                mode === id ? 'border-ring bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground' : 'border-border bg-background hover:bg-secondary')}>
-              <Icon className="size-4" aria-hidden="true" />
-              <span className="flex flex-col gap-0.5"><span className="text-sm font-medium">{PRESETS[id].label}</span><span className="text-xs font-normal text-muted-foreground">{description}</span></span>
-              {mode === id && <Check className="absolute top-3 right-3 size-3.5 text-accent-foreground" aria-hidden="true" />}
+    <div className="space-y-3">
+      <fieldset className="min-w-0">
+        <legend className="mb-2 text-xs text-muted-foreground">Vision mode</legend>
+        <div className="grid grid-cols-3 gap-2">
+          {modes.map(({ id, name, icon: Icon }) => (
+            // aria-label keeps the technical name (e.g. "Low Acuity", "Achromatopsia") that the e2e tests and screen readers use.
+            <Button key={id} type="button" variant="outline" aria-label={id === 'achromatopsia' ? 'Grayscale (Achromatopsia)' : PRESETS[id].label} aria-pressed={mode === id}
+              onClick={() => controller.setMode(id)}
+              className={cn('h-auto min-h-[68px] flex-col gap-1.5 rounded-xl px-1.5 py-3 text-xs font-medium whitespace-normal',
+                mode === id ? 'border-ring bg-accent text-foreground hover:bg-accent [&_svg]:text-accent-foreground' : 'border-border bg-background hover:bg-secondary [&_svg]:text-muted-foreground')}>
+              <Icon className="size-[18px]" aria-hidden="true" />
+              <span>{name}</span>
             </Button>
           ))}
         </div>
       </fieldset>
-      {mode === 'blur' && <div className="space-y-3 rounded-lg border border-border bg-secondary/40 p-3.5">
-        <div className="flex items-center justify-between gap-2"><span id={intensityId} className="text-sm font-medium">Low Acuity intensity</span><span className="rounded-md border border-border bg-background px-2 py-0.5 text-xs font-medium tabular-nums">{blurPx} px</span></div>
-        <Slider min={BLUR.min} max={BLUR.max} step={BLUR.step} value={[blurPx]} aria-labelledby={intensityId}
-          aria-valuetext={`${blurPx} pixels of blur`} onValueChange={([value]) => { if (value !== undefined) controller.setBlurPx(value); }} />
-        <div className="flex justify-between text-xs text-muted-foreground" aria-hidden="true"><span>0 px · Clear</span><span>8 px · Blurred</span></div>
-      </div>}
-      <div className="flex items-center justify-between gap-2">
-        <p role="status" aria-live="polite" aria-atomic="true" className="min-w-0 text-xs text-muted-foreground">Active: <strong className="font-medium text-foreground">{PRESETS[activeMode].label}</strong></p>
-        <Button type="button" variant="outline" size="sm" onClick={() => controller.reset()}><RotateCcw className="size-3.5" aria-hidden="true" />Reset</Button>
-      </div>
-      {state.error && <p role="alert" className="rounded-lg border border-destructive p-3 text-sm text-destructive">{state.error} Use Reset to return to Off.</p>}
-      <div className="flex items-start gap-2.5 rounded-lg bg-secondary p-3.5 text-xs leading-relaxed text-muted-foreground">
-        <Info className="mt-0.5 size-4" aria-hidden="true" />
-        <div className="space-y-2">
-          <p>These simulations are approximations and do not represent any individual's lived visual experience.</p>
-          <p>They do not determine accessibility. Page sections are simulated separately; backgrounds, overlays and embedded frames may differ.</p>
+
+      {mode === 'blur' && (
+        <div className="rounded-xl border border-border p-3">
+          <div className="mb-2.5 flex items-center gap-2.5">
+            <Blend className="size-4 text-muted-foreground" aria-hidden="true" />
+            <span id={intensityId} className="flex-1 text-sm font-medium">Low acuity</span>
+            <span className="text-xs tabular-nums text-muted-foreground">{blurPx} px</span>
+          </div>
+          <Slider min={BLUR.min} max={BLUR.max} step={BLUR.step} value={[blurPx]} aria-labelledby={intensityId}
+            aria-valuetext={`${blurPx} pixels of blur`} onValueChange={([value]) => { if (value !== undefined) controller.setBlurPx(value); }} />
+          <div className="mt-1.5 flex justify-between text-xs text-muted-foreground" aria-hidden="true"><span>Clear</span><span>Blurred</span></div>
         </div>
-      </div>
+      )}
+
+      {mode === 'visionless' && (
+        <div className="space-y-2.5 rounded-xl border border-border p-3">
+          <p className="text-sm">Use Tab and Shift+Tab to move through the page, Enter or Space to activate, and Escape to stop speech. Panel controls aren’t narrated.</p>
+          <p aria-live="polite" className="text-xs text-muted-foreground">{speechStatus}</p>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => controller.stopSpeech()}>Stop Speech</Button>
+            <Button type="button" size="sm" onClick={() => controller.reset()}>Exit Visionless</Button>
+          </div>
+          <p className="text-xs text-muted-foreground">An educational approximation. It doesn’t replace testing with a real screen reader, and native dialogs may stay visible.</p>
+        </div>
+      )}
+
+      {state.error && <p role="alert" className="rounded-lg border border-destructive p-3 text-sm text-destructive">{state.error} Use Reset to return to Off.</p>}
+
+      <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+        <Info className="mt-px size-3.5 shrink-0" aria-hidden="true" />
+        <span>{mode === 'none' ? 'Pick a mode to preview this page. Simulations are approximations, not a lived experience.' : `${modeInfo(mode).description} · an approximation, not a lived experience`}</span>
+      </p>
     </div>
+  );
+}
+
+/** Bottom bar for the Simulate tab: the applied mode and Reset. */
+export function SimulatorFooter({ controller, modeReader }: { controller: SimulatorController; modeReader: SimulatorModeReader }) {
+  const activeMode = useSyncExternalStore(modeReader.subscribeActiveMode, modeReader.getActiveMode);
+  const { blurPx } = useSyncExternalStore(controller.subscribe, controller.getState).settings;
+  const on = activeMode !== 'none';
+  return (
+    <PanelFooter>
+      <span className={cn('size-2 shrink-0 rounded-full', on ? 'bg-ring' : 'bg-muted-foreground/50')} aria-hidden="true" />
+      <p role="status" aria-live="polite" aria-atomic="true" className="min-w-0 flex-1 truncate">
+        {on ? <>Viewing as <strong className="font-medium text-foreground">{modeName(activeMode)}{activeMode === 'blur' ? ` · ${blurPx} px` : ''}</strong></> : 'Original page'}
+      </p>
+      <Button type="button" variant="ghost" size="xs" className="text-foreground" onClick={() => controller.reset()}><RotateCcw className="size-3.5" aria-hidden="true" />Reset</Button>
+    </PanelFooter>
   );
 }

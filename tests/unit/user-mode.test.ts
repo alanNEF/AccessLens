@@ -43,6 +43,23 @@ afterEach(() => {
 });
 
 describe('User Mode page workflow', () => {
+  it('improves faded text (CSS opacity) the same way Fix all does', async () => {
+    const f = fixture();
+    const card = document.createElement('div');
+    card.style.backgroundColor = 'white';
+    const element = document.createElement('em');
+    element.textContent = 'sleep last night';
+    element.style.cssText = 'color: rgb(85, 85, 85); opacity: 0.6; font-size: 16px';
+    card.append(element);
+    document.body.append(card);
+    // Inspector reports the color as drawn: #555 at 60% over white is #999.
+    scan.mockResolvedValueOnce([{ element, issue: { id: 'faded', selector: 'em', elementLabel: 'em', textColor: '#999999', backgroundColor: '#ffffff', contrastRatio: 2.84,
+      requiredRatio: 4.5, isLargeText: false, status: 'failed', wcagCriterion: '1.4.3' } }]).mockResolvedValue([]);
+    await f.enable();
+    expect(f.controller.getState()).toMatchObject({ status: 'enabled', count: 1 });
+    expect(f.fixer.bulk.getState().corrections[0].measuredRatio).toBeGreaterThanOrEqual(4.5);
+  });
+
   it('keeps improvements stable while a live quote replaces text without changing contrast', async () => {
     const f = fixture();
     const one = target('one');

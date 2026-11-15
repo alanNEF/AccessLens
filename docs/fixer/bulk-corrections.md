@@ -1,6 +1,6 @@
 # Bulk correction previews
 
-After **Scan page** in Inspector, **Run All Corrections** in Fixer generates suggestions from the
+**Fix all** in the Fix tab (scanning the page first if needed) generates suggestions from the
 current scan and picked element. Every successfully applied and validated correction starts checked.
 Each row shows the Inspector label/selector, original and suggested color, measured contrast, target
 and any application failure. Select All, Deselect All and Restore Original retain suggestions for reuse.
@@ -8,7 +8,7 @@ and any application failure. Select All, Deselect All and Restore Original retai
 Scanned images missing alternative text also appear with a checkbox and editable description.
 Image rows start unchecked until a developer supplies a meaningful description; AccessLens does
 not infer image content. Enter the description and check the row to preview it. Editing an enabled
-description updates the preview. Run All Corrections preserves existing image drafts and enables
+description updates the preview. Fix all preserves existing image drafts and enables
 those with nonempty descriptions. Select All, Deselect All and Restore Original include images.
 
 Inspector's **Fix image** opens the individual editor alongside the bulk controls. The individual

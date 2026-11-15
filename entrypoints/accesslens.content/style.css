@@ -1,5 +1,31 @@
 @import '../../src/styles/globals.css';
 
+/* Tailwind 4 registers these defaults with @property, which browsers ignore inside a
+   Shadow DOM. Without them, `border`, shadow, ring, outline and translate utilities
+   render nothing in the panel. Declared in the base layer so utilities still win. */
+@layer base {
+  :host, *, ::before, ::after, ::backdrop {
+    --tw-border-style: solid;
+    --tw-outline-style: solid;
+    --tw-translate-x: 0;
+    --tw-translate-y: 0;
+    --tw-translate-z: 0;
+    --tw-space-y-reverse: 0;
+    --tw-divide-y-reverse: 0;
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-alpha: 100%;
+    --tw-inset-shadow: 0 0 #0000;
+    --tw-inset-shadow-alpha: 100%;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-inset-ring-shadow: 0 0 #0000;
+    --tw-ring-offset-width: 0px;
+    --tw-ring-offset-color: #fff;
+    --tw-ring-offset-shadow: 0 0 #0000;
+    --tw-drop-shadow-alpha: 100%;
+    --tw-content: "";
+  }
+}
+
 :host {
   all: initial;
   position: fixed !important;
@@ -19,7 +45,6 @@
 }
 
 @container accesslens (max-width: 340px) {
-  .accesslens-subtitle { display: none; }
   [data-slot='tabs-trigger'] { font-size: 12px; gap: 4px; padding-inline: 6px; }
   [data-slot='tabs-trigger'] svg { width: 14px; height: 14px; }
 }
