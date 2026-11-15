@@ -1,150 +1,165 @@
-# Perspective
+<p align="center">
+  <img src="src/assets/perspective-logo.png" alt="Perspective logo" width="96">
+</p>
 
-An all inclusive accessibility simulator for developers.
+<h1 align="center">Perspective</h1>
 
-## Development
+<p align="center"><strong>See what they see.</strong><br>
+A Chrome extension that lets developers simulate, find and fix accessibility barriers on any webpage,<br>
+and lets everyday users make hard-to-read pages readable with one switch.</p>
 
-Requires Node.js 22 or newer and npm.
+<p align="center">Built at HackUMass 2026</p>
 
-```sh
-npm install
-npm run dev
-```
+---
 
-```sh
-npm run typecheck
-npm run build
-```
+## Why
 
-WXT builds the browser extension into `.output/`. The Simulator has a Phase 4 cross-site support. The Inspector scans text
-contrast with axe-core (see below). The Fixer suggests and temporarily previews a passing text color for verified Inspector failures. See [the feasibility report](docs/simulator/phase-0-feasibility.md).
+Low-contrast text is the most common accessibility failure on the web. WebAIM's 2026 study of the top
+one million home pages found it on **83.9%** of them, with an average of 34 instances per page.
+Developers rarely mean to exclude anyone. They just never see their page the way someone with
+colorblindness, cataracts or low vision does, and accessibility reports are a wall of numbers that
+don't point at anything on the page. Meanwhile, people who struggle to read these sites can't wait
+for every company to fix its CSS.
 
-## Project layout
+Perspective works on both sides: it helps developers fix problems at the source, and helps users
+get around them today.
 
-- `entrypoints/`: WXT background, popup, and content script entrypoints.
-- `src/components/`: Extension panel and shared UI components.
-- `src/features/`: Simulator, inspector, and fixer modules.
-- `src/shared/`: Shared types, messages, and constants.
-- `src/styles/`: Shared styles.
-- `tests/unit/` and `tests/e2e/`: Controller and real Chrome regression tests.
-- `demo-site/`: Local accessibility demo page.
-- `docs/`: Feature PRD placeholders.
+## What it does
 
-## Phase 4 demo
+### For users: Easier reading
 
-Run `npm run build`, load `.output/chrome-mv3` as an unpacked extension in
-Chrome, then serve the demo with `npm run demo`.
-Pin Perspective in Chrome’s Extensions menu, then click its toolbar icon in the
-active tab to show or hide the panel. Closing clears the simulation; reopening
-starts in Off. Already-open tabs initialize on the first icon click without a refresh.
+Switch the panel to **User** and turn on **Easier reading**. Perspective finds hard-to-read text on
+the current page and fixes it in place, keeps working as new content loads (infinite scroll, live
+prices), and shows how many improvements it made. **Restore original page** undoes everything.
+Nothing is saved or sent anywhere, and nothing runs on other sites unless you turn it on there.
 
-Open `http://127.0.0.1:8081` and click the icon; the in-page panel offers Off, three color-vision presets, adjustable
-Low Acuity (0–8 px in 0.5 px steps), and Reset. Ordinary HTTP/HTTPS pages are supported through direct-body content targeting;
-unsafe layouts show a limitation message.
+### For developers: Simulate, Inspect, Fix
 
-Run `npm run test:phase4` after building for the real Chrome smoke test. It uses
-a temporary profile and local server, installs/removes only its own test
-extension, and prints the location of screenshots. Requires a Chrome version
-supporting the CDP `Extensions` domain and `--enable-unsafe-extension-debugging`.
-On other systems set `CHROME_PATH` to the Chrome executable.
+| Tool | What it does |
+|---|---|
+| **Simulator** | Shows the live page through approximate vision conditions: protanopia, deuteranopia, tritanopia, achromatopsia, cataracts, low contrast sensitivity and adjustable blur (low acuity). **Visionless** blacks out the page and reads keyboard focus aloud. The page stays interactive while a simulation is on. |
+| **Inspector** | Scans for text that fails WCAG contrast (AA, or the stricter Enhanced/AAA level for low vision), links that stand out only by color, and images without alt text. Failures are outlined on the page with their colors, ratio and the rule they break. Anything it can't measure reliably, like text on a gradient, is marked **Needs review** instead of guessed. |
+| **Fixer** | Suggests the smallest color change that passes, preferring colors the site already uses. Preview one fix or **Fix all**, compare before and after (even with a simulation on), and copy the CSS. For images, type alt text and preview it. Nothing touches your source code. |
 
-See [Phase 4 compatibility results and validation](docs/simulator/phase-4-validation.md).
-The [unmarked SPA playground](http://127.0.0.1:8081/compatibility.html) exercises
-root replacement and new content without demo-specific markers.
+Each simulation leads to a check and a fix:
 
-## Panel appearance
+| Simulation | Inspector check | Fixer |
+|---|---|---|
+| Low Contrast, Cataracts | Enhanced contrast, WCAG 1.4.6 (AAA): 7:1, or 4.5:1 for large text. Selected automatically for these modes. | A text color reaching 7:1, or a background color when no text color can |
+| Achromatopsia and other color modes | Links that rely on color alone, WCAG 1.4.1 | `text-decoration-line: underline` |
+| All modes | Text contrast, WCAG 1.4.3 (AA): 4.5:1, or 3:1 for large text | A text color that passes |
+| Visionless | Images without alt text, WCAG 1.1.1 | Alt text you write and preview |
 
-Drag the panel by its header (or the collapsed launcher) to move it anywhere on the page. Keyboard users can
-focus the grip button and use the arrow keys (Shift for bigger steps, Home to reset); double-clicking the
-header also resets it. The position is kept on screen when the window resizes and is remembered in
-`browser.storage.local` as `accesslens.position`.
+### For AI coding agents
 
-Use the minus button in the panel header to collapse Perspective to a small
-bottom-right launcher. Select the launcher to expand it again. Collapsing keeps
-the active simulation, selected tab and settings; the toolbar icon still closes
-the extension and clears simulation effects.
-
-The in-page panel uses shadcn/ui with light, dark and system themes. Toggle the
-sun/moon switch to choose light or dark; select the monitor button to follow your
-system. The preference survives panel closure and page reloads. All styles and
-tooltip overlays stay within the extension's Shadow DOM.
-
-See [UI implementation and validation](docs/ui-redesign.md) for changed files,
-dependencies, accessibility details and browser checks.
-
-## For coding agents
-
-`agent/` builds an MCP server and Claude Code plugin (`agent-plugin/`) that runs the same checks headlessly and
-returns compact JSON with CSS fixes, so agents can test accessibility without screenshots. See
-[agent/README.md](agent/README.md). Install in Claude Code (2.1.275+) with:
+`agent-plugin/` is an MCP server and Claude Code plugin that runs the same checks in headless Chrome
+and returns compact JSON (selectors, colors, ratios and ready-to-apply CSS fixes) instead of
+screenshots. A scan of the demo page is about 4 KB. Agents can also pass a candidate fix in and
+rescan to verify it before editing code.
 
 ```
 /plugin install accesslens --marketplace alanNEF/accesslens
 ```
 
-## From simulation to fix
+Other MCP clients (Cursor, VS Code, Codex): run `node agent-plugin/server/accesslens-mcp.mjs` as a
+stdio server. See [agent/README.md](agent/README.md).
 
-| Simulation | Inspector check | Fixer |
-|---|---|---|
-| Low Contrast, Cataracts | Enhanced contrast, WCAG 1.4.6 (AAA): 7:1, or 4.5:1 for large text. Auto-selected for these modes; switchable any time. | Text color reaching 7:1, or the background color when no text color can |
-| Achromatopsia (and other color modes) | Links that rely on color alone, WCAG 1.4.1 (axe `link-in-text-block`). Checked in every scan. | `text-decoration-line: underline` |
-| All | Text contrast, WCAG 1.4.3 (AA) | Text color reaching 4.5:1 / 3:1 |
+## Quick start
 
-Not every simulated barrier is automatically detectable: for example, status badges whose words differ
-pass WCAG even if their colors look alike. Those remain review points rather than automated failures.
+Requires **Node.js 22+**, **npm** and **Google Chrome**.
 
-## Simulator modes
+```sh
+git clone https://github.com/alanNEF/AccessLens.git
+cd AccessLens
+npm install
+npm run build
+```
 
-Protanopia, Deuteranopia and Tritanopia use the Machado et al. (2009) matrices. Achromatopsia maps every
-color to its luminance (grayscale) in linear RGB. Cataracts (hazy, faded, yellowed) and Low Contrast
-(washed-out light and dark) are illustrative CSS filter approximations, not calibrated clinical models.
-Low Acuity is an adjustable blur; Visionless blacks out the page and narrates keyboard focus.
+1. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and select `.output/chrome-mv3`.
+2. Pin Perspective from the puzzle-piece menu.
+3. Start the demo site with `npm run demo` and open <http://127.0.0.1:8081/market.html>.
+4. Click the Perspective icon to open the panel. Click it again to close it and restore the page.
 
-## Inspector
+For live reloading while you work, run `npm run dev` instead of `npm run build`.
 
-Open the Inspector tab and click **Scan text contrast**, or **Pick element** and click any text.
-Failures (measured below WCAG AA 4.5:1, or 3:1 for large text) and cases that need manual review
-(gradients, background images, overlaps) are outlined on the page and listed with colors, ratio,
-threshold and an explanation. **Preview fix** hands a verified failure to Fixer through
-`src/shared/issue-handoff.ts`. Outlines are drawn inside the Perspective shadow root, so page styles are
-never changed. `demo-site/market.html` lists the expected result for each test case; `npm run test:unit`
-runs the contrast-mapping and simulator unit tests.
+### Demo pages
 
-## Bulk Fixer previews
+All of these are in `demo-site/` and served by `npm run demo`:
 
-Open the Fix tab and choose **Fix all**. It scans the page first if Inspect has not.
-Supported text-contrast suggestions are validated and enabled immediately. Toggle individual
-checkboxes, **Select All**, **Deselect All**, or **Restore Original** to compare temporary changes.
-Unsupported results and failed corrections are reported separately. Existing single-issue previews
-remain available; the latest action owns a given element/property.
+| Page | What it shows |
+|---|---|
+| [`market.html`](demo-site/market.html) | The main demo: a farmers market page with contrast failures, a color-only link, a gradient case and status badges. Expected results are listed in a comment at the top. |
+| [`user-mode.html`](demo-site/user-mode.html) | User mode on dynamic content |
+| [`bulk-corrections.html`](demo-site/bulk-corrections.html) | Fix all |
+| [`image-test.html`](demo-site/image-test.html) | Missing alt text |
+| [`visionless.html`](demo-site/visionless.html) | Visionless keyboard and speech playground |
+| [`index.html`](demo-site/index.html), [`compatibility.html`](demo-site/compatibility.html) | Simulator layout and single-page-app compatibility |
 
-Try `demo-site/bulk-corrections.html`. Run `npm run test:bulk` for DOM/state tests and
-`npm run test:bulk:e2e` for the production extension in an isolated Chrome profile.
-See [implementation, changed files and validation](docs/fixer/bulk-corrections.md).
+## Using the panel
 
-## User Mode
+- **Dev / User** switch in the header. Switching modes restores the page before the other mode starts.
+- **Move it:** drag the header or the collapsed launcher. Keyboard users can focus the grip and use the arrow keys (Shift for bigger steps, Home to reset).
+- **Resize, collapse, theme:** resize the panel, collapse it to a small launcher, and pick light, dark or system theme. Position and theme are remembered.
+- **Visionless:** needs a local text-to-speech voice. Use Tab and Shift+Tab to move, Escape to stop speech.
 
-Open the panel, choose **User**, and turn on **Enable Accessibility Improvements**.
-AccessLens runs the existing Inspector and bulk Fixer automatically, shows the number of
-verified text improvements, and watches for new content without Inspector highlights or a checklist.
-Turn the switch off or choose **Restore Original Page** to undo the changes.
+## How it works
 
-Mode changes restore the departing workflow's corrections and stop simulation/picking.
-Returning to Developer keeps its tabs and controls available. Improvements require activation
-for the current page; closing the panel, changing SPA routes, or navigating restores and disables them.
-Nothing is activated automatically on other websites.
+- **Extension:** [WXT](https://wxt.dev) (Manifest V3), React, TypeScript, Tailwind CSS and shadcn/ui (Radix). The panel lives in a shadow DOM, so page styles and ours never mix.
+- **Simulator:** SVG color matrices from the Machado, Oliveira and Fernandes (2009) model for color vision deficiencies, applied in linear RGB; CSS filters for cataracts, low contrast and blur. The page is filtered in sections so fixed headers and popups keep working. Visionless uses Chrome's `tts` API.
+- **Inspector:** [axe-core](https://github.com/dequelabs/axe-core) rules `color-contrast`, `color-contrast-enhanced`, `link-in-text-block` and `image-alt`, mapped into a shared issue format.
+- **Fixer:** [Culori](https://culorijs.org) searches a perceptual color space for the closest passing color, accounting for text opacity, the site's own palette and color-blind-safe choices. Previews are temporary inline styles that are restored exactly.
+- **User mode:** reuses the same scanner and fixing engine, verifies each change, and watches the page with a MutationObserver that rescans only what changed.
+- **Agent plugin:** a dependency-free MCP server that drives Chrome over the DevTools Protocol and reuses the Inspector and Fixer code, so the extension and the agent always agree.
 
-Try `demo-site/user-mode.html`. Run `npm run test:user`, `npm run test:user:e2e`, and
-`npm run test:bulk:e2e`. Browser tests use the repository's isolated real-Chrome/CDP harness.
-See [ownership, dynamic behavior, changed files, verification, and limitations](docs/user-mode.md).
+WCAG contrast is defined as $(L_1 + 0.05) / (L_2 + 0.05)$, where $L_1$ and $L_2$ are the relative
+luminances of the lighter and darker colors.
 
-## Visionless Lite
+## Project layout
 
-Reload the built extension for its new `tts` permission, then try
-[the Visionless playground](http://127.0.0.1:8081/visionless.html).
-Select Visionless from Simulator, use Tab/Shift+Tab and native Enter/Space,
-and press Escape to stop speech. Stop Speech and Exit Visionless remain in
-an unobscured panel. Local OS voices are required for narration.
+```
+entrypoints/        WXT background worker and content script
+src/components/     Panel and shared UI (shadcn/ui)
+src/features/
+  simulator/        Filters, simulation engine, Visionless
+  inspector/        axe-core runners, mapping, highlights
+  fixer/            Color suggester, previews, Fix all, alt text
+  user-mode/        Easier reading
+src/shared/         Shared types and handoff stores
+agent/              MCP server source, build script, smoke test
+agent-plugin/       Built Claude Code plugin (server, skill, manifest)
+demo-site/          Test and demo pages
+docs/               PRDs and implementation notes
+tests/              Unit tests (node:test, Vitest) and real-Chrome e2e tests
+```
 
-Run `npm run test:visionless` for Vitest coverage. See
-[implementation, files, validation and limitations](docs/simulator/visionless-lite.md).
+## Testing
+
+```sh
+npm run typecheck
+npm run test:unit         # contrast mapping, simulator, Fixer, panel position and size
+npm run test:fixer        # Fixer color search, previews, controller
+npm run test:bulk         # Fix all (Vitest)
+npm run test:user         # User mode (Vitest)
+npm run test:visionless   # Visionless (Vitest)
+npm run test:phase4       # Simulator in real Chrome, including cross-site checks
+npm run build:agent && npm run test:agent   # agent plugin end to end
+```
+
+The e2e tests launch Chrome with a temporary profile. Set `CHROME_PATH` if Chrome isn't found.
+
+## Limitations
+
+- Automated checks cover text contrast, color-only links and missing alt text. A clean scan **does not** mean a page is accessible: keyboard access, focus order, form labels, meaningful alt text and screen reader behavior still need people to test them.
+- Simulations are approximations for learning and testing, not anyone's lived experience. Cataracts and Low Contrast are illustrative filters, not clinical models.
+- Fixes are temporary previews. Apply them in your own source code.
+- Browser internal pages, the Chrome Web Store, PDFs and cross-origin iframes aren't supported.
+
+## Team
+
+Built at HackUMass 2026 by [Alan Achilles](https://github.com/alanNEF), [Sally Vakhtangishvili](https://github.com/Salikuna), [Anshuman](https://github.com/AnshumanT21) and [Aahana Garg](https://github.com/aahanagarg).
+
+## Credits
+
+- Color vision deficiency matrices: G. M. Machado, M. M. Oliveira and L. A. F. Fernandes, "A Physiologically-based Model for Simulation of Color Vision Deficiency", *IEEE TVCG*, 2009.
+- [axe-core](https://github.com/dequelabs/axe-core) by Deque Systems (MPL-2.0), [Culori](https://culorijs.org) (MIT), [WXT](https://wxt.dev), [shadcn/ui](https://ui.shadcn.com), [Lucide](https://lucide.dev).
+- Low-contrast statistics: [The WebAIM Million, 2026](https://webaim.org/projects/million/).
