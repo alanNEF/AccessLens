@@ -9,7 +9,7 @@ export async function runUserMode({ call, evaluate, waitFor, select, shadow, tri
   const ids = ['bulk-first', 'bulk-second', 'bulk-large', 'bulk-review', 'bulk-passing'];
   const styles = `${JSON.stringify(ids)}.map(id=>{const el=document.getElementById(id);return [id,el.hasAttribute('style'),[...el.style].map(p=>[p,el.style.getPropertyValue(p),el.style.getPropertyPriority(p)])]})`;
   const colors = `${JSON.stringify(ids)}.map(id=>getComputedStyle(document.getElementById(id)).color)`;
-  const bulk = `${shadow}.querySelector('section[aria-label="Bulk contrast corrections"]')`;
+  const bulk = `${shadow}.querySelector('section[aria-label="Bulk corrections"]')`;
   const frame = () => evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');
   async function tab(label) {
     const point = await evaluate(`(()=>{const n=[...${shadow}.querySelectorAll('[role=tab]')].find(n=>n.textContent===${JSON.stringify(label)});const r=n.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);
@@ -20,12 +20,12 @@ export async function runUserMode({ call, evaluate, waitFor, select, shadow, tri
   async function enabled(count) {
     await waitFor(`${status}?.textContent.includes('${count} ${count === 1 ? 'improvement' : 'improvements'} applied')`);
     assert.equal(await evaluate(`${toggle}.getAttribute('aria-checked')`), 'true');
-    assert.equal(await evaluate(`${shadow}.querySelectorAll('.inspector-highlight, [aria-label="Bulk contrast corrections"], [aria-label="AccessLens features"]').length`), 0);
+    assert.equal(await evaluate(`${shadow}.querySelectorAll('.inspector-highlight, [aria-label="Bulk corrections"], [aria-label="AccessLens features"]').length`), 0);
   }
   async function scanAndBulk() {
     await tab('Inspector');
     await select('Scan page');
-    await waitFor(`${shadow}.querySelector('section[aria-label="Failures"]')`);
+    await waitFor(`[...${shadow}.querySelectorAll('button')].some(button => button.textContent === 'Scan page' && !button.disabled)`);
     await tab('Fixer');
     await select('Run All Corrections');
     await waitFor(`${bulk}.getAttribute('aria-busy')==='false' && ${bulk}.querySelectorAll('input:checked').length===3`);

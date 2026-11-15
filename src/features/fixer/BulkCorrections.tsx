@@ -1,35 +1,58 @@
-import { useSyncExternalStore } from 'react';
+import { useId, useSyncExternalStore } from 'react';
 import { Wrench } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import type { InspectorStore } from '../inspector/inspector-store';
 import type { FixerController } from './fixer-controller';
+import type { BulkImageCorrection } from './bulk-corrections';
+
+function ImageCorrectionRow({ item, controller, busy }: { item: BulkImageCorrection; controller: FixerController; busy: boolean }) {
+  const inputId = useId();
+  return <li className="rounded-md border border-border p-2.5">
+    <label className="flex cursor-pointer items-start gap-2 text-xs font-medium">
+      <input type="checkbox" checked={item.enabled} disabled={busy}
+        onChange={event => controller.bulk.setImageEnabled(item.id, event.currentTarget.checked)}
+        className="mt-0.5 size-4 shrink-0 accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" />
+      <span className="min-w-0 break-all">Image alternative text — {item.issue.selector}</span>
+    </label>
+    <div className="mt-2 space-y-2 pl-6 text-xs text-muted-foreground">
+      <label htmlFor={inputId} className="block font-medium text-foreground">Alternative text for {item.issue.selector}</label>
+      <textarea id={inputId} value={item.text} disabled={busy} rows={3}
+        onChange={event => controller.bulk.setImageText(item.id, event.currentTarget.value)}
+        placeholder="Describe what this image communicates"
+        className="w-full rounded-md border border-border bg-background p-2 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" />
+      <p>{item.enabled ? 'Alt text temporarily applied on the page' : 'Enter a description, then select this correction to preview it.'}</p>
+      {item.failure && <p role="alert" className="text-destructive">{item.failure}</p>}
+    </div>
+  </li>;
+}
 
 export function BulkCorrections({ controller, inspector }: { controller: FixerController; inspector: InspectorStore }) {
   const state = useSyncExternalStore(controller.bulk.subscribe, controller.bulk.getState);
   const inspected = useSyncExternalStore(inspector.subscribe, inspector.getState);
   const generating = state.phase === 'generating';
-  const enabled = state.corrections.filter(item => item.enabled).length;
+  const enabled = state.corrections.filter(item => item.enabled).length + state.imageCorrections.filter(item => item.enabled).length;
+  const total = state.corrections.length + state.imageCorrections.length;
   const busy = generating || inspected.status === 'scanning' || inspected.picking;
 
   return (
-    <section aria-label="Bulk contrast corrections" aria-busy={generating} className="space-y-3 rounded-lg border border-border p-3">
+    <section aria-label="Bulk corrections" aria-busy={generating} className="space-y-3 rounded-lg border border-border p-3">
       <div>
-        <h3 className="text-sm font-semibold">Correct detected contrast issues</h3>
-        <p className="mt-1 text-xs text-muted-foreground">Generate temporary previews from Inspector’s current results.</p>
+        <h3 className="text-sm font-semibold">Correct detected issues</h3>
+        <p className="mt-1 text-xs text-muted-foreground">Preview contrast fixes and image descriptions from Inspector’s current results. Image descriptions need your input.</p>
       </div>
       <Button type="button" className="w-full" disabled={busy} onClick={() => {
         const items = inspected.picked ? [inspected.picked, ...inspected.issues] : inspected.issues;
-        void controller.bulk.run(items);
+        void controller.bulk.run(items, 'developer', { imageIssues: inspected.imageIssues });
       }}><Wrench aria-hidden="true" />{generating ? 'Generating corrections…' : 'Run All Corrections'}</Button>
 
       <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-muted-foreground">
         {generating ? 'Generating and validating supported corrections…'
           : state.phase === 'idle' ? 'Use Scan page in Inspector, then run all corrections.'
-            : state.corrections.length === 0 ? 'No supported corrections are available. Use Scan page in Inspector for current results.'
-              : `${enabled} of ${state.corrections.length} corrections enabled`}
+            : total === 0 ? 'No supported corrections are available. Use Scan page in Inspector for current results.'
+              : `${enabled} of ${total} corrections enabled`}
       </p>
 
-      {state.corrections.length > 0 && <>
+      {total > 0 && <>
         <h4 className="text-xs font-semibold">Generated Corrections</h4>
         <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" variant="outline" disabled={busy} onClick={() => controller.bulk.setAllEnabled(true)}>Select All</Button>
@@ -55,6 +78,7 @@ export function BulkCorrections({ controller, inspector }: { controller: FixerCo
               {item.failure && <p role="alert" className="text-destructive">{item.failure}</p>}
             </div>
           </li>)}
+          {state.imageCorrections.map(item => <ImageCorrectionRow key={item.id} item={item} controller={controller} busy={busy} />)}
         </ul>
       </>}
       {state.skipped > 0 && <p className="text-xs text-muted-foreground">{state.skipped} unsupported or manual-review {state.skipped === 1 ? 'result was' : 'results were'} skipped.</p>}

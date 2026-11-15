@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 /** Runs against the production extension using the existing isolated Chrome/CDP harness. */
 export async function runBulkCorrections({ call, evaluate, waitFor, select, shadow, triggerToolbar, work, url, deactivate }) {
-  const bulk = `${shadow}.querySelector('section[aria-label="Bulk contrast corrections"]')`;
+  const bulk = `${shadow}.querySelector('section[aria-label="Bulk corrections"]')`;
   const boxes = `${bulk}.querySelectorAll('input[type=checkbox]')`;
   const checked = `${bulk}.querySelectorAll('input:checked').length`;
   const frame = () => evaluate('new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))');
@@ -17,7 +17,7 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   async function scan() {
     await tab('Inspector');
     await select('Scan page');
-    await waitFor(`${shadow}.querySelector('section[aria-label="Failures"]')`);
+    await waitFor(`[...${shadow}.querySelectorAll('button')].some(button => button.textContent === 'Scan page' && !button.disabled)`);
     await tab('Fixer');
   }
   async function run() {
@@ -139,8 +139,77 @@ export async function runBulkCorrections({ call, evaluate, waitFor, select, shad
   }
   await scan();
   await run();
+  // The main demo includes an image with no alt attribute. Exercise both editors,
+  // shared bulk selection, persistence across tabs, rescans and extension cleanup.
+  await call('Page.navigate', { url });
+  await waitFor(`${shadow}?.querySelector('button')`);
+  const imagePageStyles = `[...document.querySelectorAll('main [id]')].map(element => [element.id, element.getAttribute('style')])`;
+  const originalImagePageStyles = await evaluate(imagePageStyles);
+  await scan();
+  await select('Run All Corrections');
+  await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
+  const image = `document.getElementById('unlabeled-image')`;
+  const imageRow = `[...${bulk}.querySelectorAll('li')].find(row => row.querySelector('textarea'))`;
+  const description = 'A red sun above green hills under a blue sky';
+  const editText = async (selector, text) => {
+    await evaluate(`(() => { const input=${selector}; Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(input,${JSON.stringify(text)}); input.dispatchEvent(new Event('input',{bubbles:true,composed:true})); })()`);
+    await frame();
+  };
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), null);
+  assert.equal(await evaluate(`${imageRow}.querySelector('input').checked`), false);
+  await editText(`${imageRow}.querySelector('textarea')`, description);
+  await evaluate(`${imageRow}.querySelector('input').click()`);
+  await frame();
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), description);
+  await tab('Inspector');
+  await select('Fix image');
+  assert.ok(await evaluate(`[...${shadow}.querySelectorAll('button')].some(button => button.textContent === 'Run All Corrections')`));
+  const selectedImage = `${shadow}.querySelector('section[aria-label="Selected image correction"]')`;
+  assert.equal(await evaluate(`${selectedImage}.querySelector('textarea').value`), description);
+  const edited = 'A red sun rising above green hills';
+  await editText(`${selectedImage}.querySelector('textarea')`, edited);
+  await select('Preview alt text');
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), edited);
+  await tab('Simulator');
+  await tab('Fixer');
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), edited);
+  await select('Run All Corrections');
+  await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
+  assert.equal(await evaluate(`${imageRow}.querySelector('textarea').value`), edited);
+  assert.equal(await evaluate(`${imageRow}.querySelector('input').checked`), true);
+  await select('Deselect All');
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), null);
+  await select('Select All');
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), edited);
+  await select('Restore Original');
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), null);
+  await select('Select All');
+  await scan();
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), null);
+  assert.equal(await evaluate(`${selectedImage}`), null);
+  await select('Run All Corrections');
+  await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
+  await editText(`${imageRow}.querySelector('textarea')`, description);
+  await select('Select All');
+  await triggerToolbar();
+  await waitFor(`!document.querySelector('accesslens-panel')`);
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), null);
+  await triggerToolbar();
+  await waitFor(`${shadow}?.querySelector('button')`);
+  await scan();
+  await select('Run All Corrections');
+  await waitFor(`${bulk}.getAttribute('aria-busy') === 'false' && ${bulk}.querySelectorAll('textarea').length === 1`);
+  await editText(`${imageRow}.querySelector('textarea')`, description);
+  await select('Select All');
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), description);
+  await evaluate(`${imageRow}.scrollIntoView({block:'center'})`);
+  await frame();
+  const imageScreenshot = await call('Page.captureScreenshot');
+  await writeFile(join(work, 'bulk-image-corrections.png'), Buffer.from(imageScreenshot.data, 'base64'));
+  console.log('PASS bulk image textbox/checkbox, individual image coexistence, shared drafts, tab persistence, repeat runs, restore, rescan and toolbar cleanup');
   await deactivate();
   await waitFor(`!document.querySelector('accesslens-panel')`);
-  assert.deepEqual(await evaluate(styles), original);
-  console.log('PASS actual extension uninstall restores all active bulk previews');
+  assert.equal(await evaluate(`${image}.getAttribute('alt')`), null);
+  assert.deepEqual(await evaluate(imagePageStyles), originalImagePageStyles);
+  console.log('PASS actual extension uninstall restores active image and contrast previews');
 }
